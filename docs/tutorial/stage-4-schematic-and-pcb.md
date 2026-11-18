@@ -26,7 +26,7 @@ Rather than importing the netlist manually and placing 48 footprints by hand in 
 
 ### AI Agent Prompt
 
-> *"Write `generate_kicad_pcb.py` using KiCad's `pcbnew` Python API and `kinet2pcb` to generate `EnvelopeFollower.kicad_pcb` from `envelope_follower.net`. Size the board for 6 HP (`29.60 x 107.00 mm`) centered behind a `30.00 x 128.50 mm` Doepfer 3U panel, place the 4 pots, LED, and 3 jacks on `F.Cu` aligned to an ergonomic panel grid using exact footprint-to-bushing offsets, flip `J_PWR` and all 39 SMT parts onto `B.Cu` grouped by subcircuit, add `-12V RED` / `+12V` silkscreen markings, and configure the `Power` netclass."*
+> *"Write `generate_kicad_pcb.py` using KiCad's `pcbnew` Python API and `kinet2pcb` to generate `EnvelopeFollower.kicad_pcb` from `envelope_follower.net`. Size the board for 6 HP (`29.60 x 107.00 mm`) centered behind a `30.00 x 128.50 mm` Doepfer 3U panel, place the 4 pots, LED, and 3 jacks on `F.Cu` aligned to an ergonomic panel grid using exact footprint-to-bushing offsets, flip `J_PWR` (oriented with Pin 1 / `-12V RED` at the bottom per Eurorack convention) and all 39 SMT parts onto `B.Cu` grouped by subcircuit, add `-12V RED` (bottom) / `+12V` (top) silkscreen markings, and configure the `Power` netclass."*
 
 ### How `generate_kicad_pcb.py` Works
 
@@ -54,7 +54,7 @@ Rather than importing the netlist manually and placing 48 footprints by hand in 
     | `J_INV_OUT` | `Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `(0.00, 6.48)` | `0°` | `(0.00, +6.48)` | `(122.00, 109.52)` | `(122.00, 116.00)` |
 
 3. **Single-Sided `B.Cu` Assembly & Rear Power Markings (Lines 76–123, 195–212)**:
-    Every SMT component (`U1`, `U2`, `D1`–`D5`, `C1`–`C8`, `R1`–`R23`, `R_GAIN_MIN`) and the rear `J_PWR` header are flipped to `B.Cu` (keeping JLCPCB assembly single-sided). Local bypass capacitors (`C5`–`C8`) hug Pins 4 and 11 of `U1` and `U2`, while `B.SilkS` labels mark `-12V RED`, `+12V`, and `ENV FOLLOWER 6HP`.
+    Every SMT component (`U1`, `U2`, `D1`–`D5`, `C1`–`C8`, `R1`–`R23`, `R_GAIN_MIN`) and the rear `J_PWR` header are flipped to `B.Cu` (keeping JLCPCB assembly single-sided). `J_PWR` is oriented at `0°` on `B.Cu` so Pins 1–2 (`-12V_RAW`) sit at the **bottom** (`-12V RED` silkscreen) and Pins 9–10 (`+12V_RAW`) sit at the **top** (`+12V` silkscreen) per Eurorack standard, while local bypass capacitors (`C5`–`C8`) hug Pins 4 and 11 of `U1` and `U2`, and `B.SilkS` labels mark `ENV FOLLOWER 6HP`.
 
 Run the script to generate [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb):
 

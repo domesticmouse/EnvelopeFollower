@@ -64,7 +64,7 @@ Packaged fabrication archive at production/EnvelopeFollower_Panel.zip
 
 - **Doepfer A-100 3U Mounting Slots (`H1`, `H2`)**: Oval `5.5 x 3.2 mm` NPTH slots centered at panel-local `(7.50, 3.00)` and `(7.50, 125.50)` fit both fixed threaded rail strips and sliding M3 nuts.
 - **Blemish-Free Front Shielding (`(layers "*.Cu" "B.Mask")`)**: Pot (`7.2 mm`) and jack (`6.2 mm`) holes use plated through-hole pads connected solidly to the `F.Cu` and `B.Cu` `GND` shield zones. Leaving `F.Mask` tented over the front copper ring yields a clean exterior surface around the M6/M7 nuts, while exposing `B.Mask` on the rear automatically grounds the entire front panel shield to chassis `GND` when the hardware nuts tighten against the back face.
-- **Silkscreen Clarity & Input Callout Box**: Generic part values (`100k`, `50k`, `1M`, `3.5mm_Jack`, `LED_3mm`) map cleanly to `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, with `JLCJLCJLCJLC` placed on `B.SilkS` for JLCPCB's order-number barcode.
+- **Silkscreen Clarity & Input Callout Box**: Generic part values (`100k`, `50k`, `1M`, `3.5mm_Jack`, `LED_3mm`) map cleanly to `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, with a `5 × 5 mm` white square placed on `B.SilkS` that JLCPCB replaces with a QR code during ordering.
 
 | 3U Front Panel (`F.Cu` / `F.SilkS`) | 3U Front Panel Rear (`B.Cu` / Grounding Rings) |
 | :---: | :---: |

@@ -229,7 +229,7 @@ Rather than importing the netlist manually and placing 48 footprints by hand in 
 
 ### AI Agent Prompt
 
-> *"Write `generate_kicad_pcb.py` using KiCad's `pcbnew` Python API and `kinet2pcb` to generate `EnvelopeFollower.kicad_pcb` from `envelope_follower.net`. Size the board for 6 HP (`29.60 x 107.00 mm`) centered behind a `30.00 x 128.50 mm` Doepfer 3U panel, place the 4 pots, LED, and 3 jacks on `F.Cu` aligned to an ergonomic panel grid using exact footprint-to-bushing offsets, flip `J_PWR` and all 39 SMT parts onto `B.Cu` grouped by subcircuit, add `-12V RED` / `+12V` silkscreen markings, and configure the `Power` netclass."*
+> *"Write `generate_kicad_pcb.py` using KiCad's `pcbnew` Python API and `kinet2pcb` to generate `EnvelopeFollower.kicad_pcb` from `envelope_follower.net`. Size the board for 6 HP (`29.60 x 107.00 mm`) centered behind a `30.00 x 128.50 mm` Doepfer 3U panel, place the 4 pots, LED, and 3 jacks on `F.Cu` aligned to an ergonomic panel grid using exact footprint-to-bushing offsets, flip `J_PWR` (oriented with Pin 1 / `-12V RED` at the bottom per Eurorack convention) and all 39 SMT parts onto `B.Cu` grouped by subcircuit, add `-12V RED` (bottom) / `+12V` (top) silkscreen markings, and configure the `Power` netclass."*
 
 ### How `generate_kicad_pcb.py` Works
 
@@ -254,7 +254,7 @@ Rather than importing the netlist manually and placing 48 footprints by hand in 
    | `J_INV_OUT` | `Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `(0.00, 6.48)` | `0°` | `(0.00, +6.48)` | `(122.00, 109.52)` | `(122.00, 116.00)` |
 
 3. **Single-Sided `B.Cu` Assembly & Rear Power Markings (Lines 76–123, 195–212)**:
-   Every SMT component (`U1`, `U2`, `D1`–`D5`, `C1`–`C8`, `R1`–`R23`, `R_GAIN_MIN`) and the rear `J_PWR` header are flipped to `B.Cu` (keeping JLCPCB assembly single-sided). Local bypass capacitors (`C5`–`C8`) hug Pins 4 and 11 of `U1` and `U2`, while `B.SilkS` labels mark `-12V RED`, `+12V`, and `ENV FOLLOWER 6HP`.
+   Every SMT component (`U1`, `U2`, `D1`–`D5`, `C1`–`C8`, `R1`–`R23`, `R_GAIN_MIN`) and the rear `J_PWR` header are flipped to `B.Cu` (keeping JLCPCB assembly single-sided). `J_PWR` is oriented at `0°` on `B.Cu` so Pins 1–2 (`-12V_RAW`) sit at the **bottom** (`-12V RED` silkscreen) and Pins 9–10 (`+12V_RAW`) sit at the **top** (`+12V` silkscreen) per Eurorack standard, while local bypass capacitors (`C5`–`C8`) hug Pins 4 and 11 of `U1` and `U2`, and `B.SilkS` labels mark `ENV FOLLOWER 6HP`.
 
 Run the script to generate [`EnvelopeFollower.kicad_pcb`](EnvelopeFollower.kicad_pcb):
 
@@ -380,7 +380,7 @@ Packaged fabrication archive at production/EnvelopeFollower_Panel.zip
 
 - **Doepfer A-100 3U Mounting Slots (`H1`, `H2`)**: Oval `5.5 x 3.2 mm` NPTH slots centered at panel-local `(7.50, 3.00)` and `(7.50, 125.50)` fit both fixed threaded rail strips and sliding M3 nuts.
 - **Blemish-Free Front Shielding (`(layers "*.Cu" "B.Mask")`)**: Pot (`7.2 mm`) and jack (`6.2 mm`) holes use plated through-hole pads connected solidly to the `F.Cu` and `B.Cu` `GND` shield zones. Leaving `F.Mask` tented over the front copper ring yields a clean exterior surface around the M6/M7 nuts, while exposing `B.Mask` on the rear automatically grounds the entire front panel shield to chassis `GND` when the hardware nuts tighten against the back face.
-- **Silkscreen Clarity & Input Callout Box**: Generic part values (`100k`, `50k`, `1M`, `3.5mm_Jack`, `LED_3mm`) map cleanly to `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, with `JLCJLCJLCJLC` placed on `B.SilkS` for JLCPCB's order-number barcode.
+- **Silkscreen Clarity & Input Callout Box**: Generic part values (`100k`, `50k`, `1M`, `3.5mm_Jack`, `LED_3mm`) map cleanly to `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, with a `5 × 5 mm` white square placed on `B.SilkS` that JLCPCB replaces with a QR code during ordering.
 
 | 3U Front Panel (`F.Cu` / `F.SilkS`) | 3U Front Panel Rear (`B.Cu` / Grounding Rings) |
 | :---: | :---: |
@@ -434,13 +434,13 @@ mkdir -p production/main
    - Upload [`jlcpcb_bom.csv`](jlcpcb_bom.csv) and `EnvelopeFollower_cpl.csv`.
    - Always inspect the 3D SMT assembly preview for Pin-1 / cathode orientation on `U1`, `U2` (`TL074HIDR`), `D1`–`D3` (`1N4148W`), `D4`–`D5` (`B5819W`), and polarized electrolytics `C3`–`C4`.
 2. **Front Panel PCB (`production/EnvelopeFollower_Panel.zip`)**:
-   - Upload `production/EnvelopeFollower_Panel.zip` (`1.6 mm` FR4, **Black** solder mask with **White** silkscreen, **Specify a location** for order number over `JLCJLCJLCJLC` on `B.SilkS`). No assembly needed.
+   - Upload `production/EnvelopeFollower_Panel.zip` (`1.6 mm` FR4, **Black** solder mask with **White** silkscreen, **Specify a location** for the order QR code over the `5 × 5 mm` white square on `B.SilkS`, which JLCPCB replaces with a QR code during ordering). No assembly needed.
 
 ### 7.3 Stress-Free Mechanical Assembly
 
 When your PCBs arrive and you hand-solder the 9 `Manual THT` parts (`J_PWR` on the rear, plus `RV_GAIN`, `RV_ATK`, `RV_REL`, `RV_OFFSET`, `J_IN`, `J_OUT`, `J_INV_OUT`, and `LED1` on the front):
 
-1. Solder `J_PWR` on `B.Cu` first (confirming Pin 1/Pin 2 aligns with the `-12V RED` silkscreen label).
+1. Solder `J_PWR` on `B.Cu` first (confirming Pin 1/Pin 2 (`-12V`) is at the bottom, aligned with the `-12V RED` silkscreen label).
 2. Insert all four pots, three jacks, and the 3mm LED **unsoldered** into `F.Cu` of the main PCB.
 3. Place the 3U front panel over the shafts and bushings, tighten the M6/M7 panel nuts finger-tight, and position `LED1` flush inside its `3.2 mm` bezel hole.
 4. **Only after the front panel aligns everything mechanically**, solder all pot lugs, jack pins, and LED leads on `B.Cu`. This guarantees zero mechanical stress on solder joints and perfectly centered front-panel controls.

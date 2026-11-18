@@ -48,3 +48,22 @@ In KiCad's coordinate system ($X$ right, $Y$ down) where a footprint is placed a
   $$\Delta X = c_x \cos(\theta) + c_y \sin(\theta), \quad \Delta Y = -c_x \sin(\theta) + c_y \cos(\theta)$$
   where $\theta = \text{radians}(\text{ROT\_DEG})$.
 - Always verify against the footprint's `fp_circle` on `F.Fab` or `F.SilkS`.
+
+---
+
+## 3. Eurorack Rear Power Header (`J_PWR`) Orientation & `B.Cu` Flip Geometry
+
+By Doepfer A-100 convention, the rear 10-pin (`2×5`) or 16-pin (`2×8`) Eurorack IDC power header is mounted with **Pin 1 / Pin 2 (`-12V`, red ribbon stripe) at the bottom** and **`+12V` (`Pin 9/10` on 10-pin, `Pin 9/10` + `+5V`/`CV`/`Gate` above on 16-pin) at the top**.
+
+### KiCad `pcbnew` `fp.Flip()` Behavior (`Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical`)
+Inside KiCad's default `IDC-Header_2x05_P2.54mm_Vertical` footprint:
+- Pin 1 is at `(0.00, 0.00)`, Pin 2 is at `(2.54, 0.00)`, and Pins 9–10 are at `(0.00, +10.16)` / `(2.54, +10.16)` on `F.Cu`.
+- Calling `fp.Flip(VECTOR2I(0, 0), False)` in `pcbnew` moves the footprint to `B.Cu` and **mirrors local $Y$** across the X-axis:
+  - Pin 1 / Pin 2 remain at `(0.00, 0.00)` and `(2.54, 0.00)`.
+  - Pin 9 / Pin 10 move to `(0.00, -10.16)` and `(2.54, -10.16)`.
+- **Correct Orientation on `B.Cu`**:
+  - **`rot = 0°` (Correct Eurorack Standard)**: Pin 1/2 (`-12V RED`) sit at the **bottom** (larger global $Y$), while Pin 9/10 (`+12V`) sit `10.16 mm` above at the **top** (smaller global $Y$).
+  - **`rot = 180°` (Upside Down — Avoid)**: Flips local $-Y$ back to $+Y$, placing Pin 1/2 at the top and `+12V` at the bottom.
+- **Shroud & Pin-1 Arrow Clearances (`B.Cu`, `rot = 0°`)**:
+  - Shroud silkscreen (`B.SilkS`) spans `X: [-3.29, +5.83]` mm and `Y: [-15.37, +5.21]` mm relative to Pin 1, with physical center at `(+1.27, -5.08)` mm.
+  - The Pin 1 triangle marker on `B.SilkS` extends outward to `X = -3.68 .. -4.68 mm`, `Y = -0.50 .. +0.50 mm` relative to Pin 1. Keep it clear of bottom-row jack/pot THT pads and solder mask openings to prevent `silk_over_copper` DRC warnings.

@@ -74,7 +74,7 @@ COMPONENT_PLACEMENTS: dict[str, tuple[float, float, float, str]] = {
     "J_OUT": (108.00, 109.52, 0.0, "F"),
     "J_INV_OUT": (122.00, 109.52, 0.0, "F"),
     # --- Rear Power Entry & Protection (B.Cu) ---
-    "J_PWR": (116.27, 110.20, 180.0, "B"),
+    "J_PWR": (113.73, 119.20, 0.0, "B"),
     "D5": (111.50, 97.50, 90.0, "B"),
     "D4": (117.50, 97.50, 90.0, "B"),
     "C4": (111.90, 91.00, 90.0, "B"),
@@ -195,8 +195,8 @@ def add_board_outline(brd: pcbnew.BOARD) -> None:
 def add_rear_silkscreen(brd: pcbnew.BOARD) -> None:
     """Add rear power polarity and module title labels on B.SilkS."""
     labels = [
-        ("-12V RED", 115.00, 103.50, 0.8, 0.13),
-        ("+12V", 115.00, 126.85, 0.8, 0.13),
+        ("+12V", 115.00, 102.70, 0.8, 0.13),
+        ("-12V RED", 115.00, 125.70, 0.8, 0.13),
         ("ENV FOLLOWER 6HP", 115.00, 22.80, 1.0, 0.15),
     ]
     for text, x_mm, y_mm, size_mm, thick_mm in labels:
@@ -268,7 +268,7 @@ def generate_pcb(
         # to avoid silkscreen-over-pad clutter and DRC silkscreen warnings.
         if ref == "J_PWR":
             fp.Reference().SetPosition(
-                pcbnew.VECTOR2I(pcbnew.FromMM(115.00), pcbnew.FromMM(101.80))
+                pcbnew.VECTOR2I(pcbnew.FromMM(115.00), pcbnew.FromMM(101.20))
             )
             fp.Reference().SetTextSize(
                 pcbnew.VECTOR2I(pcbnew.FromMM(0.8), pcbnew.FromMM(0.8))
@@ -304,7 +304,7 @@ def generate_pcb(
     pcbnew.SaveBoard(str(pcb_path), brd)
     print(
         f"Generated {pcb_path.name}: {len(placed_refs)} footprints, "
-        f"{brd.GetNetCount()} nets, outline "
+        f"{brd.GetNetCount() - 1} nets, outline "
         f"{BOARD_MAX_X - BOARD_MIN_X:.2f} x {BOARD_MAX_Y - BOARD_MIN_Y:.2f} mm."
     )
 

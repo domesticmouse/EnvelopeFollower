@@ -680,16 +680,16 @@ def build_panel_sexpr(
     footer_subtitle_y = round(footer_line_y + 3.2, 2)
 
     default_rear_title_y = round(panel_y1 - 26.0, 2)
-    default_rear_jlc_y = round(panel_y1 - 22.0, 2)
+    default_rear_jlc_y = round(panel_y1 - 21.0, 2)
     if not has_wide_intergroup_gap:
         rear_pad_conflict = any(
             abs(j["bushing_y"] - default_rear_title_y) < 6.5
-            or abs(j["bushing_y"] - default_rear_jlc_y) < 6.5
+            or abs(j["bushing_y"] - default_rear_jlc_y) < 8.0
             for j in jacks
         )
         if rear_pad_conflict and rows:
             rear_title_y = round(rows[-1][0]["bushing_y"] + 8.5, 2)
-            rear_jlc_y = round(rows[-1][0]["bushing_y"] + 12.0, 2)
+            rear_jlc_y = round(rows[-1][0]["bushing_y"] + 13.0, 2)
         else:
             rear_title_y = default_rear_title_y
             rear_jlc_y = default_rear_jlc_y
@@ -857,17 +857,16 @@ def build_panel_sexpr(
 \t\t\t)
 \t\t)
 \t)
-\t(gr_text "JLCJLCJLCJLC"
-\t\t(at {center_x:g} {rear_jlc_y:g} 0)
-\t\t(layer "B.SilkS")
-\t\t(uuid "{det_uuid(ns, "jlc_order_placeholder")}")
-\t\t(effects
-\t\t\t(font
-\t\t\t\t(size 1.0 1.0)
-\t\t\t\t(thickness 0.15)
-\t\t\t)
-\t\t\t(justify mirror)
+\t(gr_rect
+\t\t(start {center_x - 2.5:g} {rear_jlc_y - 2.5:g})
+\t\t(end {center_x + 2.5:g} {rear_jlc_y + 2.5:g})
+\t\t(stroke
+\t\t\t(width 0.1)
+\t\t\t(type solid)
 \t\t)
+\t\t(fill yes)
+\t\t(layer "B.SilkS")
+\t\t(uuid "{det_uuid(ns, "jlc_qr_placeholder")}")
 \t)
 \t(gr_text "{title} {hp}HP"
 \t\t(at {center_x:g} {rear_title_y:g} 0)

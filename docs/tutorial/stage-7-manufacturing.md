@@ -33,13 +33,13 @@ mkdir -p production/main
     - Upload [`jlcpcb_bom.csv`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/jlcpcb_bom.csv) and `EnvelopeFollower_cpl.csv`.
     - Always inspect the 3D SMT assembly preview for Pin-1 / cathode orientation on `U1`, `U2` (`TL074HIDR`), `D1`–`D3` (`1N4148W`), `D4`–`D5` (`B5819W`), and polarized electrolytics `C3`–`C4`.
 2. **Front Panel PCB ([`production/EnvelopeFollower_Panel.zip`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/production/EnvelopeFollower_Panel.zip))**:
-    - Upload `production/EnvelopeFollower_Panel.zip` (`1.6 mm` FR4, **Black** solder mask with **White** silkscreen, **Specify a location** for order number over `JLCJLCJLCJLC` on `B.SilkS`). No assembly needed.
+    - Upload `production/EnvelopeFollower_Panel.zip` (`1.6 mm` FR4, **Black** solder mask with **White** silkscreen, **Specify a location** for the order QR code over the `5 × 5 mm` white square on `B.SilkS`, which JLCPCB replaces with a QR code during ordering). No assembly needed.
 
 ## 7.3 Stress-Free Mechanical Assembly
 
 When your PCBs arrive and you hand-solder the 9 `Manual THT` parts (`J_PWR` on the rear, plus `RV_GAIN`, `RV_ATK`, `RV_REL`, `RV_OFFSET`, `J_IN`, `J_OUT`, `J_INV_OUT`, and `LED1` on the front):
 
-1. Solder `J_PWR` on `B.Cu` first (confirming Pin 1/Pin 2 aligns with the `-12V RED` silkscreen label).
+1. Solder `J_PWR` on `B.Cu` first (confirming Pin 1/Pin 2 (`-12V`) is at the bottom, aligned with the `-12V RED` silkscreen label).
 2. Insert all four pots, three jacks, and the 3mm LED **unsoldered** into `F.Cu` of the main PCB.
 3. Place the 3U front panel over the shafts and bushings, tighten the M6/M7 panel nuts finger-tight, and position `LED1` flush inside its `3.2 mm` bezel hole.
 4. **Only after the front panel aligns everything mechanically**, solder all pot lugs, jack pins, and LED leads on `B.Cu`. This guarantees zero mechanical stress on solder joints and perfectly centered front-panel controls.

@@ -30,7 +30,10 @@ This skill automates the mechanical alignment, KiCad `.kicad_pcb` generation, DR
    - Use plated through-holes (`thru_hole circle`, `6.2 mm` drill, `8.6 mm` pad) with `(layers "*.Cu" "B.Mask")` on jack cutouts:
      - **Front (`F.Cu` / `F.Mask`)**: Solid zone connection (`(connect_pads yes)`) tented under solder mask for a smooth, blemish-free exterior finish with zero thermal-spoke shadows or exposed copper rings around the `9.5 mm` M6 nuts.
      - **Back (`B.Cu` / `B.Mask`)**: Exposed `8.6 mm` gold/HASL grounding ring so tightening the jack nuts or resting the jack bushing shoulders automatically bonds both `F.Cu` and `B.Cu` shield planes to chassis `GND`.
-   - Place **`JLCJLCJLCJLC`** on `B.SilkS` (mirrored) so the PCB manufacturer prints the order barcode on the rear face.
+   - Place a **`5.0 × 5.0 mm` filled white silkscreen square** (`gr_rect` with `(fill yes)` on `B.SilkS`) on the rear face so JLCPCB replaces it with a 2D QR code during ordering.
+4. **Rear Eurorack Power Header (`J_PWR`) Orientation (`B.Cu`)**:
+   - Standard Doepfer A-100 Eurorack convention mounts the shrouded 10-pin/16-pin IDC power header on the rear (`B.Cu`) with **Pin 1 / Pin 2 (`-12V`, red stripe) at the bottom** edge of the module and **Pin 9 / Pin 10 (`+12V` on 10-pin) at the top**.
+   - **KiCad `pcbnew` `fp.Flip()` Pitfall**: On `Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical`, flipping the footprint onto `B.Cu` mirrors local $Y$ so Pin 1 is at `(0, 0)` and Pin 9/10 is at `(0, -10.16)`. Therefore, setting orientation to **`0°` on `B.Cu`** places Pin 1/2 at the **bottom** (larger global $Y$) and Pin 9/10 at the **top** (smaller global $Y$), whereas `180°` flips the header upside down. See [Eurorack Mechanical Specification & KiCad Footprint Offsets](./references/eurorack_mechanical_spec.md) for the exact shroud and Pin-1 arrow clearances.
 
 ---
 
