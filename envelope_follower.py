@@ -39,6 +39,7 @@ from skidl import (
     Part,
     erc_assert,
     generate_netlist,
+    generate_schematic,
     generate_xml,
     subcircuit,
 )
@@ -507,8 +508,24 @@ def build_circuit():
 
 
 if __name__ == "__main__":
+    import schematizer.engine.gen_schematic as _gs
+
+    # Disable two-pin snapping in schematizer so series protection diodes (D4, D5)
+    # do not overlap J_PWR pins and short -12V_RAW to GND.
+    _gs._snap_two_pin_parts = lambda node: None
+
     build_circuit()
     ERC()
     generate_netlist(file_="envelope_follower.net")
     generate_xml(file_="envelope_follower_bom.xml")
     generate_jlcpcb_bom(file_="jlcpcb_bom.csv")
+    generate_schematic(
+        filepath=".",
+        top_name="EnvelopeFollower",
+        title="Eurorack Analog Envelope Follower",
+        flatness=1.0,
+        auto_stub=True,
+        label_clearance=True,
+    )
+    if os.path.exists("EnvelopeFollower-erc.rpt"):
+        os.remove("EnvelopeFollower-erc.rpt")

@@ -34,10 +34,10 @@ envelope_follower = SchLib(tool=SKIDL).add_parts(
             ],
             unit_defs=[
                 {"label": "uA", "num": 1, "pin_nums": ["3", "2", "1"]},
-                {"label": "uB", "num": 2, "pin_nums": ["6", "5", "7"]},
-                {"label": "uC", "num": 3, "pin_nums": ["10", "9", "8"]},
+                {"label": "uB", "num": 2, "pin_nums": ["7", "6", "5"]},
+                {"label": "uC", "num": 3, "pin_nums": ["8", "10", "9"]},
                 {"label": "uD", "num": 4, "pin_nums": ["14", "13", "12"]},
-                {"label": "uE", "num": 5, "pin_nums": ["4", "11"]},
+                {"label": "uE", "num": 5, "pin_nums": ["11", "4"]},
             ],
         ),
         Part(
