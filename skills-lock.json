@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "skills": {
+    "eurorack-panel": {
+      "source": "domesticmouse/skills",
+      "commit": "a6a249ef9aafc49ac54332e366b3079add2977c7",
+      "sourceType": "github",
+      "skillPath": "packs/hardware/eurorack-panel/SKILL.md",
+      "computedHash": "c7da92907256ec9807df7a5e92543862ca0cea81ca6080ea045d7e1fb5fa33fd"
+    },
+    "kicad": {
+      "source": "aklofas/kicad-happy",
+      "sourceType": "github",
+      "skillPath": "skills/kicad/SKILL.md",
+      "computedHash": "a358e73836e50f73cfec76165fecc5ba94b0db9169e917f610d7eab9be8407ca"
+    },
+    "skidl": {
+      "source": "domesticmouse/skills",
+      "commit": "a6a249ef9aafc49ac54332e366b3079add2977c7",
+      "sourceType": "github",
+      "skillPath": "packs/hardware/skidl/SKILL.md",
+      "computedHash": "a6c1af33b809deaf5053d641c3ca72173f6f606040ff36588cbb5881dfe6db71"
+    }
+  }
+}

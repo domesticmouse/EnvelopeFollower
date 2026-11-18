@@ -1,0 +1,89 @@
+# Envelope Follower
+
+A Eurorack analog envelope follower module designed for KiCad, accompanied by a complete netlist specification and build checklist.
+
+The original schematic is based on Hagiwo's [$4 Envelope Follower module - DIY Eurorack Modular Synthesizer](https://note.com/solder_state/n/n110e9ba066b3).
+
+![Hagiwo's Envelope Follower Schematic](EnvelopeFollower.webp)
+
+---
+
+## ⚡ Improved Circuit Overview
+
+This repository adapts Hagiwo's original circuit for modern **Texas Instruments TL074H** quad op-amps, introducing enhancements for stability, low-noise performance, and hardware protection:
+
+1. **Dual TL074H Quad Op-Amp Configuration (6 Active Channels)**:
+   - **U1 (TL074H)**: $U1A$ Input Gain Stage, $U1B$ Half-Wave Precision Rectifier, $U1C$ Summing Precision Rectifier, $U1D$ Output Amplifier & Offset Stage.
+   - **U2 (TL074H)**: $U2A$ Inverting Output Buffer, $U2B$ LED Driver Buffer.
+   - **Unused Op-Amp Termination ($U2C$, $U2D$)**: Unused channels are configured as unity-gain followers with non-inverting inputs ($+$) grounded to prevent floating inputs, parasitic oscillation, and excessive power draw.
+
+2. **Gain Control Minimum Series Resistor**:
+   - Added $R_{\text{GAIN\_MIN}} = 1\text{ k}\Omega$ in series with the $100\text{ k}\Omega$ gain potentiometer (`RV_GAIN`). This prevents setting closed-loop feedback resistance to $0\,\Omega$ at minimum pot travel, avoiding pot wiper contact noise and op-amp loading.
+
+3. **High-Frequency Supply Decoupling**:
+   - Four $100\text{ nF}$ ceramic bypass capacitors ($C_5$–$C_8$) placed directly at the $V_{CC+}$ (Pin 4) and $V_{CC-}$ (Pin 11) pins of each TL074H IC to suppress high-frequency noise and oscillation.
+
+4. **Power & Output Protection**:
+   - **Reverse Polarity Protection**: Schottky diodes ($D_4, D_5$ / 1N5817) on $+12\text{V}$ and $-12\text{V}$ supply lines.
+   - **Short Circuit Protection**: $1\text{ k}\Omega$ output resistors ($R_{16}, R_{19}$) on `J_OUT` and `J_INV_OUT` jacks to protect against patch cable shorts.
+
+5. **Precision Rectification**:
+   - Recommended 1% metal film resistors ($10\text{ k}\Omega, 22\text{ k}\Omega$) in the full-wave rectifier stage for balanced positive and negative peak response.
+
+---
+
+## 🔄 Signal Flow & Functional Blocks
+
+The circuit is partitioned into six functional blocks (matching [`ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`](ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md)):
+
+1. **Power Entry, Protection & Decoupling (`J_PWR`, `D4`–`D5`, `C3`–`C8`)**:
+   Eurorack $\pm 12\text{V}$ 10-pin power entry through 1N5817 Schottky reverse-polarity diodes (`D4`, `D5`), $4.7\,\mu\text{F}$ bulk electrolytics (`C3`, `C4`), and local $100\text{ nF}$ ceramic IC bypass capacitors (`C5`–`C8`).
+2. **Input Coupling & Gain Stage (`U1A`)**:
+   AC-coupled input (`J_IN`, `C1` $4.7\,\mu\text{F}$, `R1` $1\text{ M}\Omega$ pulldown) driving an inverting op-amp stage (`R2` $10\text{ k}\Omega$, `RV_GAIN` $100\text{ k}\Omega$, `R_GAIN_MIN` $1\text{ k}\Omega$).
+3. **Precision Full-Wave Rectifier (`U1B`, `U1C`)**:
+   `U1B` with 1N4148 diodes (`D1`, `D2`) and $10\text{ k}\Omega$ resistors (`R3`, `R4`) forms an active half-wave rectifier, which `U1C` sums (`R7` $10\text{ k}\Omega$) against the direct signal (`R5` + `R6`, $20\text{ k}\Omega$ total) with a $22\text{ k}\Omega$ feedback resistor (`R8`).
+4. **Peak Detector & Envelope Timing**:
+   1N4148 diode `D3` charges the $1\,\mu\text{F}$ smoothing capacitor `C2` through `RV_ATK` ($50\text{ k}\Omega$ attack control) and discharges through `R9` ($1\text{ k}\Omega$), `R10` ($10\text{ k}\Omega$), and `RV_REL` ($1\text{ M}\Omega$ release control).
+5. **Output Amplifier & DC Offset Stage (`U1D`)**:
+   Follows the envelope voltage on Pin 12 ($+$) while summing an adjustable $\pm 12\text{V}$ DC bias (`R11`, `R12`, `RV_OFFSET`, `R13`, `R14`, `R15`) at Pin 13 ($-$) and driving `J_OUT` through `R16` ($1\text{ k}\Omega$).
+6. **Inverted Output, LED Driver & Termination (`U2A`–`U2D`)**:
+   - `U2A`: Unity-gain inverting stage (`R17` = `R18` = $10\text{ k}\Omega$) driving `J_INV_OUT` through `R19` ($1\text{ k}\Omega$).
+   - `U2B`: Unity-gain LED buffer (`R20` $10\text{ k}\Omega$ input isolation, `R21` $22\text{ k}\Omega$ current limit) driving `LED1` against a cathode bias divider (`R22` $10\text{ k}\Omega$ to `GND`, `R23` $33\text{ k}\Omega$ to $-12\text{V}$).
+   - `U2C`, `U2D`: Terminated as unity-gain followers with non-inverting inputs tied to `GND`.
+
+---
+
+## 🎛️ Controls & I/O Summary
+
+| Reference | Component / Value | Taper / Type | Function |
+| :--- | :--- | :--- | :--- |
+| **`RV_GAIN`** | $100\text{ k}\Omega$ Potentiometer | Linear / Log | Input Gain Control |
+| **`RV_ATK`** | $50\text{ k}\Omega$ Potentiometer | Linear | Attack Time Control |
+| **`RV_REL`** | $1\text{ M}\Omega$ Potentiometer | Audio / Log | Release Time Control |
+| **`RV_OFFSET`** | $100\text{ k}\Omega$ Potentiometer | Linear | Output DC Offset Adjust |
+| **`J_IN`** | 3.5mm Mono Jack | Switched | Audio / CV Input |
+| **`J_OUT`** | 3.5mm Mono Jack | Switched | Non-Inverted Envelope CV Output |
+| **`J_INV_OUT`** | 3.5mm Mono Jack | Switched | Inverted Envelope CV Output |
+| **`LED1`** | 3mm / 5mm LED | Red / Blue / Green | Envelope Signal Level Indicator |
+| **`J_PWR`** | 2x5 Shrouded Header | 10-Pin Eurorack | $\pm 12\text{V}$ & `GND` Power Input |
+
+---
+
+## 📄 Documentation & Netlist
+
+For complete BOM details, pin-by-pin net connections, and step-by-step KiCad capture instructions, see:
+
+* [**`ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`**](ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md) – Full Bill of Materials, 35-Net Connection List, and 8-Step KiCad Build Checklist.
+
+---
+
+## 📁 Repository Structure
+
+```text
+EnvelopeFollower/
+├── README.md                              # Project overview & documentation
+├── ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md  # Complete BOM, netlist, and KiCad capture checklist
+├── EnvelopeFollower.webp                  # Original Hagiwo hand-drawn reference schematic
+├── skills-lock.json                       # Agent skill lockfile
+└── .agents/skills/                        # Installed hardware skills (kicad, skidl, eurorack-panel)
+```
