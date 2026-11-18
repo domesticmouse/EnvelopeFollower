@@ -1,6 +1,6 @@
 # Stage 2: Interpreting Hagiwo's Sketch & Designing Production Upgrades
 
-Start from the original hand-drawn reference schematic, [`EnvelopeFollower.webp`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.webp):
+Start from [Hagiwo's original post](https://note.com/solder_state/n/n110e9ba066b3?hl=en) and the hand-drawn reference schematic, [`EnvelopeFollower.webp`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.webp):
 
 ![Hagiwo's Original Envelope Follower Sketch](../images/EnvelopeFollower.webp)
 

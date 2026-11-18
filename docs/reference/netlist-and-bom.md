@@ -1,6 +1,6 @@
 # Envelope Follower — Netlist, BOM & KiCad Capture Guide
 
-This reference provides the complete Bill of Materials, 35-net connection list, and manual KiCad capture checklist for the improved Eurorack Envelope Follower based on Hagiwo's original design, updated for modern Texas Instruments **TL074H** quad op-amps (source: [`ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md)).
+This reference provides the complete Bill of Materials, 35-net connection list, and manual KiCad capture checklist for the improved Eurorack Envelope Follower based on [Hagiwo's original design](https://note.com/solder_state/n/n110e9ba066b3?hl=en), updated for modern Texas Instruments **TL074H** quad op-amps (source: [`ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md)).
 
 ---
 

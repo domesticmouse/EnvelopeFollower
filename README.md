@@ -2,7 +2,7 @@
 
 A Eurorack analog envelope follower module designed for KiCad, defined in SKiDL with a generated KiCad netlist, JLCPCB PCBA BOM, complete netlist specification, and build checklist.
 
-The original schematic is based on Hagiwo's [$4 Envelope Follower module - DIY Eurorack Modular Synthesizer](https://note.com/solder_state/n/n110e9ba066b3).
+The original schematic is based on Hagiwo's [$4 Envelope Follower module - DIY Eurorack Modular Synthesizer](https://note.com/solder_state/n/n110e9ba066b3?hl=en).
 
 ![Hagiwo's Envelope Follower Schematic](EnvelopeFollower.webp)
 
