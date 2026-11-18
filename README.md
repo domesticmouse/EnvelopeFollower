@@ -69,11 +69,20 @@ The circuit is partitioned into six functional blocks (matching [`ENVELOPE_FOLLO
 
 ---
 
-## 📄 Documentation, Tutorial & Netlist
+## 📄 Documentation, Tutorial & GitHub Pages Site
 
-For the complete end-to-end build tutorial and technical reference, see:
+This repository publishes a multi-page **MkDocs Material** documentation site via [`.github/workflows/docs.yml`](.github/workflows/docs.yml) at **[https://domesticmouse.github.io/EnvelopeFollower/](https://domesticmouse.github.io/EnvelopeFollower/)**.
 
-* [**`TUTORIAL.md`**](TUTORIAL.md) – **Step-by-Step Build Tutorial**: From Hagiwo's circuit sketch and installing hardware agent skills (`skidl`, `kicad`, `eurorack-panel`) through SKiDL capture, KiCad schematic/6 HP PCB generation, interactive routing, and 3U front panel construction.
+To preview the documentation site locally:
+
+```bash
+mkdocs serve
+```
+
+Source files and standalone Markdown references:
+
+* [**`mkdocs.yml`**](mkdocs.yml) & [**`docs/`**](docs/) – Multi-page MkDocs Material tutorial and technical reference source (deployed to GitHub Pages on push to `main`).
+* [**`TUTORIAL.md`**](TUTORIAL.md) – **Standalone End-to-End Tutorial**: Single-file version covering Hagiwo's circuit sketch, hardware agent skills (`skidl`, `kicad`, `eurorack-panel`), SKiDL capture, KiCad schematic/6 HP PCB generation, interactive routing, and 3U front panel construction.
 * [**`ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`**](ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md) – Full Bill of Materials, 35-Net Connection List, and 8-Step KiCad Build Checklist.
 * [**`TODO.md`**](TODO.md) – KiCad PCB routing, panel, and JLCPCB fabrication progress checklist.
 
@@ -128,8 +137,15 @@ EnvelopeFollower/
 ├── production/
 │   ├── EnvelopeFollower_Panel.zip         # Packaged front panel Gerbers & Excellon drills
 │   └── panel/                             # Individual front panel Gerber & drill files
+├── .github/workflows/
+│   └── docs.yml                           # GitHub Pages deployment workflow (MkDocs Material)
+├── mkdocs.yml                             # MkDocs Material site configuration
 ├── docs/
-│   └── images/                            # Schematic SVG and 3D PCB/panel renders for TUTORIAL.md
+│   ├── index.md                           # Documentation landing page & pipeline overview
+│   ├── tutorial/                          # Multi-page stage-by-stage tutorial (Stages 1–7)
+│   ├── reference/                         # Netlist/BOM guide and PCB fabrication checklist
+│   ├── javascripts/mathjax.js             # MathJax v3 initialization for circuit equations
+│   └── images/                            # Original sketch, schematic SVG, and 3D PCB/panel renders
 ├── skills-lock.json                       # Agent skill lockfile
 └── .agents/skills/                        # Installed hardware skills (kicad, skidl, eurorack-panel)
 ```
