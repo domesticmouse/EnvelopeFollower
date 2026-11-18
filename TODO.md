@@ -42,11 +42,11 @@ Follow this checklist to take the circuit into KiCad PCB layout and manufacturin
 
 ## Step 3: Mated 3U Eurorack Front Panel PCB
 
-- [ ] Generate the mated 3U front panel (`panel/EnvelopeFollower_Panel.kicad_pcb`) using the main PCB's finalized coordinates:
-  - [ ] Extract exact `(x, y)` positions of `RV_GAIN`, `RV_ATK`, `RV_REL`, `RV_OFFSET`, `LED1`, `J_IN`, `J_OUT`, and `J_INV_OUT`, applying footprint-to-bushing mechanical offsets (e.g., `+6.48 mm` for `WQP-PJ398SM` Thonkiconn jacks).
-  - [ ] Place standard Doepfer A-100 3U (`128.5 mm` height) M3 mounting slots.
-  - [ ] Add panel silkscreen labels (`GAIN`, `ATK`, `REL`, `OFFSET`, `IN`, `OUT`, `INV OUT`, `ENV`), input callout badges, and grounded `F.Cu`/`B.Cu` shield planes.
-  - [ ] Run DRC on the front panel PCB.
+- [x] Generate the mated 3U front panel (`panel/EnvelopeFollower_Panel.kicad_pcb`) using the main PCB's finalized coordinates:
+  - [x] Extract exact `(x, y)` positions of `RV_GAIN`, `RV_ATK`, `RV_REL`, `RV_OFFSET`, `LED1`, `J_IN`, `J_OUT`, and `J_INV_OUT`, applying footprint-to-bushing mechanical offsets (e.g., `+6.48 mm` for `WQP-PJ398SM` Thonkiconn jacks).
+  - [x] Place standard Doepfer A-100 3U (`128.5 mm` height) M3 mounting slots.
+  - [x] Add panel silkscreen labels (`GAIN`, `ATK`, `REL`, `OFFSET`, `IN`, `OUT`, `INV OUT`, `ENV`), input callout badges, and grounded `F.Cu`/`B.Cu` shield planes.
+  - [x] Run DRC on the front panel PCB (`0 violations, 0 unconnected items`).
 
 ---
 

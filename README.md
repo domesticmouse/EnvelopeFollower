@@ -69,11 +69,13 @@ The circuit is partitioned into six functional blocks (matching [`ENVELOPE_FOLLO
 
 ---
 
-## 📄 Documentation & Netlist
+## 📄 Documentation, Tutorial & Netlist
 
-For complete BOM details, pin-by-pin net connections, and step-by-step KiCad capture instructions, see:
+For the complete end-to-end build tutorial and technical reference, see:
 
+* [**`TUTORIAL.md`**](TUTORIAL.md) – **Step-by-Step Build Tutorial**: From Hagiwo's circuit sketch and installing hardware agent skills (`skidl`, `kicad`, `eurorack-panel`) through SKiDL capture, KiCad schematic/6 HP PCB generation, interactive routing, and 3U front panel construction.
 * [**`ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`**](ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md) – Full Bill of Materials, 35-Net Connection List, and 8-Step KiCad Build Checklist.
+* [**`TODO.md`**](TODO.md) – KiCad PCB routing, panel, and JLCPCB fabrication progress checklist.
 
 ---
 
@@ -82,17 +84,21 @@ For complete BOM details, pin-by-pin net connections, and step-by-step KiCad cap
 The circuit is implemented in Python with [SKiDL](https://devbisme.github.io/skidl/) in [**`envelope_follower.py`**](envelope_follower.py) using dual **Texas Instruments TL074H** (`TL074HIDR`, `SOIC-14`) quad op-amps across 6 `@subcircuit` blocks, 48 physical components, and 35 nets:
 
 * [**`envelope_follower.py`**](envelope_follower.py) – Complete SKiDL circuit definition (`ERC()` passes with 0 errors and 0 warnings).
+* [**`EnvelopeFollower.kicad_sch`**](EnvelopeFollower.kicad_sch) – Generated KiCad schematic (`generate_schematic()`).
+* [**`generate_kicad_pcb.py`**](generate_kicad_pcb.py) & [**`EnvelopeFollower.kicad_pcb`**](EnvelopeFollower.kicad_pcb) – Automated 6 HP (`29.60 × 107.00 mm`) main PCB layout with pre-placed `F.Cu` panel controls and `B.Cu` SMT parts/power entry.
+* [**`panel/EnvelopeFollower_Panel.kicad_pcb`**](panel/EnvelopeFollower_Panel.kicad_pcb) – Mated 6 HP × 3U (`30.00 × 128.50 mm`) Eurorack front panel PCB (`0` DRC violations) with Gerber export in [`production/panel/`](production/panel/) and [`production/EnvelopeFollower_Panel.zip`](production/EnvelopeFollower_Panel.zip).
 * [**`envelope_follower.net`**](envelope_follower.net) – Generated KiCad netlist ready to import in `pcbnew` (`File -> Import -> Netlist...`).
 * [**`envelope_follower_bom.xml`**](envelope_follower_bom.xml) – KiCad XML BOM with embedded `LCSC`, `MPN`, and `JLCPCB_Class` fields.
 * [**`jlcpcb_bom.csv`**](jlcpcb_bom.csv) – Grouped 4-column JLCPCB SMT PCBA BOM (`Comment,Designator,Footprint,LCSC Part #`, 12 SMT line items; panel-mounted THT controls and jacks are marked `Manual THT`).
 * [**`envelope_follower_sklib.py`**](envelope_follower_sklib.py) & [**`envelope_follower.erc`**](envelope_follower.erc) – Generated backup SKiDL symbol library and Electrical Rules Check report.
 
-To regenerate the netlist, BOMs, and ERC report locally using `uv`:
+To regenerate the netlist, BOMs, schematic, and initial 6 HP PCB locally using `uv`:
 
 ```bash
 uv venv --clear --python 3.14 .venv
-uv pip install skidl
+uv pip install skidl kinet2pcb
 .venv/bin/python envelope_follower.py
+.venv/bin/python generate_kicad_pcb.py
 ```
 
 ---
@@ -103,6 +109,8 @@ uv pip install skidl
 EnvelopeFollower/
 ├── LICENSE                                # Apache License 2.0
 ├── README.md                              # Project overview & documentation
+├── TUTORIAL.md                            # End-to-end tutorial (sketch -> SKiDL -> KiCad -> 3U panel)
+├── TODO.md                                # KiCad PCB routing & fabrication checklist
 ├── ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md  # Complete BOM, netlist, and KiCad capture checklist
 ├── EnvelopeFollower.webp                  # Original Hagiwo hand-drawn reference schematic
 ├── envelope_follower.py                   # SKiDL circuit definition (dual TL074H, 6 subcircuits)
@@ -112,6 +120,16 @@ EnvelopeFollower/
 ├── jlcpcb_bom.csv                         # Grouped JLCPCB SMT PCBA BOM
 ├── envelope_follower.erc                  # SKiDL ERC report
 ├── envelope_follower.log                  # SKiDL generation log
+├── EnvelopeFollower.kicad_sch             # Generated KiCad 10 schematic
+├── generate_kicad_pcb.py                  # Automated 6 HP KiCad PCB placement script
+├── EnvelopeFollower.kicad_pcb             # 6 HP main circuit PCB (pre-placed, ready to route)
+├── panel/
+│   └── EnvelopeFollower_Panel.kicad_pcb   # Mated 6 HP x 3U Eurorack front panel PCB
+├── production/
+│   ├── EnvelopeFollower_Panel.zip         # Packaged front panel Gerbers & Excellon drills
+│   └── panel/                             # Individual front panel Gerber & drill files
+├── docs/
+│   └── images/                            # Schematic SVG and 3D PCB/panel renders for TUTORIAL.md
 ├── skills-lock.json                       # Agent skill lockfile
 └── .agents/skills/                        # Installed hardware skills (kicad, skidl, eurorack-panel)
 ```

@@ -465,9 +465,27 @@ def format_mount_slot_footprint(ns: str, ref: str, x: float, y: float) -> str:
 \t)"""
 
 
-def clean_label(raw_value: str) -> str:
-    """Format a net/component value like `IN_1` or `OUT_1A` into `IN 1` or `OUT 1A`."""
-    return raw_value.replace("_", " ").strip()
+def clean_label(raw_value: str, ref: str = "") -> str:
+    """Format a net/component value like `IN_1` or `OUT_1A` into `IN 1` or `OUT 1A`.
+
+    When `raw_value` is a generic electrical/part value (e.g. `100k`, `3.5mm_Jack`,
+    `LED_3mm`) and `ref` is provided, derive a readable front-panel label from `ref`
+    (e.g. `RV_GAIN -> GAIN`, `J_INV_OUT -> INV OUT`, `LED1 -> ENV`).
+    """
+    val = raw_value.strip()
+    is_generic = bool(
+        re.match(
+            r"^(\d+(\.\d+)?\s*[kKmMΩR]?|.*jack.*|.*led.*|.*pot.*)$",
+            val,
+            re.IGNORECASE,
+        )
+    )
+    if is_generic and ref:
+        if ref.upper().startswith("LED"):
+            return "ENV"
+        cleaned_ref = re.sub(r"^(RV|J|SW)_", "", ref.strip(), flags=re.IGNORECASE)
+        return cleaned_ref.replace("_", " ").strip()
+    return val.replace("_", " ").strip()
 
 
 def build_panel_sexpr(
@@ -546,9 +564,9 @@ def build_panel_sexpr(
 
         for j in row:
             jx = j["bushing_x"]
-            lbl = clean_label(j["value"])
+            lbl = clean_label(j["value"], j["ref"])
             ref_id = j["ref"].lower()
-            is_input = lbl.upper().startswith("IN")
+            is_input = bool(re.match(r"^IN(?:\b|\d)", lbl.upper()))
 
             if is_input:
                 jack_graphics.append(
@@ -657,16 +675,27 @@ def build_panel_sexpr(
 \t)"""
 
     jack_graphics_str = "\n".join(jack_graphics)
-    rear_title_y = (
-        round(panel_y1 - 26.0, 2)
-        if not has_wide_intergroup_gap
-        else round(panel_y0 + 16.0, 2)
-    )
-    rear_jlc_y = (
-        round(panel_y1 - 22.0, 2)
-        if not has_wide_intergroup_gap
-        else round((panel_y0 + panel_y1) / 2.0 - 1.25, 2)
-    )
+    max_lbl_y = max(row_label_ys) if row_label_ys else (panel_y1 - 25.0)
+    footer_line_y = max(round(panel_y1 - 19.5, 2), round(max_lbl_y + 2.8, 2))
+    footer_subtitle_y = round(footer_line_y + 3.2, 2)
+
+    default_rear_title_y = round(panel_y1 - 26.0, 2)
+    default_rear_jlc_y = round(panel_y1 - 22.0, 2)
+    if not has_wide_intergroup_gap:
+        rear_pad_conflict = any(
+            abs(j["bushing_y"] - default_rear_title_y) < 6.5
+            or abs(j["bushing_y"] - default_rear_jlc_y) < 6.5
+            for j in jacks
+        )
+        if rear_pad_conflict and rows:
+            rear_title_y = round(rows[-1][0]["bushing_y"] + 8.5, 2)
+            rear_jlc_y = round(rows[-1][0]["bushing_y"] + 12.0, 2)
+        else:
+            rear_title_y = default_rear_title_y
+            rear_jlc_y = default_rear_jlc_y
+    else:
+        rear_title_y = round(panel_y0 + 16.0, 2)
+        rear_jlc_y = round((panel_y0 + panel_y1) / 2.0 - 1.25, 2)
 
     return f"""(kicad_pcb
 \t(version 20260206)
@@ -807,8 +836,8 @@ def build_panel_sexpr(
 \t)
 {jack_graphics_str}{cascade_graphics}
 \t(gr_line
-\t\t(start {panel_x0 + 2.0:g} {panel_y1 - 19.5:g})
-\t\t(end {panel_x1 - 2.0:g} {panel_y1 - 19.5:g})
+\t\t(start {panel_x0 + 2.0:g} {footer_line_y:g})
+\t\t(end {panel_x1 - 2.0:g} {footer_line_y:g})
 \t\t(stroke
 \t\t\t(width 0.25)
 \t\t\t(type solid)
@@ -817,7 +846,7 @@ def build_panel_sexpr(
 \t\t(uuid "{det_uuid(ns, "footer_line_bot")}")
 \t)
 \t(gr_text "{subtitle}"
-\t\t(at {center_x:g} {panel_y1 - 16.0:g} 0)
+\t\t(at {center_x:g} {footer_subtitle_y:g} 0)
 \t\t(layer "F.SilkS")
 \t\t(uuid "{det_uuid(ns, "footer_subtitle")}")
 \t\t(effects
@@ -1094,6 +1123,7 @@ def main() -> None:
         ns=args.output.stem,
         cascade_arrow=args.cascade_arrow,
     )
+    args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(sexpr, encoding="utf-8")
     refill_zones_with_kicad(args.output)
     print(
