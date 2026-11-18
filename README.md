@@ -81,9 +81,18 @@ For complete BOM details, pin-by-pin net connections, and step-by-step KiCad cap
 
 ```text
 EnvelopeFollower/
+├── LICENSE                                # Apache License 2.0
 ├── README.md                              # Project overview & documentation
 ├── ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md  # Complete BOM, netlist, and KiCad capture checklist
 ├── EnvelopeFollower.webp                  # Original Hagiwo hand-drawn reference schematic
 ├── skills-lock.json                       # Agent skill lockfile
 └── .agents/skills/                        # Installed hardware skills (kicad, skidl, eurorack-panel)
 ```
+
+---
+
+## 📜 License & Disclaimer
+
+Licensed under the [Apache License 2.0](LICENSE).
+
+This is not an officially supported Google product.
