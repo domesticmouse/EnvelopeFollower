@@ -1,6 +1,6 @@
 # Envelope Follower
 
-A Eurorack analog envelope follower module designed for KiCad, accompanied by a complete netlist specification and build checklist.
+A Eurorack analog envelope follower module designed for KiCad, defined in SKiDL with a generated KiCad netlist, JLCPCB PCBA BOM, complete netlist specification, and build checklist.
 
 The original schematic is based on Hagiwo's [$4 Envelope Follower module - DIY Eurorack Modular Synthesizer](https://note.com/solder_state/n/n110e9ba066b3).
 
@@ -77,6 +77,26 @@ For complete BOM details, pin-by-pin net connections, and step-by-step KiCad cap
 
 ---
 
+## 🐍 SKiDL Circuit & Generated Artifacts
+
+The circuit is implemented in Python with [SKiDL](https://devbisme.github.io/skidl/) in [**`envelope_follower.py`**](envelope_follower.py) using dual **Texas Instruments TL074H** (`TL074HIDR`, `SOIC-14`) quad op-amps across 6 `@subcircuit` blocks, 48 physical components, and 35 nets:
+
+* [**`envelope_follower.py`**](envelope_follower.py) – Complete SKiDL circuit definition (`ERC()` passes with 0 errors and 0 warnings).
+* [**`envelope_follower.net`**](envelope_follower.net) – Generated KiCad netlist ready to import in `pcbnew` (`File -> Import -> Netlist...`).
+* [**`envelope_follower_bom.xml`**](envelope_follower_bom.xml) – KiCad XML BOM with embedded `LCSC`, `MPN`, and `JLCPCB_Class` fields.
+* [**`jlcpcb_bom.csv`**](jlcpcb_bom.csv) – Grouped 4-column JLCPCB SMT PCBA BOM (`Comment,Designator,Footprint,LCSC Part #`, 12 SMT line items; panel-mounted THT controls and jacks are marked `Manual THT`).
+* [**`envelope_follower_sklib.py`**](envelope_follower_sklib.py) & [**`envelope_follower.erc`**](envelope_follower.erc) – Generated backup SKiDL symbol library and Electrical Rules Check report.
+
+To regenerate the netlist, BOMs, and ERC report locally using `uv`:
+
+```bash
+uv venv --clear --python 3.14 .venv
+uv pip install skidl
+.venv/bin/python envelope_follower.py
+```
+
+---
+
 ## 📁 Repository Structure
 
 ```text
@@ -85,6 +105,13 @@ EnvelopeFollower/
 ├── README.md                              # Project overview & documentation
 ├── ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md  # Complete BOM, netlist, and KiCad capture checklist
 ├── EnvelopeFollower.webp                  # Original Hagiwo hand-drawn reference schematic
+├── envelope_follower.py                   # SKiDL circuit definition (dual TL074H, 6 subcircuits)
+├── envelope_follower_sklib.py             # Backup SKiDL symbol library
+├── envelope_follower.net                  # Generated KiCad netlist
+├── envelope_follower_bom.xml              # KiCad XML BOM with LCSC/MPN metadata
+├── jlcpcb_bom.csv                         # Grouped JLCPCB SMT PCBA BOM
+├── envelope_follower.erc                  # SKiDL ERC report
+├── envelope_follower.log                  # SKiDL generation log
 ├── skills-lock.json                       # Agent skill lockfile
 └── .agents/skills/                        # Installed hardware skills (kicad, skidl, eurorack-panel)
 ```
