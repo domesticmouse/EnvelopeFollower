@@ -2,47 +2,10 @@
   (version "D")
   (design
     (source "envelope_follower.py")
-    (date "11/20/2026 09:38 AM")
+    (date "11/20/2026 09:41 AM")
     (tool "SKiDL (3.0.0)")
     (sheet
       (number 1)
-      (name "/outputs/")
-      (tstamps "/b05e70df-56d9-5044-a604-a095ede86e70/")
-      (title_block
-        (title)
-        (company)
-        (rev)
-        (date)
-        (source "envelope_follower.py")
-        (comment
-          (number "1")
-          (value ""))
-        (comment
-          (number "2")
-          (value ""))
-        (comment
-          (number "3")
-          (value ""))
-        (comment
-          (number "4")
-          (value ""))
-        (comment
-          (number "5")
-          (value ""))
-        (comment
-          (number "6")
-          (value ""))
-        (comment
-          (number "7")
-          (value ""))
-        (comment
-          (number "8")
-          (value ""))
-        (comment
-          (number "9")
-          (value ""))))
-    (sheet
-      (number 2)
       (name "/test_points/")
       (tstamps "/389467fa-3a54-59eb-b421-272da13fe268/")
       (title_block
@@ -79,7 +42,7 @@
           (number "9")
           (value ""))))
     (sheet
-      (number 3)
+      (number 2)
       (name "/preamp/")
       (tstamps "/336ae568-4a16-5489-b99f-168f188d7364/")
       (title_block
@@ -116,9 +79,9 @@
           (number "9")
           (value ""))))
     (sheet
-      (number 4)
-      (name "/")
-      (tstamps "/")
+      (number 3)
+      (name "/outputs/")
+      (tstamps "/b05e70df-56d9-5044-a604-a095ede86e70/")
       (title_block
         (title)
         (company)
@@ -153,7 +116,7 @@
           (number "9")
           (value ""))))
     (sheet
-      (number 5)
+      (number 4)
       (name "/envelope/")
       (tstamps "/98337b9f-bf7a-5dac-8d27-ed34def88e33/")
       (title_block
@@ -190,9 +153,46 @@
           (number "9")
           (value ""))))
     (sheet
+      (number 5)
+      (name "/")
+      (tstamps "/")
+      (title_block
+        (title)
+        (company)
+        (rev)
+        (date)
+        (source "envelope_follower.py")
+        (comment
+          (number "1")
+          (value ""))
+        (comment
+          (number "2")
+          (value ""))
+        (comment
+          (number "3")
+          (value ""))
+        (comment
+          (number "4")
+          (value ""))
+        (comment
+          (number "5")
+          (value ""))
+        (comment
+          (number "6")
+          (value ""))
+        (comment
+          (number "7")
+          (value ""))
+        (comment
+          (number "8")
+          (value ""))
+        (comment
+          (number "9")
+          (value ""))))
+    (sheet
       (number 6)
-      (name "/led/")
-      (tstamps "/378f91ec-0b4c-55e3-a2ca-600ac3991bab/")
+      (name "/rectifier/")
+      (tstamps "/5de63b2e-e3dc-5d34-b42d-3c872c00354d/")
       (title_block
         (title)
         (company)
@@ -228,8 +228,8 @@
           (value ""))))
     (sheet
       (number 7)
-      (name "/rectifier/")
-      (tstamps "/5de63b2e-e3dc-5d34-b42d-3c872c00354d/")
+      (name "/led/")
+      (tstamps "/378f91ec-0b4c-55e3-a2ca-600ac3991bab/")
       (title_block
         (title)
         (company)
@@ -326,7 +326,7 @@
         (field
           (name "SKiDL Tag") "c1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -358,7 +358,7 @@
         (field
           (name "SKiDL Tag") "c10")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -390,7 +390,7 @@
         (field
           (name "SKiDL Tag") "c11")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -422,7 +422,7 @@
         (field
           (name "SKiDL Tag") "c12")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -454,7 +454,7 @@
         (field
           (name "SKiDL Tag") "c13")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -488,7 +488,7 @@
         (field
           (name "SKiDL Tag") "c2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -522,7 +522,7 @@
         (field
           (name "SKiDL Tag") "c3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C_Polarized"))
@@ -556,7 +556,7 @@
         (field
           (name "SKiDL Tag") "c4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C_Polarized"))
@@ -588,7 +588,7 @@
         (field
           (name "SKiDL Tag") "c5")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -620,7 +620,7 @@
         (field
           (name "SKiDL Tag") "c6")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -652,7 +652,7 @@
         (field
           (name "SKiDL Tag") "c7")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -684,7 +684,7 @@
         (field
           (name "SKiDL Tag") "c8")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -716,7 +716,7 @@
         (field
           (name "SKiDL Tag") "c9")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -748,7 +748,7 @@
         (field
           (name "SKiDL Tag") "d1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "D"))
@@ -782,7 +782,7 @@
         (field
           (name "SKiDL Tag") "d10")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "D"))
@@ -816,7 +816,7 @@
         (field
           (name "SKiDL Tag") "d11")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "D"))
@@ -848,7 +848,7 @@
         (field
           (name "SKiDL Tag") "d2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "D"))
@@ -880,7 +880,7 @@
         (field
           (name "SKiDL Tag") "d3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "D"))
@@ -912,7 +912,7 @@
         (field
           (name "SKiDL Tag") "d4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "LED"))
@@ -944,7 +944,7 @@
         (field
           (name "SKiDL Tag") "d5")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "D"))
@@ -976,7 +976,7 @@
         (field
           (name "SKiDL Tag") "d6")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "D"))
@@ -1008,7 +1008,7 @@
         (field
           (name "SKiDL Tag") "d7")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "D"))
@@ -1040,7 +1040,7 @@
         (field
           (name "SKiDL Tag") "d8")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Diode")
         (part "BAV99"))
@@ -1072,7 +1072,7 @@
         (field
           (name "SKiDL Tag") "d9")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Diode")
         (part "BAV99"))
@@ -1104,7 +1104,7 @@
         (field
           (name "SKiDL Tag") "j1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector_Audio")
         (part "AudioJack2_SwitchT"))
@@ -1136,7 +1136,7 @@
         (field
           (name "SKiDL Tag") "j2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector_Audio")
         (part "AudioJack2_SwitchT"))
@@ -1168,7 +1168,7 @@
         (field
           (name "SKiDL Tag") "j3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector_Audio")
         (part "AudioJack2_SwitchT"))
@@ -1202,7 +1202,7 @@
         (field
           (name "SKiDL Tag") "j_pwr")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector_Generic")
         (part "Conn_02x05_Odd_Even"))
@@ -1234,7 +1234,7 @@
         (field
           (name "SKiDL Tag") "r1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1266,7 +1266,7 @@
         (field
           (name "SKiDL Tag") "r10")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1298,7 +1298,7 @@
         (field
           (name "SKiDL Tag") "r11")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1330,7 +1330,7 @@
         (field
           (name "SKiDL Tag") "r12")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1362,7 +1362,7 @@
         (field
           (name "SKiDL Tag") "r13")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1394,7 +1394,7 @@
         (field
           (name "SKiDL Tag") "r14")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1426,7 +1426,7 @@
         (field
           (name "SKiDL Tag") "r15")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1458,7 +1458,7 @@
         (field
           (name "SKiDL Tag") "r16")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1490,7 +1490,7 @@
         (field
           (name "SKiDL Tag") "r17")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1522,7 +1522,7 @@
         (field
           (name "SKiDL Tag") "r18")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1554,7 +1554,7 @@
         (field
           (name "SKiDL Tag") "r19")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1586,7 +1586,7 @@
         (field
           (name "SKiDL Tag") "r2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1618,7 +1618,7 @@
         (field
           (name "SKiDL Tag") "r24")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1650,7 +1650,7 @@
         (field
           (name "SKiDL Tag") "r25")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1682,7 +1682,7 @@
         (field
           (name "SKiDL Tag") "r26")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1714,7 +1714,7 @@
         (field
           (name "SKiDL Tag") "r28")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1748,7 +1748,7 @@
         (field
           (name "SKiDL Tag") "r29")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1780,7 +1780,7 @@
         (field
           (name "SKiDL Tag") "r3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1812,7 +1812,7 @@
         (field
           (name "SKiDL Tag") "r30")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1844,7 +1844,7 @@
         (field
           (name "SKiDL Tag") "r4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1876,7 +1876,7 @@
         (field
           (name "SKiDL Tag") "r5")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1908,7 +1908,7 @@
         (field
           (name "SKiDL Tag") "r6")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1940,7 +1940,7 @@
         (field
           (name "SKiDL Tag") "r7")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1972,7 +1972,7 @@
         (field
           (name "SKiDL Tag") "r8a")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -2004,7 +2004,7 @@
         (field
           (name "SKiDL Tag") "r8b")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -2034,7 +2034,7 @@
         (field
           (name "SKiDL Tag") "rv1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R_Potentiometer"))
@@ -2064,7 +2064,7 @@
         (field
           (name "SKiDL Tag") "rv2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R_Potentiometer"))
@@ -2094,7 +2094,7 @@
         (field
           (name "SKiDL Tag") "rv3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R_Potentiometer"))
@@ -2124,7 +2124,7 @@
         (field
           (name "SKiDL Tag") "rv4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Device")
         (part "R_Potentiometer"))
@@ -2158,7 +2158,7 @@
         (field
           (name "SKiDL Tag") "tp1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2196,7 +2196,7 @@
         (field
           (name "SKiDL Tag") "tp2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2234,7 +2234,7 @@
         (field
           (name "SKiDL Tag") "tp3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2272,7 +2272,7 @@
         (field
           (name "SKiDL Tag") "tp4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2310,7 +2310,7 @@
         (field
           (name "SKiDL Tag") "tp5")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2348,7 +2348,7 @@
         (field
           (name "SKiDL Tag") "tp6")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2386,7 +2386,7 @@
         (field
           (name "SKiDL Tag") "tp7")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2424,7 +2424,7 @@
         (field
           (name "SKiDL Tag") "tp8")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2462,7 +2462,7 @@
         (field
           (name "SKiDL Tag") "u1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Amplifier_Operational")
         (part "TL074"))
@@ -2496,7 +2496,7 @@
         (field
           (name "SKiDL Tag") "u2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:332"))
+          (name "SKiDL Line") "envelope_follower.py:334"))
       (libsource
         (lib "Amplifier_Operational")
         (part "TL074"))

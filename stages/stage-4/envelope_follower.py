@@ -23,6 +23,8 @@ if os.path.isdir("/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprint
         "KICAD10_FOOTPRINT_DIR",
         "/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints",
     )
+if __name__ == "__main__":
+    os.chdir(Path(__file__).resolve().parent)
 
 from skidl import (
     ERC,
