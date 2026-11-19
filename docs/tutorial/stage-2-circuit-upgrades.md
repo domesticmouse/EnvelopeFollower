@@ -4,6 +4,12 @@ Start from [Hagiwo's original post](https://note.com/solder_state/n/n110e9ba066b
 
 ![Hagiwo's Original Envelope Follower Sketch](../images/EnvelopeFollower.webp)
 
+Download the reference schematic into your project directory so your AI agent can inspect it:
+
+```bash
+curl -LO https://raw.githubusercontent.com/domesticmouse/EnvelopeFollower/main/EnvelopeFollower.webp
+```
+
 ## AI Agent Prompt
 
 > *"Inspect `EnvelopeFollower.webp`. Trace every node and component in Hagiwo's Envelope Follower schematic, adapt the design for modern Texas Instruments `TL074H` quad op-amps (`SOIC-14`), apply Eurorack production safeguards (reverse-polarity protection, local decoupling, gain floor limiting, output protection, and unused op-amp termination), and write a complete BOM, 35-net connection list, and KiCad capture checklist to `ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`."*
