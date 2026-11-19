@@ -72,3 +72,49 @@ Generated EnvelopeFollower.kicad_pcb: 62 footprints (54 populated + 8 DNP), 36 n
 | Main PCB Front (`F.Cu` — THT Panel Controls) | Main PCB Rear (`B.Cu` — SMT, `J_PWR` & `TP1`–`TP8`) |
 | :---: | :---: |
 | ![Main PCB Front (F.Cu Controls)](../images/pcb_front.png) | ![Main PCB Back (B.Cu SMT & Power Header)](../images/pcb_back.png) |
+
+---
+
+## Step 5.2: Semantic Silkscreen & Polarity Audit (Verification & Fix Prompts)
+
+Geometric verification tools (`kicad-cli pcb drc` and `analyze_pcb.py`) confirm **physical and electrical rules** (`0` copper shorts, `0` unrouted nets, `0` `silk_overlap` / `silk_over_copper` violations, and `62/62` visible reference designators), but they do **not** verify **semantic label parity**—whether the human-readable function/value text printed next to each footprint actually matches `@SilkscreenInstructions.md` and the `Silkscreen` fields inside `envelope_follower.net`, or whether every polarized package category in `@SilkscreenInstructions.md` Section 5 received its external orientation mark.
+
+For example, in our Stage 5 trace (`357a293d`), the generator script passed DRC with `0` violations, yet a semantic comparison against `@SilkscreenInstructions.md` revealed two issues:
+
+1. **Hardcoded Override Drift (`SILK_VALUE_OVERRIDES`)**: The script overrode the netlist's `Silkscreen` metadata on `J2`, `J3`, `RV4`, `D4`, and `TP1`/`TP4`–`TP8` with labels from a Gate/Threshold comparator circuit (`J2 ENV`, `J3 GATE`, `RV4 THRESH`, `D4 GATE`, `TP1 GAIN`, `TP4 RECT`, `TP5 ATK`, `TP6 ENV`, `TP7 BUF`, `TP8 GATE`) instead of the actual design labels (`J2 OUT`, `J3 INV_OUT`, `RV4 OFFSET`, `D4 LED`, `TP1 GND`, `TP4 PRE`, `TP5 HALF`, `TP6 RECT`, `TP7 ENV`, `TP8 OFS`).
+2. **Missing Electrolytic `+` Polarity Marks (`C3`, `C4`)**: External Pin-1 dots (`U1`, `U2`), `SOD-123` cathode bars (`D1`–`D3`, `D5`–`D7`), `D4` `+`/`-` markers, and `J_PWR` `-12V RED` stripe bars were placed, but external `+` polarity symbols outside the positive pads of SMD bulk electrolytic capacitors `C3` (`+12V` pad) and `C4` (`GND` pad) were omitted.
+
+### 1. Verification Prompt (Finds Semantic Label & Polarity Discrepancies)
+
+Run this follow-up audit prompt to catch any drift between the generated PCB silkscreen and `@SilkscreenInstructions.md`:
+
+> *"Please audit `generate_kicad_pcb.py` and the generated `EnvelopeFollower.kicad_pcb` against `@SilkscreenInstructions.md` and `@envelope_follower.net`. Check: (1) whether every component's rendered silkscreen value/function label on `F.SilkS` and `B.SilkS` matches the exact schedule in `@SilkscreenInstructions.md` (Sections 3, 4, and 7) and the `Silkscreen` field in `@envelope_follower.net` rather than hardcoded overrides, and (2) whether all polarized component categories in `@SilkscreenInstructions.md` Section 5 (`U1`/`U2` Pin-1 dots, `D1`–`D3`/`D5`–`D7` cathode bars, `D4` `+`/`-`, `J_PWR` `-12V RED` bar, and `C3`/`C4` external electrolytic `+` marks) are present on the silkscreen. Report every discrepancy without editing files yet."*
+
+### 2. Fix Prompt (Resolves Discrepancies & Re-Verifies DRC)
+
+Once the audit lists the mismatches, send this prompt to fix them and re-verify the board (and update `kicad-silkscreen-markup` if you extracted the skill in Step 5.3):
+
+> *"Please update `generate_kicad_pcb.py` (and `.agents/skills/kicad-silkscreen-markup/` if present) to fix every silkscreen discrepancy found in the audit: derive component value/function labels from `@envelope_follower.net` and `@SilkscreenInstructions.md` (`J1 IN`, `J2 OUT`, `J3 INV_OUT`, `RV1 GAIN`, `RV2 ATK`, `RV3 REL`, `RV4 OFFSET`, `D4 LED`, `J_PWR +/-12V`, `U1`/`U2 TL074H`, and `TP1 GND`, `TP2 +12V`, `TP3 -12V`, `TP4 PRE`, `TP5 HALF`, `TP6 RECT`, `TP7 ENV`, `TP8 OFS`), add external `+` polarity markers on `B.SilkS` outside the positive anode pads of `C3` (Pad 1 / `+12V`) and `C4` (Pad 1 / `GND`), re-run `generate_kicad_pcb.py`, and re-verify with `ruff`, `kicad-cli pcb drc --refill-zones`, and `analyze_pcb.py`."*
+
+---
+
+## Step 5.3 (Optional): Extracting Reusable PCB & Silkscreen Skills (`/agy-customizations`)
+
+Looking at the 7 skills installed in [Stage 1](stage-1-agent-skills.md), there is a natural boundary between `skidl` (which ends at `envelope_follower.net`), `eurorack-panel` (which inspects an existing main `.kicad_pcb` to build the 3U front panel), and `kicad` (which audits an existing `.kicad_pcb`). Turning `envelope_follower.net` into a routed, DFM-clean 2-layer `.kicad_pcb` required solving several non-obvious KiCad 10 `pcbnew` API and silkscreen geometry problems during Stage 5.
+
+You can use the built-in `/agy-customizations` skill right after Stage 5 to distill those hard-won patterns into reusable workspace skills under `.agents/skills/`:
+
+### AI Agent Prompts
+
+> *"`/agy-customizations` are there skills that could be created from this step?"*
+>
+> *"Please create these skills, and append to the build log in `@README.md`."*
+
+### Resulting Workspace Skills
+
+1. **`kicad-pcbnew-layout` (`.agents/skills/kicad-pcbnew-layout/`)**:
+   - **`SKILL.md` & References (`kicad10_pcbnew_api.md`, `routing_and_dfm_patterns.md`)**: Documents self-bootstrapping to KiCad 10's bundled Python (`os.execv`), initializing boards via `pcbnew.LoadBoard()` on a minimal shell (preventing the `fp.Flip()` segfault on raw `pcbnew.BOARD()`), Eurorack `F.Cu` controls + `B.Cu` SMD/power sandwich placement, pre-placing immediate `B.Cu` SMD `GND` stitching vias before signal routing, blocking vias inside SMD pad bounds (`0` `VP-001` via-in-pad warnings), free layer transitions at THT barrels (`0` `holes_co_located`), preserving T-junction vertices during collinear track merging (`0` `track_dangling`), and calling `board.BuildConnectivity()` both **before and after** `ZONE_FILLER.Fill()` with `ISLAND_REMOVAL_MODE_ALWAYS`.
+   - **`scripts/pcbnew_layout_template.py`**: Reusable S-expression `.net` parser, board initializer, 2-layer `GridRouter`, `GND` zone filler, and `--netlist` summary CLI.
+2. **`kicad-silkscreen-markup` (`.agents/skills/kicad-silkscreen-markup/`)**:
+   - **`SKILL.md`**: Documents measuring true KiCad stroke-font bounding boxes via a cached scratch `pcbnew.PCB_TEXT(board).GetBoundingBox()` (avoiding character-width heuristics that clip uppercase glyphs), seeding `SilkGrid` with both solder-mask pad openings (`+0.25 mm`) and non-text footprint graphics (`+0.20 mm`), pairing visible `fp.Reference()` on `.SilkS` with a `PCB_TEXT(fp)` value item (`62/62` `refs_visible_on_silk`, `0` `values_visible_on_silk` warnings), handling `B.SilkS` mirroring (`+X` = visual left), placing external polarity markers and `5 × 5 mm` JLCPCB QR squares, and emitting the 6 required `B.Fab` keywords for `100%` `fab_notes_completeness`.
+   - **`scripts/silk_annotator.py`**: Reusable `SilkGrid` collision detector, exact text measurer, `add_standard_fab_notes()` helper, and `--inspect <board.kicad_pcb>` CLI that checks reference visibility and text bounding-box overlaps on any KiCad PCB.
