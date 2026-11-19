@@ -4,11 +4,14 @@ Start from [Hagiwo's original post](https://note.com/solder_state/n/n110e9ba066b
 
 ![Hagiwo's Original Envelope Follower Sketch](../images/EnvelopeFollower.webp)
 
-Download the reference schematic into your project directory so your AI agent can inspect it:
+Download the reference schematic into your project directory and verify that you fetched the raw image rather than an HTML wrapper page before asking your AI agent to inspect it:
 
 ```bash
 curl -LO https://raw.githubusercontent.com/domesticmouse/EnvelopeFollower/main/EnvelopeFollower.webp
+file EnvelopeFollower.webp
 ```
+
+Confirm `file` reports a valid image (`RIFF ... Web/P image` or `JPEG image data`) rather than `HTML document`.
 
 Rather than jumping straight from a raw sketch to a PCB in a single prompt, breaking Stage 2 into **six focused engineering prompts** catches hidden analog bugs, validates real JLCPCB part stock, creates a learning guide, and locks down test points and silkscreen DFM rules before writing a single line of SKiDL.
 
@@ -67,7 +70,7 @@ Hagiwo's passive peak detector suffers from three compounding issues:
 
 - **Fix**: Using **`2× TL074H`** (`8` op-amp channels) leaves `U2C` and `U2D` available to build an **active zero-deadzone peak detector and buffer**:
   - **`U2C` (Active Peak Driver)**: Drives `D3` (`1N4148W`) inside a closed feedback loop from `ENV_SIG` via **`R24` (`100k`)**, eliminating `D3`'s `0.6 V` forward drop and compensating for Attack/Release divider sag.
-  - **Anti-Saturation Catch Diode `D7` (`1N4148W`) & Loop Compensation `C11` (`47 pF` C0G)**: During Release ($V_{\text{FULL\_RECT}} < V_{\text{ENV\_SIG}}$), `D7` clamps `U2C` just one diode drop below `FULL_RECT` instead of letting `U2C` slam into the `-12V` rail, while `C11` stabilizes phase margin across the dual-op-amp loop.
+  - **Anti-Saturation Catch Diode `D7` (`1N4148W`) & Loop Compensation `C11` (`47 pF` C0G)**: During Release ($V_{\text{FULL\_RECT}} < V_{\text{ENV\_SIG}}$), `D7` clamps `U2C` just one diode drop below `FULL_RECT` instead of letting `U2C` slam into the `-12V` rail—with **`D7` anode at `PK_FB_INV` (`U2C-`) and cathode at `PK_DRV_OUT`** (reversing `D7` would clamp positive attack drive to $+0.6\text{ V}$ and defeat peak tracking). Meanwhile, because placing the attack RC network (`R9 + RV2 + C2`) inside `U2C`'s feedback loop adds a second pole that causes a $\sim 61\text{ kHz}$ small-signal oscillation, `C11` (`47 pF` C0G) across `U2C` paired with `R24` (`100 kΩ`) introduces a phase-lead zero ($f_z \approx 33.9\text{ kHz}$) that stabilizes loop phase margin without extra BOM lines.
   - **Moved `R9` & Scaled Timing**: Move `R9` (`1k`) to the **input side** of `C2` (between `D3` cathode and `RV2` `A50k`) to protect `U2C`; scale `C2` to **`220 nF` (`0805` X7R)** and `R10` to **`47k`** with `RV3 = A1M`, yielding $\tau_{\text{atk}} \approx 0.22\text{--}11.2\text{ ms}$ and $\tau_{\text{rel}} \approx 10.3\text{--}230\text{ ms}$.
   - **`U2D` (Zero-Load JFET Buffer)**: Buffers `ENV_CAP` ($\sim 1\text{ pA}$ input bias) so Stage 5, Stage 7, and feedback `R24` never drain `C2`.
 
@@ -201,4 +204,4 @@ Finally, define bench test points (`TP1`–`TP8`, marked **`DNP`** so JLCPCB lea
 1. **Reference + Value on SMD Silkscreen (`B.SilkS`)**: Display both the reference designator and concise value/MPN (`U1 TL074H`, `R8 20k`, `C10 47pF`, `D8 BAT54S`) outside component courtyards and pads so unmarked `0603`/`0805` MLCCs and `SOD-123`/`SOT-23` diodes can be verified directly in JLCPCB's 3D/DFM preview.
 2. **Dual-Sided Test Point Labels (`F.SilkS` & `B.SilkS`)**: Print `TP1 GND` through `TP8 OFS` on **both** `F.SilkS` (for bare-board bring-up) and `B.SilkS` (for rear bench probing once the 3U front panel hides `F.Cu`).
 3. **Dual-Sided THT Control & Power Labels (`F.SilkS` & `B.SilkS`)**: Print `RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k`, `J1 IN`, `J2 OUT`, `J3 INV_OUT`, `D4 LED` (`+`/`-`), and `J_PWR +/-12V` (`-12V / RED STRIPE` on pins 1–2) on **both** sides so identical-footprint pots cannot be swapped during hand assembly.
-4. **Visible Orientation Marks & JLCPCB Geometry**: Keep Pin-1 dots (`U1`, `U2`), diode cathode bars (`|`), and electrolytic `+` symbols outside component bodies; enforce $\ge 0.8\text{ mm}$ text height (`0.9–1.2 mm` recommended), $\ge 0.15\text{ mm}$ stroke thickness, $\ge 0.20\text{ mm}$ pad clearance, `0°`/`90°` rotations only, and include a `5 × 5 mm` QR code placeholder square.
+4. **Visible Orientation Marks & JLCPCB Geometry**: Keep Pin-1 dots (`U1`, `U2`), diode cathode bars (`|`), and electrolytic `+` symbols outside component bodies; enforce $\ge 0.8\text{ mm}$ text height (`0.9–1.2 mm` recommended), $\ge 0.15\text{ mm}$ stroke thickness, $\ge 0.20\text{ mm}$ pad clearance, `0°`/`90°` rotations only, and include a `5 × 5 mm` solid filled silkscreen square as the JLCPCB 2D QR code placeholder (JLCPCB's legacy `JLCJLCJLC` text placeholder string is obsolete and no longer used).

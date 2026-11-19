@@ -31,11 +31,20 @@ Notice how `--smd-only` skips the 9 manual THT parts while `--exclude-dnp` autom
 
 ## 7.2 Ordering on JLCPCB & Cost Breakdown
 
+### AI Agent Prompt (Capturing Ordering Notes)
+
+Before uploading your Gerbers and BOM, have your agent write a concise ordering checklist (`OrderingNotes.md`) tied to your exact BOM and QR placeholder:
+
+> *"Create a file for ordering notes. Include which BOM file to use, and the requirement to replace the 5mmx5mm solid square with a JLCPCB QR code during board entry."*
+
 ### Main Circuit PCB (`EnvelopeFollower.kicad_pcb`)
 
-- Upload the zipped `production/main/` Gerbers (`1.6 mm` FR4, 2 layers; optionally specify the `5 × 5 mm` white square on `B.SilkS` for JLCPCB's order QR code).
+- Upload the zipped `production/main/` Gerbers (`1.6 mm` FR4, 2 layers; under **Mark on PCB / Order Number / QR Code**, select the option to **replace the `5 × 5 mm` solid silkscreen square** on `B.SilkS` with a JLCPCB 2D QR code—JLCPCB's legacy `JLCJLCJLC` text string is obsolete and no longer used).
 - Enable **Economic PCB Assembly** on **Bottom Side** only (`B.Cu`).
 - Upload [`jlcpcb_bom.csv`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/jlcpcb_bom.csv) (`18` BOM lines, `45` SMD components) and `EnvelopeFollower_cpl.csv`.
+
+!!! warning "Do Not Upload `envelope_follower_bom.xml` to JLCPCB"
+    Always upload **`jlcpcb_bom.csv`** (`Comment,Designator,Footprint,LCSC Part #`) for JLCPCB Economic PCBA. Do **not** upload `envelope_follower_bom.xml`: that file is the raw KiCad XML BOM containing all 62 parts (including the 9 manual THT parts and 8 `DNP` test points) and will be rejected or pull unpopulated THT parts into assembly.
 
 #### Feeder Tier & Cost Summary
 

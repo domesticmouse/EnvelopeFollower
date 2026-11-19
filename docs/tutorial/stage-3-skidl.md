@@ -4,7 +4,11 @@ Defining the circuit in **SKiDL** turns the netlist into testable, version-contr
 
 ## AI Agent Prompt
 
-> *"Using the `skidl`, `bom`, `datasheets`, `jlcpcb`, and `lcsc` skills together with `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, implement the improved Eurorack Envelope Follower in `envelope_follower.py` using dual `TL074H` (`SOIC-14`, all 8 op-amp channels active). Populate verified `LCSC`, `MPN`, and `JLCPCB_Class` fields, add `TP1`–`TP8` (`Ronghe RH-5001`, `C5199801`) marked `dnp=True` / `Manual THT`, verify `ERC()` passes with 0 errors and 0 warnings, and export `envelope_follower.net`, `envelope_follower_bom.xml`, `jlcpcb_bom.csv`, and `EnvelopeFollower.kicad_sch`."*
+Because Stage 2 already froze every net, component reference, LCSC code, and `DNP` attribute inside `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, you only need a one-line prompt to drive the `/skidl` skill:
+
+> *"`/skidl` Please turn `@EnvelopeFollowerImproved.md` and `@EnvelopeFollowerBOM.md` into a SKiDL circuit."*
+
+That single prompt instructs the agent (using `skidl` alongside the BOM/LCSC skills) to implement all `62` components (`2× TL074H`, `45` SMD parts, `9` manual THT parts, and `8` `DNP` `TP1`–`TP8` test points), verify `ERC()` passes with 0 errors and 0 warnings, and export `envelope_follower.net`, `envelope_follower_bom.xml`, `jlcpcb_bom.csv`, and `EnvelopeFollower.kicad_sch`.
 
 ## Step 3.1: Set Up the Python Environment & Query Parts
 
@@ -31,29 +35,62 @@ In `envelope_follower.py`, five SKiDL patterns make the improved 54-part (+8 `DN
 1. **Pre-Import Environment Setup**:
     Before importing `skidl`, set `XDG_DATA_HOME`, `MPLCONFIGDIR`, `KICAD10_SYMBOL_DIR`, `KICAD_SYMBOL_DIR`, and `KICAD10_FOOTPRINT_DIR` so SKiDL resolves KiCad 10's `.kicad_sym` libraries cleanly on macOS.
 
-2. **Reusable Templates, `part.fields` Metadata & `DNP` Test Points**:
-    All passives, diodes, panel controls, and test loops derive from `dest=TEMPLATE` parts (`make_templates()`). Catalog metadata is written into `part.fields["LCSC"]`, `part.fields["MPN"]`, and `part.fields["JLCPCB_Class"]` (rather than plain Python attributes, which SKiDL's netlist/XML exporters ignore):
+2. **Deterministic `make_part()` Helpers, `part.fields` Metadata & `DNP` Test Points**:
+    Instead of relying on `dest=TEMPLATE` auto-numbering—which would shift resistor references because the Stage 7 LED fix intentionally removed `R20`, `R22`, and `R23`—instantiate every component deterministically with explicit `ref=ref` and `tag=ref.lower()` via `make_part()` and `make_resistors()`. Write catalog and silkscreen metadata directly into `part.fields["LCSC"]`, `part.fields["MPN"]`, `part.fields["JLCPCB_Class"]`, and `part.fields["Silkscreen"]` (rather than plain Python attributes, which SKiDL's netlist and XML exporters ignore):
 
     ```python
-    # Verified JLCPCB Basic 1% thick-film resistors (0603 & 1206)
-    JLCPCB_RESISTORS_0603 = {
-        "1k": ("C21190", "0603WAF1001T5E", "Basic"),
-        "1.5k": ("C22843", "0603WAF1501T5E", "Basic"),
-        "10k": ("C25804", "0603WAF1002T5E", "Basic"),
-        "20k": ("C4184", "0603WAF2002T5E", "Basic"),
-        "47k": ("C25819", "0603WAF4702T5E", "Basic"),
-        "100k": ("C25803", "0603WAF1003T5E", "Basic"),
-        "1M": ("C22935", "0603WAF1004T5E", "Basic"),
-    }
+    def make_part(
+        lib: str,
+        symbol: str,
+        ref: str,
+        value: str,
+        footprint: str,
+        fields: dict[str, str] | None = None,
+        *,
+        dnp: bool = False,
+    ) -> Part:
+        """Instantiate a SKiDL Part with deterministic tag, footprint, and BOM fields."""
+        part = Part(
+            lib,
+            symbol,
+            ref=ref,
+            value=value,
+            footprint=footprint,
+            tag=ref.lower(),
+        )
+        if fields:
+            for key, field_val in fields.items():
+                part.fields[key] = field_val
+        if dnp:
+            part.dnp = True
+        return part
 
-    JLCPCB_RESISTORS_1206 = {
-        "10R 1/4W": ("C17903", "1206W4F100JT5E", "Basic"),
-        "1k 1/4W": ("C4410", "1206W4F1001T5E", "Basic"),
-    }
+
+    def make_resistors(
+        specs: list[tuple[str, str, str, str, str, str]],
+    ) -> dict[str, Part]:
+        """Instantiate fixed SMD resistors from (ref, value, fp, lcsc, mpn, silk) rows."""
+        resistors: dict[str, Part] = {}
+        for ref, value, footprint, lcsc, mpn, silkscreen in specs:
+            resistors[ref] = make_part(
+                "Device",
+                "R",
+                ref=ref,
+                value=value,
+                footprint=footprint,
+                fields={
+                    "LCSC": lcsc,
+                    "MPN": mpn,
+                    "Manufacturer": "UNI-ROYAL",
+                    "JLCPCB_Class": "Basic",
+                    "Silkscreen": silkscreen,
+                },
+            )
+        return resistors
     ```
 
-    - **Panel THT Controls** (`RV1`–`RV4`, `J1`–`J3`, `D4`, `J_PWR`) are tagged `JLCPCB_Class = "Manual THT"` so `generate_jlcpcb_bom()` excludes them from the SMT pick-and-place CSV.
-    - **Optional Test Points (`TP1`–`TP8`)** instantiate `Part("Connector", "TestPoint", footprint="TestPoint:TestPoint_Keystone_5000-5004_Miniature")` with `LCSC = "C5199801"`, `MPN = "RH-5001"`, `JLCPCB_Class = "Manual THT"`, and `part.dnp = True` so both the JLCPCB BOM and the `.pos` centroid file leave those `1.0 mm` holes unpopulated.
+    - **Panel THT Controls** (`RV1`–`RV4`, `J1`–`J3`, `D4`, `J_PWR`) are tagged `JLCPCB_Class = "Manual THT"` so `generate_jlcpcb_bom()` excludes them from the SMT pick-and-place CSV, while `part.fields["Silkscreen"]` preserves labels such as `"RV1 GAIN A100k"` and `"J_PWR +/-12V"` for PCB layout.
+    - **Optional Test Points (`TP1`–`TP8`)** instantiate `Part("Connector", "TestPoint", ref=ref, value=val, footprint="TestPoint:TestPoint_Keystone_5000-5004_Miniature", tag=ref.lower())` with `LCSC = "C5199801"`, `MPN = "RH-5001"`, `JLCPCB_Class = "Manual THT (DNP)"`, `Silkscreen = f"{ref} {val}"`, and `part.dnp = True` so both the JLCPCB BOM and the `.pos` centroid file leave those `1.0 mm` holes unpopulated.
 
 3. **Power `Interface` & `NetClass` Rules**:
     Power rails (`+12V_IN`, `+12V_PROT`, `+12V`, `-12V_IN`, `-12V_PROT`, `-12V`, `GND`) are bundled into a SKiDL `Interface`, assigned `NetClass("Power", priority=1, trace_width=0.6, clearance=0.25)`, and marked `drive = POWER` on the power-entry rails so ERC verifies every supply connection.
@@ -89,7 +126,27 @@ In `envelope_follower.py`, five SKiDL patterns make the improved 54-part (+8 `DN
     Similarly, Stage 5 (`U1D`) and Stage 6 (`U2A`) wire each `BAT54S` dual Schottky rail clamp (`D8` on `AMP_OUT`, `D9` on `INV_AMP_OUT`) with pin `1` (`A`) to `-12V`, pin `2` (`K`) to `+12V`, and pin `3` (`COM`) to the op-amp output ahead of `1/4 W` `1206` resistors `R16`/`R19`, while Stage 7 (`U2B`) places `D4` (`3 mm` LED) between pin `7` (`LED_A`) and pin `6` (`LED_K`) with `R21` (`1.5k`) to `GND`.
 
 5. **Programmatic `erc_assert()` & Exports**:
-    Custom assertions verify package pin counts (`len(u1.get_pins()) == 14`, `len(u2.get_pins()) == 14`) and power connections before calling `ERC()`, `generate_netlist()`, `generate_xml()`, `generate_jlcpcb_bom()` (skipping `Manual THT` and `dnp=True`), and `generate_schematic()`.
+    Custom net-level pin-count and part-count assertions catch missing or stray connections before `ERC()`, `generate_netlist()`, `generate_xml()`, and `generate_jlcpcb_bom()` (skipping `Manual THT` and `dnp=True`) run:
+
+    ```python
+    erc_assert("len(v_p12) == 10", "+12V rail expected 10 connected pins")
+    erc_assert("len(v_n12) == 10", "-12V rail expected 10 connected pins")
+    erc_assert("len(gnd) == 27", "GND rail expected 27 connected pins")
+    erc_assert("len(out_tip) == 2", "OUT_TIP net should connect R16 and J2 tip")
+    erc_assert("len(inv_out_tip) == 2", "INV_OUT_TIP net should connect R19 and J3 tip")
+    erc_assert(
+        "len(builtins.default_circuit.parts) == 62",
+        "Expected 62 total components (45 SMD + 9 THT + 8 DNP TPs)",
+    )
+    ```
+
+    Verifying exact net counts (such as `len(gnd) == 27`) immediately catches off-by-one wiring or ground-pin omissions before a netlist ever reaches PCB layout.
+
+!!! warning "KiCad 10 Polarized Pin Numbers vs. Pin Names"
+    Always inspect `.kicad_sym` and `.kicad_mod` definitions before wiring polarized parts by pin number:
+
+    - **`Device:C_Polarized` (`CP_Elec_6.3x5.4`)**: Pin `1` is `+` and Pin `2` is `-`. On the `-12V` rail, **`c4[1]` connects to `GND`** (`0 V`) and **`c4[2]` connects to `-12V`** (`-11.78 V`).
+    - **`Diode:1N4148W`, `Device:D_Schottky`, and `Device:LED`**: Pin `1` is **`K` (cathode)** and Pin `2` is **`A` (anode)**—the opposite of intuitive "1 = anode" assumptions. Always wire diodes and LEDs by pin name (`d["A"]`, `d["K"]`) rather than raw pin integers.
 
 ## Step 3.3: Run SKiDL & Inspect Outputs
 

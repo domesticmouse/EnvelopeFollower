@@ -31,3 +31,6 @@ Verify the installed directory layout:
 | **`datasheets`** | `aklofas/kicad-happy` | Extracts verified pinouts, absolute maximum ratings, and package footprints from IC/diode datasheets (`TL074H`, `BAT54S`, `RH-5001`) | [Stage 2](stage-2-circuit-upgrades.md) & [Stage 3](stage-3-skidl.md) |
 | **`jlcpcb`** | `aklofas/kicad-happy` | Optimizes part choices for JLCPCB Economic single-sided PCBA (`Basic` vs. `Extended` feeder fees), rotation offsets, and silkscreen DFM rules | [Stage 2](stage-2-circuit-upgrades.md), [Stage 4](stage-4-schematic-and-pcb.md) & [Stage 7](stage-7-manufacturing.md) |
 | **`lcsc`** | `aklofas/kicad-happy` | Queries live LCSC Electronics stock/pricing by `Cxxxxx` or MPN and verifies drop-in fallback parts | [Stage 2](stage-2-circuit-upgrades.md) & [Stage 3](stage-3-skidl.md) |
+
+!!! tip "Keep `README.md` as a Living Build Log"
+    As you work through Stages 2–7 across separate agent sessions, treat your repository's `README.md` as a **living build log**: after each step, record the prompt you used, key design choices (such as THT vs. SMD decisions or test-point parts), and links to the generated files, then commit right away. When you open a fresh conversation for the next stage, your agent reads `README.md` and automatically inherits the full project context without repeating earlier prompts.
