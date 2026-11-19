@@ -10,7 +10,7 @@ Now ask the agent to verify live JLCPCB SMT availability, consolidate values ont
 
 ### AI Agent Prompt
 
-> *"Given `EnvelopeFollower.md` and `EnvelopeFollowerImprovements.md`, I'd like to research part availability on JLCPCB. I'd like the TL074s to be TL074H (SOIC), and most of the parts to be surface mount parts for JLCPCB construction. The jacks, pots, IDC power header, and 3mm indicator LED will be THT parts, mounted later. Incorporate the circuit improvements and Eurorack protections, use `U2C` and `U2D` for the active zero-deadzone peak detector and buffer, and adopt the improved potentiometer values (`A100k`, `A50k`, `A1M`, `B10k`)."*
+> *"Given `EnvelopeFollower.md` and `EnvelopeFollowerImprovements.md`, I'd like to research part availability on JLCPCB. I'd like the TL074s to be TL074H (SOIC), and most of the parts to be surface mount parts for JLCPCB construction. The jacks, pots, IDC power header, and 3mm indicator LED will be THT parts, mounted later. Incorporate the circuit improvements and Eurorack protections, use `U2C` and `U2D` for the active zero-deadzone peak detector and buffer, and adopt the improved potentiometer values (`A100k`, `A50k`, `A1M`, `B10k`). Save the updated circuit specification to `EnvelopeFollowerImproved.md` and the BOM to `EnvelopeFollowerBOM.md`."*
 
 ### Consolidated Assembly Strategy
 
@@ -28,7 +28,7 @@ Generating an educational explanation (`EnvelopeFollowerExplanation.md`) alongsi
 
 ### AI Agent Prompt
 
-> *"Given `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, please create a markdown file explaining the circuit for someone learning audio electronics. I'd like to follow the audio signal path for the main arc, with supporting sections for power handling and the like."*
+> *"Given `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, please create `EnvelopeFollowerExplanation.md` explaining the circuit for someone learning audio electronics. I'd like to follow the audio signal path for the main arc, with supporting sections for power handling and the like."*
 
 ### Signal Architecture & Key Engineering Takeaways
 
@@ -73,7 +73,7 @@ Finally, define bench test points (`TP1`–`TP8`, marked **`DNP`** so JLCPCB lea
 >
 > *"Please add these test points to `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`. I'll be using Ronghe `RH-5001`. Mark as DNP in the BOM."*
 >
-> *"Please create a markdown file for capturing instructions on how to mark up components on the silkscreens. Marking test points on both sides is a useful instruction. I also want the component values marked on the silkscreen for ease of comparing the populated component against its required value in the JLCPCB reports."*
+> *"Please create `SilkscreenInstructions.md` for capturing instructions on how to mark up components on the silkscreens. Marking test points on both sides is a useful instruction. I also want the component values marked on the silkscreen for ease of comparing the populated component against its required value in the JLCPCB reports."*
 
 ### `TP1`–`TP8` Test Point Schedule (`Ronghe RH-5001`, LCSC `C5199801`, `DNP`)
 

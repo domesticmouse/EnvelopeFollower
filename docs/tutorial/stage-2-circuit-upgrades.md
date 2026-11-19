@@ -23,7 +23,7 @@ First, ask the agent to transcribe every net, component value, and diode orienta
 
 ### AI Agent Prompt
 
-> *"Please review `EnvelopeFollower.webp`. I'd like to extract a Markdown description of the circuit that can be used to build a circuit."*
+> *"Please review `EnvelopeFollower.webp`. I'd like to extract a Markdown description of the circuit that can be used to build a circuit, and save it to `EnvelopeFollower.md`."*
 
 ### Baseline 7-Stage Topology
 
