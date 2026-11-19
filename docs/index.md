@@ -10,7 +10,7 @@ Each stage uses a **hybrid workflow**: you will see both the **AI agent prompt**
 
 ```mermaid
 flowchart TD
-    S0["0. Hagiwo Sketch<br/>EnvelopeFollower.jpg / .webp"] --> S1["1. Install 7 Agent Skills<br/>skidl, eurorack-panel, kicad,<br/>bom, datasheets, jlcpcb, lcsc"]
+    S0["0. Hagiwo Sketch<br/>EnvelopeFollower.jpg / .webp"] --> S1["1. Install 9 Agent Skills<br/>skidl, kicad-pcbnew-layout, kicad-silkscreen-markup,<br/>eurorack-panel, kicad, bom, datasheets, jlcpcb, lcsc"]
     S1 --> S2["2. Sketch & Analog Upgrades<br/>Extract -> Critique -> Eurorack Protections"]
     S2 --> S3["3. JLCPCB BOM, Walkthrough & DFM<br/>Basic/Extended BOM -> Audio Walkthrough -> TP1-TP8 & Silkscreen"]
     S3 --> S4["4. SKiDL Circuit & ERC<br/>envelope_follower.py -> .net + jlcpcb_bom.csv (18 lines)"]
@@ -52,11 +52,11 @@ flowchart TD
 
 ## Stage-by-Stage Guide
 
-1. **[Stage 1: Hardware Agent Skills](tutorial/stage-1-agent-skills.md)** — Install all 7 hardware design and fabrication skills (`skidl`, `eurorack-panel`, `kicad`, `bom`, `datasheets`, `jlcpcb`, `lcsc`) into `.agents/skills/`.
+1. **[Stage 1: Hardware Agent Skills](tutorial/stage-1-agent-skills.md)** — Install all 9 hardware design and fabrication skills (`skidl`, `kicad-pcbnew-layout`, `kicad-silkscreen-markup`, `eurorack-panel`, `kicad`, `bom`, `datasheets`, `jlcpcb`, `lcsc`) into `.agents/skills/`.
 2. **[Stage 2: Sketch & Circuit Upgrades](tutorial/stage-2-circuit-upgrades.md)** — Extract Hagiwo's hand-drawn sketch (`EnvelopeFollower.md`), critique and fix analog flaws (`OFFSET` pot loading, passive diode deadzone and loop stability using `U2C`/`U2D` + `D7` + `C11`, active V-to-I LED driver), and add Eurorack hardware protections (`EnvelopeFollowerImprovements.md`).
 3. **[Stage 3: JLCPCB BOM, Walkthrough & Test Points](tutorial/stage-3-bom-and-dfm.md)** — Research live JLCPCB Basic/Extended SMT parts vs. manual THT controls (`EnvelopeFollowerImproved.md` & `EnvelopeFollowerBOM.md`), document the 7-stage audio signal path (`EnvelopeFollowerExplanation.md`), and define `TP1`–`TP8` (`DNP`) test points and dual-sided silkscreen rules (`SilkscreenInstructions.md`).
 4. **[Stage 4: SKiDL Circuit & ERC](tutorial/stage-4-skidl.md)** — Express the 54 populated components + 8 `DNP` test points (62 footprints, 36 nets) in Python (`envelope_follower.py`), verify live LCSC stock across 18 JLCPCB SMT BOM lines, and pass `ERC()` with zero errors or warnings.
-5. **[Stage 5: 6 HP Main PCB, Routing & Silkscreen](tutorial/stage-5-schematic-and-pcb.md)** — Automate the `29.60 × 107.00 mm` main PCB (`generate_kicad_pcb.py`) directly from `envelope_follower.net` with `F.Cu` panel controls, `B.Cu` single-sided SMT + `J_PWR` + `TP1`–`TP8`, 2-layer copper routing and stitched `GND` pours, `Reference + Value` / dual-sided silkscreen markup, DRC, semantic silkscreen auditing, and reusable skill extraction.
+5. **[Stage 5: 6 HP Main PCB, Routing & Silkscreen](tutorial/stage-5-schematic-and-pcb.md)** — Automate the `29.60 × 107.00 mm` main PCB (`generate_kicad_pcb.py`) directly from `envelope_follower.net` with `F.Cu` panel controls, `B.Cu` single-sided SMT + `J_PWR` + `TP1`–`TP8`, 2-layer copper routing and stitched `GND` pours, `Reference + Value` / dual-sided silkscreen markup, DRC, and semantic silkscreen auditing.
 6. **[Stage 6: Mated 3U Front Panel](tutorial/stage-6-front-panel.md)** — Inspect main PCB bushing coordinates and generate a grounded `1.6 mm` FR4 3U front panel (`panel/EnvelopeFollower_Panel.kicad_pcb`) with clean functional labels (`GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, `INV OUT`), Gerbers, and DRC verification.
 7. **[Stage 7: JLCPCB PCBA & Assembly](tutorial/stage-7-manufacturing.md)** — Export Gerbers, Excellon drills, and bottom-side CPL files (excluding `DNP` test points) for single-sided JLCPCB Economic PCBA (\$0.85/board SMD + \$9.00 Extended setup), verify placement previews against `B.SilkS` values, hand-solder THT controls/test loops, and probe `TP1`–`TP8` on the bench.
 
