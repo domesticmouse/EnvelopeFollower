@@ -64,4 +64,4 @@ flowchart TD
 
 - **[Netlist, BOM & Capture Guide](reference/netlist-and-bom.md)** — Complete JLCPCB SMD + Manual THT Bill of Materials, ready-to-upload 18-line CSV, all 36 nets with IC pin numbers, 8-step manual KiCad capture guide, and complete silkscreen schedule.
 - **[PCB & Fabrication Checklist](reference/build-checklist.md)** — Interactive checklist tracking layout, dual-sided silkscreen markup, optional `DNP` test points, panel generation, and JLCPCB ordering.
-- **[GitHub Repository](https://github.com/domesticmouse/EnvelopeFollower)** — Full source code, KiCad project files, Gerbers, and [Apache 2.0 License](https://github.com/domesticmouse/EnvelopeFollower/blob/main/LICENSE).
+- **[GitHub Repository](https://github.com/domesticmouse/EnvelopeFollower)** — Tutorial source, prompt traces, reference sketch, and [Apache 2.0 License](https://github.com/domesticmouse/EnvelopeFollower/blob/main/LICENSE).

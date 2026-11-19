@@ -1,6 +1,6 @@
 # Envelope Follower
 
-A Eurorack analog envelope follower module designed for KiCad, defined in SKiDL with a generated KiCad netlist, JLCPCB PCBA BOM, complete netlist specification, and build checklist.
+An end-to-end hardware design tutorial (MkDocs Material site and prompt traces) for turning Hagiwo's analog envelope follower sketch into a 6 HP Eurorack KiCad 10 PCB and 3U front panel using AI hardware skills and SKiDL.
 
 The original schematic is based on Hagiwo's [$4 Envelope Follower module - DIY Eurorack Modular Synthesizer](https://note.com/solder_state/n/n110e9ba066b3?hl=en).
 
@@ -10,62 +10,58 @@ The original schematic is based on Hagiwo's [$4 Envelope Follower module - DIY E
 
 ## ⚡ Improved Circuit Overview
 
-This repository adapts Hagiwo's original circuit for modern **Texas Instruments TL074H** quad op-amps, introducing enhancements for stability, low-noise performance, and hardware protection:
+The tutorial adapts Hagiwo's original circuit for modern **Texas Instruments TL074H** (`TL074HIDR`, `SOIC-14`) quad op-amps, introducing enhancements for zero-deadzone envelope tracking, stability, low-noise performance, and Eurorack hardware protection:
 
-1. **Dual TL074H Quad Op-Amp Configuration (6 Active Channels)**:
-   - **U1 (TL074H)**: $U1A$ Input Gain Stage, $U1B$ Half-Wave Precision Rectifier, $U1C$ Summing Precision Rectifier, $U1D$ Output Amplifier & Offset Stage.
-   - **U2 (TL074H)**: $U2A$ Inverting Output Buffer, $U2B$ LED Driver Buffer.
-   - **Unused Op-Amp Termination ($U2C$, $U2D$)**: Unused channels are configured as unity-gain followers with non-inverting inputs ($+$) grounded to prevent floating inputs, parasitic oscillation, and excessive power draw.
+1. **Dual `TL074HIDR` Configuration (All 8 Channels Active)**:
+   - **U1 (`TL074H`)**: `U1A` Input Gain Stage, `U1B` Precision Half-Wave Rectifier, `U1C` $1.0\times$ Summing Rectifier (`R8` = $20\text{ k}\Omega$ 1%), `U1D` Output Gain ($\approx 2.98\times$) & Linear DC Offset Stage.
+   - **U2 (`TL074H`)**: `U2A` Unity-Gain Inverting Output, `U2B` Active Voltage-to-Current LED Driver, `U2C` Active Zero-Deadzone Peak Driver (with catch diode `D7` & loop compensation `C11` = $47\text{ pF}$ C0G), `U2D` Zero-Load JFET `ENV_CAP` Buffer.
 
-2. **Gain Control Minimum Series Resistor**:
-   - Added $R_{\text{GAIN\_MIN}} = 1\text{ k}\Omega$ in series with the $100\text{ k}\Omega$ gain potentiometer (`RV_GAIN`). This prevents setting closed-loop feedback resistance to $0\,\Omega$ at minimum pot travel, avoiding pot wiper contact noise and op-amp loading.
+2. **Gain-Floor Limiting & HF Roll-Off**:
+   - `R25` ($1\text{ k}\Omega$) in series with `RV1` (`A100k`) sets a $-0.1\times$ minimum gain floor so hot Eurorack audio can be padded down without muting or shorting `C10` ($47\text{ pF}$ C0G, $f_c \approx 33.5\text{ kHz}$ at max gain).
 
-3. **High-Frequency Supply Decoupling**:
-   - Four $100\text{ nF}$ ceramic bypass capacitors ($C_5$–$C_8$) placed directly at the $V_{CC+}$ (Pin 4) and $V_{CC-}$ (Pin 11) pins of each TL074H IC to suppress high-frequency noise and oscillation.
+3. **Power Entry, Reverse-Polarity & RC Bus Filtering**:
+   - Series `B5819W` Schottky diodes (`D5`, `D6`) and $10\,\Omega$ `1/4 W` (`1206`) series resistors (`R26`, `R27`) feed $10\,\mu\text{F}$ $50\text{ V}$ SMD electrolytics (`C3`, `C4`), plus four $100\text{ nF}$ `0603` X7R local IC bypass capacitors (`C5`–`C8`) placed directly at the $V_{CC+}$ (Pin 4) and $V_{CC-}$ (Pin 11) pins of `U1` and `U2`.
 
-4. **Power & Output Protection**:
-   - **Reverse Polarity Protection**: Schottky diodes ($D_4, D_5$ / 1N5817) on $+12\text{V}$ and $-12\text{V}$ supply lines.
-   - **Short Circuit Protection**: $1\text{ k}\Omega$ output resistors ($R_{16}, R_{19}$) on `J_OUT` and `J_INV_OUT` jacks to protect against patch cable shorts.
-
-5. **Precision Rectification**:
-   - Recommended 1% metal film resistors ($10\text{ k}\Omega, 22\text{ k}\Omega$) in the full-wave rectifier stage for balanced positive and negative peak response.
+4. **Low-Impedance Linear `OFFSET` & Output Protection**:
+   - Scaling `RV4` to `B10k` (`R11 = R12 = 1k`) driving `R13 = R14 = R15 = 100k` holds envelope gain steady at $2.97\times\text{--}2.99\times$ across a full $\pm 9.8\text{ V}$ linear offset range, while `C9` ($100\text{ nF}$) bypasses rail ripple on `OFFSET_WIPER` to `GND`.
+   - **Short-Circuit & Rail Clamping**: $1\text{ k}\Omega$ `1/4 W` (`1206`) output resistors (`R16`, `R19`) plus `BAT54SLT1G` (`SOT-23`) dual series Schottky rail clamps (`D8`, `D9`) on `AMP_OUT` and `INV_AMP_OUT`.
 
 ---
 
 ## 🔄 Signal Flow & Functional Blocks
 
-The circuit is partitioned into six functional blocks (matching [`ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`](ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md)):
+The circuit covers 54 populated components plus 8 optional `DNP` test points (62 footprints total) across 36 nets (matching [`docs/reference/netlist-and-bom.md`](docs/reference/netlist-and-bom.md)):
 
-1. **Power Entry, Protection & Decoupling (`J_PWR`, `D4`–`D5`, `C3`–`C8`)**:
-   Eurorack $\pm 12\text{V}$ 10-pin power entry through 1N5817 Schottky reverse-polarity diodes (`D4`, `D5`), $4.7\,\mu\text{F}$ bulk electrolytics (`C3`, `C4`), and local $100\text{ nF}$ ceramic IC bypass capacitors (`C5`–`C8`).
+1. **Power Entry, Protection & Decoupling (`J_PWR`, `D5`–`D6`, `R26`–`R27`, `C3`–`C8`)**:
+   Eurorack $\pm 12\text{ V}$ 10-pin power entry through `B5819W` Schottky reverse-polarity diodes (`D5`, `D6`), $10\,\Omega$ `1/4 W` series resistors (`R26`, `R27`), $10\,\mu\text{F}$ $50\text{ V}$ bulk electrolytics (`C3`, `C4`), and local $100\text{ nF}$ ceramic IC bypass capacitors (`C5`–`C8`).
 2. **Input Coupling & Gain Stage (`U1A`)**:
-   AC-coupled input (`J_IN`, `C1` $4.7\,\mu\text{F}$, `R1` $1\text{ M}\Omega$ pulldown) driving an inverting op-amp stage (`R2` $10\text{ k}\Omega$, `RV_GAIN` $100\text{ k}\Omega$, `R_GAIN_MIN` $1\text{ k}\Omega$).
+   AC-coupled input (`J1`, `C1` $1\,\mu\text{F}$, `R1` $1\text{ M}\Omega$ pulldown) driving an inverting op-amp stage (`R2` $10\text{ k}\Omega$, `RV1` $100\text{ k}\Omega$, `R25` $1\text{ k}\Omega$, `C10` $47\text{ pF}$).
 3. **Precision Full-Wave Rectifier (`U1B`, `U1C`)**:
-   `U1B` with 1N4148 diodes (`D1`, `D2`) and $10\text{ k}\Omega$ resistors (`R3`, `R4`) forms an active half-wave rectifier, which `U1C` sums (`R7` $10\text{ k}\Omega$) against the direct signal (`R5` + `R6`, $20\text{ k}\Omega$ total) with a $22\text{ k}\Omega$ feedback resistor (`R8`).
-4. **Peak Detector & Envelope Timing**:
-   1N4148 diode `D3` charges the $1\,\mu\text{F}$ smoothing capacitor `C2` through `RV_ATK` ($50\text{ k}\Omega$ attack control) and discharges through `R9` ($1\text{ k}\Omega$), `R10` ($10\text{ k}\Omega$), and `RV_REL` ($1\text{ M}\Omega$ release control).
-5. **Output Amplifier & DC Offset Stage (`U1D`)**:
-   Follows the envelope voltage on Pin 12 ($+$) while summing an adjustable $\pm 12\text{V}$ DC bias (`R11`, `R12`, `RV_OFFSET`, `R13`, `R14`, `R15`) at Pin 13 ($-$) and driving `J_OUT` through `R16` ($1\text{ k}\Omega$).
-6. **Inverted Output, LED Driver & Termination (`U2A`–`U2D`)**:
-   - `U2A`: Unity-gain inverting stage (`R17` = `R18` = $10\text{ k}\Omega$) driving `J_INV_OUT` through `R19` ($1\text{ k}\Omega$).
-   - `U2B`: Unity-gain LED buffer (`R20` $10\text{ k}\Omega$ input isolation, `R21` $22\text{ k}\Omega$ current limit) driving `LED1` against a cathode bias divider (`R22` $10\text{ k}\Omega$ to `GND`, `R23` $33\text{ k}\Omega$ to $-12\text{V}$).
-   - `U2C`, `U2D`: Terminated as unity-gain followers with non-inverting inputs tied to `GND`.
+   `U1B` with `1N4148W` diodes (`D1`, `D2`) and $10\text{ k}\Omega$ resistors (`R3`, `R4`) forms an active half-wave rectifier, which `U1C` sums (`R5` $10\text{ k}\Omega$) against the direct signal (`R6` + `R7`, $20\text{ k}\Omega$ total) with a $20\text{ k}\Omega$ feedback resistor (`R8`).
+4. **Active Peak Detector, Envelope Timing & Buffer (`U2C`, `U2D`)**:
+   `U2C` with catch diode `D7` (`1N4148W`) and loop compensation `C11` ($47\text{ pF}$) drives `D3` (`1N4148W`) to charge the $220\text{ nF}$ smoothing capacitor `C2` through `R9` ($1\text{ k}\Omega$) and `RV2` ($50\text{ k}\Omega$ attack control) and discharge through `R10` ($47\text{ k}\Omega$) and `RV3` ($1\text{ M}\Omega$ release control), buffered by `U2D` (`R24` $100\text{ k}\Omega$ feedback).
+5. **Output Amplifier & Linear DC Offset Stage (`U1D`)**:
+   Follows `ENV_SIG` on Pin 12 ($+$) while summing an adjustable $\pm 12\text{ V}$ DC bias (`R11`, `R12`, `RV4`, `C9`, `R13`, `R14`, `R15`) at Pin 13 ($-$) and driving `J2` (`OUT`) through `D8` (`BAT54S`) and `R16` ($1\text{ k}\Omega$ `1/4 W`).
+6. **Inverted Output & Active V-to-I LED Driver (`U2A`, `U2B`)**:
+   - `U2A`: Unity-gain inverting stage (`R17` = `R18` = $10\text{ k}\Omega$) driving `J3` (`INV_OUT`) through `D9` (`BAT54S`) and `R19` ($1\text{ k}\Omega$ `1/4 W`).
+   - `U2B`: Active voltage-to-current LED buffer driving `D4` (`LED`) against `R21` ($1.5\text{ k}\Omega$ to `GND`).
 
 ---
 
-## 🎛️ Controls & I/O Summary
+## 🎛️ Controls, I/O & Test Points Summary
 
 | Reference | Component / Value | Taper / Type | Function |
 | :--- | :--- | :--- | :--- |
-| **`RV_GAIN`** | $100\text{ k}\Omega$ Potentiometer | Linear / Log | Input Gain Control |
-| **`RV_ATK`** | $50\text{ k}\Omega$ Potentiometer | Linear | Attack Time Control |
-| **`RV_REL`** | $1\text{ M}\Omega$ Potentiometer | Audio / Log | Release Time Control |
-| **`RV_OFFSET`** | $100\text{ k}\Omega$ Potentiometer | Linear | Output DC Offset Adjust |
-| **`J_IN`** | 3.5mm Mono Jack | Switched | Audio / CV Input |
-| **`J_OUT`** | 3.5mm Mono Jack | Switched | Non-Inverted Envelope CV Output |
-| **`J_INV_OUT`** | 3.5mm Mono Jack | Switched | Inverted Envelope CV Output |
-| **`LED1`** | 3mm / 5mm LED | Red / Blue / Green | Envelope Signal Level Indicator |
-| **`J_PWR`** | 2x5 Shrouded Header | 10-Pin Eurorack | $\pm 12\text{V}$ & `GND` Power Input |
+| **`RV1`** (`GAIN`) | $100\text{ k}\Omega$ Potentiometer | Audio / Log (`A100k`) | Input Preamp Gain ($-0.1\times$ to $-10.1\times$) |
+| **`RV2`** (`ATK`) | $50\text{ k}\Omega$ Potentiometer | Audio / Log (`A50k`) | Attack Time Control ($\tau_{\text{atk}} \approx 0.22\text{--}11.2\text{ ms}$) |
+| **`RV3`** (`Release`) | $1\text{ M}\Omega$ Potentiometer | Audio / Log (`A1M`) | Release Time Control ($\tau_{\text{rel}} \approx 10.3\text{--}230\text{ ms}$) |
+| **`RV4`** (`OFFSET`) | $10\text{ k}\Omega$ Potentiometer | Linear (`B10k`) | Output DC Offset Adjust ($\approx -9.8\text{ V}$ to $+9.8\text{ V}$, flat $\approx 2.98\times$ gain) |
+| **`J1`** (`IN`) | 3.5mm Mono Jack (`WQP-PJ398SM`) | Switched THT | AC-Coupled Audio / CV Input ($Z_{\text{in}} \approx 10\text{ k}\Omega$, $f_c \approx 15.9\text{ Hz}$) |
+| **`J2`** (`OUT`) | 3.5mm Mono Jack (`WQP-PJ398SM`) | Switched THT | Non-Inverted Envelope CV Output (`BAT54S` + `1k` `1/4 W` protected) |
+| **`J3`** (`INV_OUT`) | 3.5mm Mono Jack (`WQP-PJ398SM`) | Switched THT | Inverted Envelope CV Output ($-V_{\text{AMP\_OUT}}$, `BAT54S` + `1k` `1/4 W` protected) |
+| **`D4`** (`LED`) | 3mm THT LED | Any Color | Active Voltage-to-Current Envelope Indicator ($I_{\text{LED}} = V_{\text{ENV\_SIG}} / 1.5\text{ k}\Omega$) |
+| **`J_PWR`** | 2×5 Shrouded IDC Header | 10-Pin Eurorack | $\pm 12\text{ V}$ & `GND` Power Input (`B5819W` + `10 Ω` RC protected) |
+| **`TP1`–`TP8`** (`DNP`) | `Ronghe RH-5001` (`C5199801`) | Optional THT Loops (`1.0 mm` drill) | Bench Probing (`GND`, `+12V`, `-12V`, `PRE`, `HALF`, `RECT`, `ENV`, `OFS`) |
 
 ---
 
@@ -79,36 +75,12 @@ To preview the documentation site locally:
 mkdocs serve
 ```
 
-Source files and standalone Markdown references:
+Documentation sources and session traces:
 
-* [**`mkdocs.yml`**](mkdocs.yml) & [**`docs/`**](docs/) – Multi-page MkDocs Material tutorial and technical reference source (deployed to GitHub Pages on push to `main`).
-* [**`TUTORIAL.md`**](TUTORIAL.md) – **Standalone End-to-End Tutorial**: Single-file version covering Hagiwo's circuit sketch, hardware agent skills (`skidl`, `kicad`, `eurorack-panel`), SKiDL capture, KiCad schematic/6 HP PCB generation, interactive routing, and 3U front panel construction.
-* [**`ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md`**](ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md) – Full Bill of Materials, 35-Net Connection List, and 8-Step KiCad Build Checklist.
-* [**`TODO.md`**](TODO.md) – KiCad PCB routing, panel, and JLCPCB fabrication progress checklist.
-
----
-
-## 🐍 SKiDL Circuit & Generated Artifacts
-
-The circuit is implemented in Python with [SKiDL](https://devbisme.github.io/skidl/) in [**`envelope_follower.py`**](envelope_follower.py) using dual **Texas Instruments TL074H** (`TL074HIDR`, `SOIC-14`) quad op-amps across 6 `@subcircuit` blocks, 48 physical components, and 35 nets:
-
-* [**`envelope_follower.py`**](envelope_follower.py) – Complete SKiDL circuit definition (`ERC()` passes with 0 errors and 0 warnings).
-* [**`EnvelopeFollower.kicad_sch`**](EnvelopeFollower.kicad_sch) – Generated KiCad schematic (`generate_schematic()`).
-* [**`generate_kicad_pcb.py`**](generate_kicad_pcb.py) & [**`EnvelopeFollower.kicad_pcb`**](EnvelopeFollower.kicad_pcb) – Automated 6 HP (`29.60 × 107.00 mm`) main PCB layout with pre-placed `F.Cu` panel controls and `B.Cu` SMT parts/power entry.
-* [**`panel/EnvelopeFollower_Panel.kicad_pcb`**](panel/EnvelopeFollower_Panel.kicad_pcb) – Mated 6 HP × 3U (`30.00 × 128.50 mm`) Eurorack front panel PCB (`0` DRC violations) with Gerber export in [`production/panel/`](production/panel/) and [`production/EnvelopeFollower_Panel.zip`](production/EnvelopeFollower_Panel.zip).
-* [**`envelope_follower.net`**](envelope_follower.net) – Generated KiCad netlist ready to import in `pcbnew` (`File -> Import -> Netlist...`).
-* [**`envelope_follower_bom.xml`**](envelope_follower_bom.xml) – KiCad XML BOM with embedded `LCSC`, `MPN`, and `JLCPCB_Class` fields.
-* [**`jlcpcb_bom.csv`**](jlcpcb_bom.csv) – Grouped 4-column JLCPCB SMT PCBA BOM (`Comment,Designator,Footprint,LCSC Part #`, 12 SMT line items; panel-mounted THT controls and jacks are marked `Manual THT`).
-* [**`envelope_follower_sklib.py`**](envelope_follower_sklib.py) & [**`envelope_follower.erc`**](envelope_follower.erc) – Generated backup SKiDL symbol library and Electrical Rules Check report.
-
-To regenerate the netlist, BOMs, schematic, and initial 6 HP PCB locally using `uv`:
-
-```bash
-uv venv --clear --python 3.14 .venv
-uv pip install skidl kinet2pcb
-.venv/bin/python envelope_follower.py
-.venv/bin/python generate_kicad_pcb.py
-```
+* [**`mkdocs.yml`**](mkdocs.yml) & [**`docs/`**](docs/) – Multi-page MkDocs Material tutorial (Stages 1–7) and technical reference source (deployed to GitHub Pages on push to `main`).
+* [**`docs/reference/netlist-and-bom.md`**](docs/reference/netlist-and-bom.md) – Full Bill of Materials, ready-to-upload JLCPCB CSV listing, 36-net connection table, and 8-step KiCad capture guide.
+* [**`docs/reference/build-checklist.md`**](docs/reference/build-checklist.md) – Interactive PCB layout, silkscreen verification, front-panel, and JLCPCB ordering checklist.
+* [**`prompts/README.md`**](prompts/README.md) – Per-conversation prompt and build logs from the hardware design sessions.
 
 ---
 
@@ -118,25 +90,7 @@ uv pip install skidl kinet2pcb
 EnvelopeFollower/
 ├── LICENSE                                # Apache License 2.0
 ├── README.md                              # Project overview & documentation
-├── TUTORIAL.md                            # End-to-end tutorial (sketch -> SKiDL -> KiCad -> 3U panel)
-├── TODO.md                                # KiCad PCB routing & fabrication checklist
-├── ENVELOPE_FOLLOWER_NETLIST_AND_TODO.md  # Complete BOM, netlist, and KiCad capture checklist
 ├── EnvelopeFollower.webp                  # Original Hagiwo hand-drawn reference schematic
-├── envelope_follower.py                   # SKiDL circuit definition (dual TL074H, 6 subcircuits)
-├── envelope_follower_sklib.py             # Backup SKiDL symbol library
-├── envelope_follower.net                  # Generated KiCad netlist
-├── envelope_follower_bom.xml              # KiCad XML BOM with LCSC/MPN metadata
-├── jlcpcb_bom.csv                         # Grouped JLCPCB SMT PCBA BOM
-├── envelope_follower.erc                  # SKiDL ERC report
-├── envelope_follower.log                  # SKiDL generation log
-├── EnvelopeFollower.kicad_sch             # Generated KiCad 10 schematic
-├── generate_kicad_pcb.py                  # Automated 6 HP KiCad PCB placement script
-├── EnvelopeFollower.kicad_pcb             # 6 HP main circuit PCB (pre-placed, ready to route)
-├── panel/
-│   └── EnvelopeFollower_Panel.kicad_pcb   # Mated 6 HP x 3U Eurorack front panel PCB
-├── production/
-│   ├── EnvelopeFollower_Panel.zip         # Packaged front panel Gerbers & Excellon drills
-│   └── panel/                             # Individual front panel Gerber & drill files
 ├── .github/workflows/
 │   └── docs.yml                           # GitHub Pages deployment workflow (MkDocs Material)
 ├── mkdocs.yml                             # MkDocs Material site configuration
@@ -146,8 +100,9 @@ EnvelopeFollower/
 │   ├── reference/                         # Netlist/BOM guide and PCB fabrication checklist
 │   ├── javascripts/mathjax.js             # MathJax v3 initialization for circuit equations
 │   └── images/                            # Original sketch, schematic SVG, and 3D PCB/panel renders
+├── prompts/                               # Per-conversation prompt traces and build logs
 ├── skills-lock.json                       # Agent skill lockfile
-└── .agents/skills/                        # Installed hardware skills (kicad, skidl, eurorack-panel)
+└── .agents/skills/agy-brain-explorer/     # Brain trajectory explorer skill
 ```
 
 ---

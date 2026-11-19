@@ -95,7 +95,7 @@ python3 .agents/skills/kicad/scripts/analyze_gerbers.py production/panel/ --full
 
     > *"Please remove the JLCJLCJLC marking, it is obsolete. Please add a 5mm x 5mm filled square to B.SilkS for replacement with the JLCPCB QR Code during ordering."*
 
-Verified analyzer results on [`panel/EnvelopeFollower_Panel.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/panel/EnvelopeFollower_Panel.kicad_pcb) and [`production/panel/`](https://github.com/domesticmouse/EnvelopeFollower/tree/main/production/panel):
+Verified analyzer results on `panel/EnvelopeFollower_Panel.kicad_pcb` and `production/panel/`:
 
 - **PCB Analyzer**: `0` errors, `0` warnings, `10` footprints (`8` controls + `2` M3 slots), `2` filled copper zones (`F.Cu`, `B.Cu`), `30.0 x 128.5 mm` outline, `routing_complete: True`.
 - **Gerber Analyzer**: `0` findings across all severities; `9/9` Gerber layers complete (`B.Cu`, `B.Mask`, `B.Paste`, `B.SilkS`, `Edge.Cuts`, `F.Cu`, `F.Mask`, `F.Paste`, `F.SilkS`); `7` PTH component holes (`3 × 6.2 mm`, `4 × 7.2 mm`) and `3` NPTH mounting/LED holes (`3.2 mm` LED hole + `2` M3 oval slots).

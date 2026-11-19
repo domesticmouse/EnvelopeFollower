@@ -2,7 +2,7 @@
 
 LLMs working without domain tooling tend to hallucinate KiCad S-expression syntax, guess footprint pinouts, overlook mechanical bushing offsets, verify BOM parts from stale memory, or pick out-of-stock LCSC components. Installing dedicated **hardware agent skills** gives your coding agent verified reference docs, datasheet extractors, live JLCPCB/LCSC catalog search tools, and deterministic Python PCB/Gerber analyzers inside `.agents/skills/`.
 
-Install all **7 hardware design and fabrication skills** from [`domesticmouse/skills`](https://github.com/domesticmouse/skills) and [`aklofas/kicad-happy`](https://github.com/aklofas/kicad-happy) (tracked in [`skills-lock.json`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/skills-lock.json)):
+Install all **7 hardware design and fabrication skills** from [`domesticmouse/skills`](https://github.com/domesticmouse/skills) and [`aklofas/kicad-happy`](https://github.com/aklofas/kicad-happy) (recorded in `skills-lock.json`):
 
 ```bash
 npx skills add domesticmouse/skills --skill skidl --skill eurorack-panel

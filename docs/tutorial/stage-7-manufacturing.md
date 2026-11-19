@@ -11,7 +11,7 @@
 
 ## Step 7.1: Export, Format & Verify Main PCB Manufacturing Files
 
-Once [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb) is generated, routed, and verified with `0` DRC violations ([Stage 5](stage-5-schematic-and-pcb.md)), export Gerbers, Excellon drills, and the bottom-side SMD Centroid (`.pos`) file, convert the CPL headers for JLCPCB, package both Gerber ZIP archives, and audit `production/main/` with `analyze_gerbers.py`:
+Once `EnvelopeFollower.kicad_pcb` is generated, routed, and verified with `0` DRC violations ([Stage 5](stage-5-schematic-and-pcb.md)), export Gerbers, Excellon drills, and the bottom-side SMD Centroid (`.pos`) file, convert the CPL headers for JLCPCB, package both Gerber ZIP archives, and audit `production/main/` with `analyze_gerbers.py`:
 
 ```bash
 mkdir -p production/main
@@ -94,7 +94,7 @@ If you only need to generate or refresh `OrderingNotes.md` independently of the 
 
 - Upload `production/EnvelopeFollower_Main.zip` (`1.6 mm` FR4, 2 layers; under **Mark on PCB / Order Number / QR Code**, select **Specify a location** to replace the **`5 × 5 mm` solid silkscreen square** on `B.SilkS` with a JLCPCB 2D QR code—JLCPCB's legacy `JLCJLCJLC` text string is obsolete and no longer used).
 - Enable **Economic PCB Assembly** on **Bottom Side** only (`B.Cu`).
-- Upload [`jlcpcb_bom.csv`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/jlcpcb_bom.csv) (`18` BOM lines, `45` SMD components) and `production/main/EnvelopeFollower_cpl.csv`.
+- Upload `jlcpcb_bom.csv` (`18` BOM lines, `45` SMD components) and `production/main/EnvelopeFollower_cpl.csv`.
 
 !!! warning "Do Not Upload `envelope_follower_bom.xml` to JLCPCB"
     Always upload **`jlcpcb_bom.csv`** (`Comment,Designator,Footprint,LCSC Part #`) for JLCPCB Economic PCBA. Do **not** upload `envelope_follower_bom.xml`: that file is the raw KiCad XML BOM containing all 62 parts (including the 9 manual THT parts and 8 `DNP` test points) and will be rejected or pull unpopulated THT parts into assembly.
@@ -134,7 +134,7 @@ Because every SMD part carries its `<Ref> <Value>` label and external orientatio
 | `1.5k` | `R21 1.5k` | `R21` | `0603` | `C22843` | `1501` / `18B` (if marked) or CPL `C22843` |
 | `10R 1/4W` | `R26 10R`, `R27 10R` | `R26`, `R27` | `1206` | `C17903` | Marked `10R0`/`100` on `1206` body; verify `1206` size & CPL `C17903` |
 
-### Front Panel PCB ([`production/EnvelopeFollower_Panel.zip`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/production/EnvelopeFollower_Panel.zip))
+### Front Panel PCB (`production/EnvelopeFollower_Panel.zip`)
 
 - Upload `production/EnvelopeFollower_Panel.zip` (`1.6 mm` FR4, **Black** solder mask with **White** silkscreen; under **Mark on PCB / Order Number / QR Code**, select **Specify a location** to place the order QR code over the `5 × 5 mm` white square on `B.SilkS` verified in [Stage 6](stage-6-front-panel.md)). No PCBA needed.
 
@@ -157,7 +157,7 @@ When your assembled PCBs arrive, hand-solder the `9` required `Manual THT` parts
     - `J1` (`J1 IN`), `J2` (`J2 OUT`), `J3` (`J3 INV_OUT`) $\rightarrow$ `WQP-PJ398SM` jacks (mating to boxed **`IN`**, **`OUT`**, and unboxed **`INV OUT`** on the front panel)
     - `D4` (`D4 LED`) $\rightarrow$ `3 mm` LED (mating to **`ENV`** on the front panel; verify long lead `+` anode and flat edge `-` cathode match the dual-sided `+`/`-` marks)
 4. **Align Against Front Panel & Solder**:
-    Seat the 3U front panel ([`panel/EnvelopeFollower_Panel.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/panel/EnvelopeFollower_Panel.kicad_pcb)) over the shafts and bushings, tighten the M6/M7 panel nuts finger-tight against the exposed rear `B.Mask` grounding rings, position `D4` flush inside its `3.2 mm` **`ENV`** bezel hole, and **only after the front panel aligns everything mechanically**, solder all pot lugs, jack pins, and LED leads on `B.Cu`.
+    Seat the 3U front panel (`panel/EnvelopeFollower_Panel.kicad_pcb`) over the shafts and bushings, tighten the M6/M7 panel nuts finger-tight against the exposed rear `B.Mask` grounding rings, position `D4` flush inside its `3.2 mm` **`ENV`** bezel hole, and **only after the front panel aligns everything mechanically**, solder all pot lugs, jack pins, and LED leads on `B.Cu`.
 5. **Bench Bring-Up Using `TP1`–`TP8`**:
     - Power the module via a current-limited $\pm 12\text{ V}$ bench supply (or Eurorack skiff), clip ground to **`TP1` (`GND`)**, and confirm **`~+11.78 V`** on **`TP2` (`+12V`)** and **`~-11.78 V`** on **`TP3` (`-12V`)**.
     - With nothing patched into `J1` (`IN`), verify `D4` (`LED` / **`ENV`**) is completely dark (`0 mA`) and check **`TP8` (`OFS`)** sweeps smoothly from `~-9.8 V` to `~+9.8 V` as you turn `RV4` (`OFFSET`).

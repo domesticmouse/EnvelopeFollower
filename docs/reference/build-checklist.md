@@ -47,7 +47,7 @@ Follow this checklist to take the improved design through KiCad PCB layout, dual
 
 ## Step 3: Mated 3U Eurorack Front Panel PCB
 
-- [x] Generate the mated 3U front panel ([`panel/EnvelopeFollower_Panel.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/panel/EnvelopeFollower_Panel.kicad_pcb)) from the main PCB's finalized coordinates (see [Stage 6](../tutorial/stage-6-front-panel.md)):
+- [x] Generate the mated 3U front panel (`panel/EnvelopeFollower_Panel.kicad_pcb`) from the main PCB's finalized coordinates (see [Stage 6](../tutorial/stage-6-front-panel.md)):
     - [x] Extract exact `(x, y)` positions of `RV1`–`RV4`, `D4`, and `J1`–`J3`, applying footprint-to-bushing mechanical offsets (`+6.48 mm` for `WQP-PJ398SM`, `(+2.50, -7.50)` for `RD901F` at `90°`, `+1.27 mm` for `LED_D3.0mm`).
     - [x] Place standard Doepfer A-100 3U (`128.5 mm` height) M3 mounting slots (`5.5 × 3.2 mm` NPTH).
     - [x] Add front-panel labels (`GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `OUT`, `INV OUT`, `ENV`) and grounded `F.Cu`/`B.Cu` shield planes.
@@ -57,7 +57,7 @@ Follow this checklist to take the improved design through KiCad PCB layout, dual
 
 ## Step 4: Export Fabrication, JLCPCB PCBA & Bench Bring-Up
 
-- [ ] Export fabrication **Gerbers** and **Excellon drill** files for `EnvelopeFollower.kicad_pcb` (panel Gerbers are packaged in [`production/EnvelopeFollower_Panel.zip`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/production/EnvelopeFollower_Panel.zip)).
+- [ ] Export fabrication **Gerbers** and **Excellon drill** files for `EnvelopeFollower.kicad_pcb` (panel Gerbers are packaged in `production/EnvelopeFollower_Panel.zip`).
 - [ ] Export the **Bottom-Side SMD Centroid (`.pos` / CPL)** file with `--side back --smd-only --exclude-dnp` so only the `45` `B.Cu` SMD components appear (`TP1`–`TP8` `DNP` and `9` THT parts excluded).
 - [ ] Upload the Gerber ZIP, 18-line `jlcpcb_bom.csv` (`15` Basic + `3` Extended), and CPL `.pos` file to JLCPCB; inspect every part's orientation and `B.SilkS` value label in the 3D/DFM preview (`U1`, `U2`, `D1`–`D3`, `D5`–`D9`, `C3`, `C4`).
 - [ ] Hand-solder `J_PWR` (`B.Cu`), optional `TP1`–`TP8` (`Ronghe RH-5001` on `B.Cu`), dry-fit `RV1`–`RV4`, `J1`–`J3`, `D4` against the 3U front panel before soldering, and verify rails/signals across `TP1`–`TP8`.

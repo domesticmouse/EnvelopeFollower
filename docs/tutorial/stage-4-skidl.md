@@ -13,7 +13,7 @@ Because [Stage 3](stage-3-bom-and-dfm.md) already froze every net, component ref
 
     - Creating the isolated Python 3.14 `.venv` and installing `skidl`.
     - Inspecting KiCad 10 symbol pins and footprint pad polarities (and optionally querying `jlcpcb_search.py` if any LCSC codes need live verification).
-    - Writing [`envelope_follower.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.py) with all `62` components (`2× TL074H`, `45` SMD parts, `9` manual THT parts, and `8` `DNP` `TP1`–`TP8` test points) across `36` nets.
+    - Writing `envelope_follower.py` with all `62` components (`2× TL074H`, `45` SMD parts, `9` manual THT parts, and `8` `DNP` `TP1`–`TP8` test points) across `36` nets.
     - Running `.venv/bin/python envelope_follower.py`, verifying `ERC()` passes with `0` errors and `0` warnings, exporting `envelope_follower.net`, `envelope_follower_bom.xml`, and `jlcpcb_bom.csv`, and formatting the code with `ruff`.
 
     Steps 4.1–4.3 below show what the agent executes under the hood—and give you the exact commands to re-run manually if you ever edit `envelope_follower.py` by hand.
@@ -38,7 +38,7 @@ Because `EnvelopeFollowerBOM.md` ([Stage 3](stage-3-bom-and-dfm.md)) already loc
 
 ## Step 4.2: Anatomy of the Generated `envelope_follower.py`
 
-**The agent generates [`envelope_follower.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.py)** using four SKiDL patterns from the `skidl` skill that make the improved 54-part (+8 `DNP` test points), 36-net circuit modular and fabrication-ready:
+**The agent generates `envelope_follower.py`** using four SKiDL patterns from the `skidl` skill that make the improved 54-part (+8 `DNP` test points), 36-net circuit modular and fabrication-ready:
 
 1. **Pre-Import Environment Setup**:
     Before importing `skidl`, set `XDG_DATA_HOME`, `MPLCONFIGDIR`, `KICAD10_SYMBOL_DIR`, `KICAD_SYMBOL_DIR`, and `KICAD10_FOOTPRINT_DIR` so SKiDL resolves KiCad 10's `.kicad_sym` libraries cleanly on macOS.
@@ -159,10 +159,10 @@ ruff format envelope_follower.py envelope_follower_sklib.py
 
 Key generated files:
 
-- [`envelope_follower.erc`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.erc): `ERC INFO: No errors or warnings found while running ERC.`
-- [`envelope_follower.net`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.net): KiCad netlist containing all **54 populated physical components + 8 `DNP` test points (62 footprints total)** and **36 nets**.
-- [`envelope_follower_bom.xml`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower_bom.xml): Full XML BOM with embedded `LCSC`, `MPN`, `JLCPCB_Class`, `DNP`, and `Notes` fields.
-- [`jlcpcb_bom.csv`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/jlcpcb_bom.csv): Grouped 4-column JLCPCB SMT BOM (`Comment,Designator,Footprint,LCSC Part #`) with **18 SMT line items** (**45 SMD components total**: `15` JLCPCB Basic lines + `3` Extended lines; the `9` required THT parts and `8` `DNP` test points are excluded automatically).
+- `envelope_follower.erc`: `ERC INFO: No errors or warnings found while running ERC.`
+- `envelope_follower.net`: KiCad netlist containing all **54 populated physical components + 8 `DNP` test points (62 footprints total)** and **36 nets**.
+- `envelope_follower_bom.xml`: Full XML BOM with embedded `LCSC`, `MPN`, `JLCPCB_Class`, `DNP`, and `Notes` fields.
+- `jlcpcb_bom.csv`: Grouped 4-column JLCPCB SMT BOM (`Comment,Designator,Footprint,LCSC Part #`) with **18 SMT line items** (**45 SMD components total**: `15` JLCPCB Basic lines + `3` Extended lines; the `9` required THT parts and `8` `DNP` test points are excluded automatically).
 
 ??? info "Preview of generated `jlcpcb_bom.csv` (18 SMT line items, 45 SMD components)"
 

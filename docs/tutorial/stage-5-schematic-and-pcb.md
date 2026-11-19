@@ -1,8 +1,8 @@
 # Stage 5: Generating, Routing & Auditing the 6 HP Main PCB (`generate_kicad_pcb.py`)
 
-Because `envelope_follower.net` ([Stage 4](stage-4-skidl.md)) already contains all 62 component footprints, 36 nets, `dnp` flags, and custom BOM/silkscreen fields (`LCSC`, `MPN`, `JLCPCB_Class`, `Silkscreen`), KiCad's `pcbnew` API and `kinet2pcb` can generate [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb) directly from the netlist without needing an intermediate `.kicad_sch` schematic.
+Because `envelope_follower.net` ([Stage 4](stage-4-skidl.md)) already contains all 62 component footprints, 36 nets, `dnp` flags, and custom BOM/silkscreen fields (`LCSC`, `MPN`, `JLCPCB_Class`, `Silkscreen`), KiCad's `pcbnew` API and `kinet2pcb` can generate `EnvelopeFollower.kicad_pcb` directly from the netlist without needing an intermediate `.kicad_sch` schematic.
 
-Rather than importing the netlist manually, placing 62 footprints by hand, and routing traces interactively in `pcbnew`, [`generate_kicad_pcb.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/generate_kicad_pcb.py) automates the board outline, control grid, single-sided `B.Cu` SMT placement, `DNP` test points, BOM metadata transfer, dual-sided silkscreen markup, 2-layer copper routing, `GND` copper pours, and DRC/DFM verification.
+Rather than importing the netlist manually, placing 62 footprints by hand, and routing traces interactively in `pcbnew`, `generate_kicad_pcb.py` automates the board outline, control grid, single-sided `B.Cu` SMT placement, `DNP` test points, BOM metadata transfer, dual-sided silkscreen markup, 2-layer copper routing, `GND` copper pours, and DRC/DFM verification.
 
 ## AI Agent Prompt
 
@@ -76,7 +76,7 @@ Rather than importing the netlist manually, placing 62 footprints by hand, and r
 
     Confirm `0` DRC errors, `0` clearance violations, `0` unrouted nets (`routing_complete: True`), `0` `silk_overlap` / `silk_over_copper` violations, decoupling proximity, `DNP` test-point flags, and `100%` fabrication notes completeness.
 
-Run the script to generate [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb):
+Run the script to generate `EnvelopeFollower.kicad_pcb`:
 
 ```bash
 .venv/bin/python generate_kicad_pcb.py
