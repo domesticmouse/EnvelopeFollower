@@ -38,7 +38,7 @@ Follow this checklist to take the improved design through KiCad PCB layout, dual
     - [ ] Display both Reference and Value on `B.SilkS` outside component courtyards for all 45 SMD parts (`U1 TL074H`, `R8 20k`, `C10 47pF`, `D8 BAT54S`, etc.).
     - [ ] Label `TP1 GND`–`TP8 OFS` and all 9 THT parts (`RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k`, `J1 IN`, `J2 OUT`, `J3 INV_OUT`, `D4 LED +/-`, `J_PWR +/-12V`) on **both `F.SilkS` and `B.SilkS`**.
     - [ ] Verify external Pin-1 dots (`U1`, `U2`), diode cathode bars (`|`), electrolytic `+` marks, `>= 0.8 mm` text height, `>= 0.15 mm` stroke, `>= 0.20 mm` pad clearance, and `5 × 5 mm` JLCPCB QR placeholder square.
-- [ ] **Routing, Ground Pour & DRC** (see [Stage 6](../tutorial/stage-6-routing-and-drc.md)):
+- [ ] **Routing, Ground Pour & DRC** (see [Stage 5](../tutorial/stage-5-schematic-and-pcb.md)):
     - [ ] Route `Power` netclass (`+12V_IN`, `+12V_PROT`, `+12V`, `-12V_IN`, `-12V_PROT`, `-12V`) at `0.60 mm` width and analog signal nets at `0.25 mm` width.
     - [ ] Add `GND` copper pours on both `F.Cu` and `B.Cu` with stitching vias.
     - [ ] Run **DRC** (`0` errors, `0` clearance violations, `0` unrouted nets) and run `kicad` skill analyzer (`analyze_pcb.py`).
@@ -47,7 +47,7 @@ Follow this checklist to take the improved design through KiCad PCB layout, dual
 
 ## Step 3: Mated 3U Eurorack Front Panel PCB
 
-- [x] Generate the mated 3U front panel ([`panel/EnvelopeFollower_Panel.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/panel/EnvelopeFollower_Panel.kicad_pcb)) from the main PCB's finalized coordinates (see [Stage 7](../tutorial/stage-7-front-panel.md)):
+- [x] Generate the mated 3U front panel ([`panel/EnvelopeFollower_Panel.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/panel/EnvelopeFollower_Panel.kicad_pcb)) from the main PCB's finalized coordinates (see [Stage 6](../tutorial/stage-6-front-panel.md)):
     - [x] Extract exact `(x, y)` positions of `RV1`–`RV4`, `D4`, and `J1`–`J3`, applying footprint-to-bushing mechanical offsets (`+6.48 mm` for `WQP-PJ398SM`, `(+2.50, -7.50)` for `RD901F` at `90°`, `+1.27 mm` for `LED_D3.0mm`).
     - [x] Place standard Doepfer A-100 3U (`128.5 mm` height) M3 mounting slots (`5.5 × 3.2 mm` NPTH).
     - [x] Add front-panel labels (`GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `OUT`, `INV OUT`, `ENV`) and grounded `F.Cu`/`B.Cu` shield planes.

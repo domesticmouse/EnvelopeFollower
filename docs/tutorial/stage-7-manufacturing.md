@@ -1,8 +1,8 @@
-# Stage 8: JLCPCB PCBA Export, Assembly & Bench Bring-Up
+# Stage 7: JLCPCB PCBA Export, Assembly & Bench Bring-Up
 
-## 8.1 Export Main PCB Manufacturing Files
+## 7.1 Export Main PCB Manufacturing Files
 
-Once you finish routing [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb) in KiCad and pass DRC (`0` violations), export Gerbers, Excellon drills, and the bottom-side SMD Centroid (`.pos`) file for JLCPCB SMT assembly:
+Once [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb) is generated, routed, and verified with `0` DRC violations ([Stage 5](stage-5-schematic-and-pcb.md)), export Gerbers, Excellon drills, and the bottom-side SMD Centroid (`.pos`) file for JLCPCB SMT assembly:
 
 ```bash
 mkdir -p production/main
@@ -29,7 +29,7 @@ Notice how `--smd-only` skips the 9 manual THT parts while `--exclude-dnp` autom
 
 ---
 
-## 8.2 Ordering on JLCPCB & Cost Breakdown
+## 7.2 Ordering on JLCPCB & Cost Breakdown
 
 ### AI Agent Prompt (Capturing Ordering Notes)
 
@@ -86,7 +86,7 @@ Because every SMD part carries both its reference and value on `B.SilkS` ([Stage
 
 ---
 
-## 8.3 Stress-Free Mechanical Assembly & Bench Bring-Up
+## 7.3 Stress-Free Mechanical Assembly & Bench Bring-Up
 
 When your assembled PCBs arrive, hand-solder the `9` required `Manual THT` parts (plus optional `TP1`–`TP8` wire-loop test points):
 

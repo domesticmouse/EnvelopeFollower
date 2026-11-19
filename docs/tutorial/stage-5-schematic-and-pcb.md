@@ -1,8 +1,8 @@
-# Stage 5: Generating the 6 HP Main PCB & Silkscreen Markup (`generate_kicad_pcb.py`)
+# Stage 5: Generating, Routing & Auditing the 6 HP Main PCB (`generate_kicad_pcb.py`)
 
 Because `envelope_follower.net` ([Stage 4](stage-4-skidl.md)) already contains all 62 component footprints, 36 nets, `dnp` flags, and custom BOM/silkscreen fields (`LCSC`, `MPN`, `JLCPCB_Class`, `Silkscreen`), KiCad's `pcbnew` API and `kinet2pcb` can generate [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb) directly from the netlist without needing an intermediate `.kicad_sch` schematic.
 
-Rather than importing the netlist manually and placing 62 footprints by hand in `pcbnew`, [`generate_kicad_pcb.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/generate_kicad_pcb.py) automates the board outline, control grid, single-sided `B.Cu` SMT placement, `DNP` test points, BOM metadata transfer, and dual-sided silkscreen markup.
+Rather than importing the netlist manually, placing 62 footprints by hand, and routing traces interactively in `pcbnew`, [`generate_kicad_pcb.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/generate_kicad_pcb.py) automates the board outline, control grid, single-sided `B.Cu` SMT placement, `DNP` test points, BOM metadata transfer, dual-sided silkscreen markup, 2-layer copper routing, `GND` copper pours, and DRC/DFM verification.
 
 ## AI Agent Prompt
 
@@ -13,16 +13,16 @@ Rather than importing the netlist manually and placing 62 footprints by hand in 
 1. **`/eurorack-panel` + `/kicad` + `generate_kicad_pcb.py` from `envelope_follower.net`**:
     Converts the SKiDL netlist (`62` footprints, `36` nets, embedded `LCSC`/`MPN`/`JLCPCB_Class`/`Silkscreen` fields, and `dnp` flags) directly into `EnvelopeFollower.kicad_pcb` using `kinet2pcb` and KiCad 10's bundled `pcbnew` Python API, while pulling the 6 HP × 3U Doepfer mechanical envelope (`29.60 × 107.00 mm` main board centered behind a `30.00 × 128.50 mm` panel) and footprint-to-bushing offset rules from `/eurorack-panel`.
 2. **Pots, Jacks & LED on `F.Cu` Aligned to a 6 HP Front-Panel Grid**:
-    Keeps the 8 user-facing through-hole controls (`RV1`–`RV4`, `J1`–`J3`, `D4`) on `F.Cu` facing the front panel and applies each footprint's shaft/bushing offset (`RD901F` pots, `WQP-PJ398SM` jacks, `3 mm` LED) so the physical shafts and jack bushings land on exact millimeter grid coordinates that Stage 7 reads to drill the front panel.
+    Keeps the 8 user-facing through-hole controls (`RV1`–`RV4`, `J1`–`J3`, `D4`) on `F.Cu` facing the front panel and applies each footprint's shaft/bushing offset (`RD901F` pots, `WQP-PJ398SM` jacks, `3 mm` LED) so the physical shafts and jack bushings land on exact millimeter grid coordinates that [Stage 6](stage-6-front-panel.md) reads to drill the front panel.
 3. **`J_PWR`, `DNP` Test Points (`TP1`–`TP8`) & 45 SMD Parts on `B.Cu`**:
     Flips everything that is not a front-panel control onto the rear of the PCB (`B.Cu`)—orienting `J_PWR` with Pin 1/2 (`-12V / RED STRIPE`) at the bottom per `/eurorack-panel`, flagging `TP1`–`TP8` as `DNP` (`exclude_from_pos_files`, `exclude_from_bom`) so JLCPCB leaves the `1.0 mm` probe holes open, and grouping all 45 SMD components by functional stage for single-sided **Bottom Side** JLCPCB Economic PCBA while keeping `F.Cu` completely clear under the pot and jack bodies.
 4. **`@SilkscreenInstructions.md` Labels on `B.Cu` (`B.SilkS`) & Dual-Sided THT/TP Markup**:
     Follows `@SilkscreenInstructions.md` to print both Reference and Value (`R8 20k`, `C10 47pF`, `U1 TL074H`, etc.) on `B.SilkS` outside every SMD courtyard, print `TP1`–`TP8` and all 9 THT control/power labels (`RV1 GAIN A100k` … `J_PWR +/-12V`) on **both** `F.SilkS` and `B.SilkS`, and add external Pin-1/cathode/electrolytic `+` polarity markers plus the `5 × 5 mm` JLCPCB QR placeholder square.
 
-## How `generate_kicad_pcb.py` Works
+## Step 5.1: How `generate_kicad_pcb.py` Works
 
-1. **Dual-Environment Python Bootstrap**:
-    The agent installs `kinet2pcb` into `.venv` (`uv pip install kinet2pcb`). KiCad's compiled `pcbnew` C++ bindings only load inside KiCad's bundled Python (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3`), while `kinet2pcb` and `simp_sexp` live in `.venv`. If `import pcbnew` fails under `.venv`, the script re-executes itself (`os.execv`) using `KICAD_PYTHON` and appends `.venv/lib/python*/site-packages` to `sys.path`.
+1. **Dual-Environment Python Bootstrap & Board Initialization**:
+    The agent installs `kinet2pcb` into `.venv` (`uv pip install kinet2pcb`). KiCad's compiled `pcbnew` C++ bindings only load inside KiCad's bundled Python (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3`), while `kinet2pcb` and `simp_sexp` live in `.venv`. If `import pcbnew` fails under `.venv`, the script re-executes itself (`os.execv`) using `KICAD_PYTHON` and appends `.venv/lib/python*/site-packages` to `sys.path`. From there, `generate_kicad_pcb.py` parses `envelope_follower.net` (via S-expression parsing / `kinet2pcb`) and initializes the board via `pcbnew.LoadBoard()` on a minimal `.kicad_pcb` shell before calling `pcbnew.FootprintLoad()` and `fp.Flip()`.
 
 2. **6 HP Mechanical Coordinates & Bushing Offsets**:
     The target 6 HP × 3U panel measures `30.00 x 128.50 mm` spanning global KiCad coordinates `X = [100.00, 130.00]`, `Y = [10.00, 138.50]`. Leaving `0.20 mm` horizontal clearance per side and `10.75 mm` vertical clearance top/bottom (clearing Eurorack rails and M3 screw heads) yields a main PCB outline of **`29.60 x 107.00 mm`** (`X = [100.20, 129.80]`, `Y = [20.75, 127.75]`).
@@ -56,6 +56,25 @@ Rather than importing the netlist manually and placing 62 footprints by hand in 
     - **Dual-Sided `F.SilkS` & `B.SilkS` Test Point Labels**: Prints `TP1 GND`, `TP2 +12V`, `TP3 -12V`, `TP4 PRE`, `TP5 HALF`, `TP6 RECT`, `TP7 ENV`, and `TP8 OFS` on **both** sides so probing works both during bare-board bring-up (`F.SilkS`) and from behind a mounted front panel (`B.SilkS`).
     - **Dual-Sided `F.SilkS` & `B.SilkS` THT Control & Power Labels**: Prints `RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k`, `J1 IN`, `J2 OUT`, `J3 INV_OUT`, `D4 LED` (`+` anode / `-` cathode), and `J_PWR +/-12V` (`-12V / RED STRIPE`, `GND`, `+12V`) on **both** layers so identical-footprint pots and polarized leads cannot be reversed during solder-side assembly.
     - **External Polarity Marks & JLCPCB DFM Sizing**: Positions Pin-1 dots/notches (`U1`, `U2`), diode cathode bars (`|` on `D1`–`D3`, `D5`–`D7`), and electrolytic `+` symbols (`C3` on `+12V`; **`C4` `+` on `GND`**) outside the component bodies; enforces `0.9–1.2 mm` text height, `0.15 mm` stroke thickness, $\ge 0.20\text{ mm}$ pad clearance, `0°`/`90°` rotations only, a board metadata block (`EURORACK ENVELOPE FOLLOWER`, `Rev 1.0 / 2026-11`), and a `5 × 5 mm` solid square on `B.SilkS` for JLCPCB's order QR code.
+
+5. **2-Layer Copper Routing, Sensitive Analog Nodes & Stitched `GND` Pours**:
+    Rather than leaving an unrouted ratsnest, `generate_kicad_pcb.py` enforces power/analog layout rules and completes 2-layer copper routing plus `GND` zone pours automatically:
+    - **Power Rail Routing (`B.Cu`)**: Routes `+12V_IN` and `-12V_IN` from `J_PWR` through Schottky diodes `D5`/`D6` (`B5819W`) and series `10 Ω` `1/4 W` (`1206`) resistors `R26`/`R27` into bulk `10 µF` electrolytics `C3`/`C4` (`C4` `+` pad on `GND`, `-` pad on `-12V`), then distributes widened `+12V` and `-12V` power tracks (`0.30–0.60 mm` width; `0.25 mm` for signal nets) through local `100 nF` bypass caps `C5`–`C8` before reaching `U1`/`U2` Pins 4 and 11, and branches to `BAT54S` rail clamps `D8`/`D9`, bias resistors `R11`/`R12`, and test points `TP2` (`+12V`) / `TP3` (`-12V`) with `TP1` anchored on `GND`.
+    - **Sensitive Summing Junctions & High-Impedance `ENV_CAP`**: Keeps inverting summing nodes (`PREAMP_INV` at `U1A` Pin 2, `RECT1_INV` at `U1B` Pin 6, `RECT2_INV` at `U1C` Pin 9, `PK_FB_INV` at `U2C` Pin 9, `AMP_INV` at `U1D` Pin 13, `INV_STAGE_IN` at `U2A` Pin 2, and `LED_K` at `U2B` Pin 6) compact; isolates the high-impedance `ENV_CAP` node (`RV2`, `C2` `220 nF`, `R10` `47k`, `U2D` Pin 12 `+`) from power traces while wiring `TP7` (`ENV`) strictly to buffered `ENV_SIG` (`U2D` Pin 14); places `C9` (`100 nF`) directly at `RV4` wiper (`OFFSET_WIPER`) and keeps `D8`/`R16` and `D9`/`R19` close to output jacks `J2` and `J3`.
+    - **2-Layer A\* Grid Routing (`GridRouter`) & Stitched `GND` Copper Pours (`F.Cu` + `B.Cu`)**: Pre-places immediate `B.Cu` SMD `GND` stitching vias and perimeter vias (`0.60–0.80 mm` pad / `0.30–0.40 mm` drill), routes all 35 non-`GND` nets with outward `SOIC-14` escape stubs (blocking vias inside SMD pads for `0` `VP-001` warnings, using free THT barrel layer transitions for `0` `holes_co_located`, and preserving T-junction vertices when merging collinear segments for `0` `track_dangling`), and fills full-board `F.Cu` and `B.Cu` `GND` zones (`0.30 mm` inset from `Edge.Cuts`, thermal relief spokes) via `pcbnew.ZONE_FILLER(board).Fill(zones)` with `ISLAND_REMOVAL_MODE_ALWAYS` and `board.BuildConnectivity()` called both before and after filling.
+
+6. **Automated DRC & `kicad` Skill PCB Audit**:
+    After generating `EnvelopeFollower.kicad_pcb`, verify physical, electrical, and DFM compliance using KiCad 10's CLI Design Rules Checker and the `kicad` skill's PCB analyzer:
+
+    ```bash
+    /Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli pcb drc \
+        --refill-zones --exit-code-violations --format json \
+        --output /tmp/main_drc.json EnvelopeFollower.kicad_pcb
+
+    python3 .agents/skills/kicad/scripts/analyze_pcb.py EnvelopeFollower.kicad_pcb --full --analysis-dir analysis/
+    ```
+
+    Confirm `0` DRC errors, `0` clearance violations, `0` unrouted nets (`routing_complete: True`), `0` `silk_overlap` / `silk_over_copper` violations, decoupling proximity, `DNP` test-point flags, and `100%` fabrication notes completeness.
 
 Run the script to generate [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb):
 

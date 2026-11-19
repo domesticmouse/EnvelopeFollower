@@ -142,7 +142,7 @@ EnvelopeFollower/
 ├── mkdocs.yml                             # MkDocs Material site configuration
 ├── docs/
 │   ├── index.md                           # Documentation landing page & pipeline overview
-│   ├── tutorial/                          # Multi-page stage-by-stage tutorial (Stages 1–8)
+│   ├── tutorial/                          # Multi-page stage-by-stage tutorial (Stages 1–7)
 │   ├── reference/                         # Netlist/BOM guide and PCB fabrication checklist
 │   ├── javascripts/mathjax.js             # MathJax v3 initialization for circuit equations
 │   └── images/                            # Original sketch, schematic SVG, and 3D PCB/panel renders
