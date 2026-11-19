@@ -4,33 +4,41 @@ Defining the circuit in **SKiDL** turns the netlist into testable, version-contr
 
 ## AI Agent Prompt
 
-Because [Stage 3](stage-3-bom-and-dfm.md) already froze every net, component reference, LCSC code, and `DNP` attribute inside `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, you only need a one-line prompt to drive the `/skidl` skill:
+Because [Stage 3](stage-3-bom-and-dfm.md) already froze every net, component reference, LCSC code, and `DNP` attribute inside `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, you only need a single prompt to drive the `/skidl` skill:
 
 > *"`/skidl` Please turn `@EnvelopeFollowerImproved.md` and `@EnvelopeFollowerBOM.md` into a SKiDL circuit."*
 
-That single prompt instructs the agent (using `skidl` alongside the BOM/LCSC skills) to implement all `62` components (`2× TL074H`, `45` SMD parts, `9` manual THT parts, and `8` `DNP` `TP1`–`TP8` test points), verify `ERC()` passes with 0 errors and 0 warnings, and export `envelope_follower.net`, `envelope_follower_bom.xml`, `jlcpcb_bom.csv`, and `EnvelopeFollower.kicad_sch`.
+!!! note "One Prompt Runs the Entire Stage"
+    **You do not need to run the commands below manually.** Sending this single prompt causes the AI agent (guided by `.agents/skills/skidl/SKILL.md`) to execute Steps 4.1–4.3 automatically behind the scenes:
 
-## Step 4.1: Set Up the Python Environment & Query Parts
+    - Creating the isolated Python 3.14 `.venv` and installing `skidl`.
+    - Inspecting KiCad 10 symbol pins and footprint pad polarities (and optionally querying `jlcpcb_search.py` if any LCSC codes need live verification).
+    - Writing [`envelope_follower.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.py) with all `62` components (`2× TL074H`, `45` SMD parts, `9` manual THT parts, and `8` `DNP` `TP1`–`TP8` test points) across `36` nets.
+    - Running `.venv/bin/python envelope_follower.py`, verifying `ERC()` passes with `0` errors and `0` warnings, exporting `envelope_follower.net`, `envelope_follower_bom.xml`, `jlcpcb_bom.csv`, and `EnvelopeFollower.kicad_sch`, and formatting the code with `ruff`.
 
-Create an isolated `.venv` with `uv` (Python 3.14 avoids compiling `h5py` from source) and install `skidl` and `kinet2pcb`:
+    Steps 4.1–4.3 below show what the agent executes under the hood—and give you the exact commands to re-run manually if you ever edit `envelope_follower.py` by hand.
+
+## Step 4.1: Environment Setup & Symbol Verification (Run by the Agent)
+
+In response to the `/skidl` prompt, **the agent creates** an isolated `.venv` with `uv` (using Python 3.14 so prebuilt `h5py` wheels install without compiling from source) and installs `skidl` (along with `kinet2pcb` for Stage 5):
 
 ```bash
 uv venv --clear --python 3.14 .venv
 uv pip install skidl kinet2pcb
 ```
 
-Verify live JLCPCB stock and Basic vs. Extended pricing for the active ICs, clamps, precision passives, and test points using `jlcpcb_search.py` (or the `lcsc` / `jlcpcb` skills):
+Before writing `envelope_follower.py`, **the agent inspects** the local KiCad 10 `.kicad_sym` and `.kicad_mod` definitions—for example via `show("Amplifier_Operational", "TL074")`, `show("Diode", "BAT54S")`, `show("Connector_Audio", "AudioJack2_SwitchT")`, and `show("Connector", "TestPoint")`—to confirm exact pin numbers and pad polarities.
+
+Because `EnvelopeFollowerBOM.md` ([Stage 3](stage-3-bom-and-dfm.md)) already locked down the LCSC part numbers, the agent reads them directly from the BOM. If any part needs a live stock or Basic vs. Extended pricing re-check, the agent (or you) can run `jlcpcb_search.py`:
 
 ```bash
 .venv/bin/python .agents/skills/skidl/scripts/jlcpcb_search.py \
     --in-stock-only "TL074HIDR" "BAT54SLT1G" "B5819W" "1N4148W" "47pF 0603" "220nF 0805" "10R 1206" "1k 1206"
 ```
 
-You can also inspect exact KiCad 10 symbol pins before coding (`show("Amplifier_Operational", "TL074")`, `show("Diode", "BAT54S")`, `show("Connector_Audio", "AudioJack2_SwitchT")`, `show("Connector", "TestPoint")`).
+## Step 4.2: Anatomy of the Generated `envelope_follower.py`
 
-## Step 4.2: Anatomy of `envelope_follower.py`
-
-In `envelope_follower.py`, five SKiDL patterns make the improved 54-part (+8 `DNP` test points), 36-net circuit modular and fabrication-ready:
+**The agent generates [`envelope_follower.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.py)** using five SKiDL patterns from the `skidl` skill that make the improved 54-part (+8 `DNP` test points), 36-net circuit modular and fabrication-ready:
 
 1. **Pre-Import Environment Setup**:
     Before importing `skidl`, set `XDG_DATA_HOME`, `MPLCONFIGDIR`, `KICAD10_SYMBOL_DIR`, `KICAD_SYMBOL_DIR`, and `KICAD10_FOOTPRINT_DIR` so SKiDL resolves KiCad 10's `.kicad_sym` libraries cleanly on macOS.
@@ -148,7 +156,9 @@ In `envelope_follower.py`, five SKiDL patterns make the improved 54-part (+8 `DN
     - **`Device:C_Polarized` (`CP_Elec_6.3x5.4`)**: Pin `1` is `+` and Pin `2` is `-`. On the `-12V` rail, **`c4[1]` connects to `GND`** (`0 V`) and **`c4[2]` connects to `-12V`** (`-11.78 V`).
     - **`Diode:1N4148W`, `Device:D_Schottky`, and `Device:LED`**: Pin `1` is **`K` (cathode)** and Pin `2` is **`A` (anode)**—the opposite of intuitive "1 = anode" assumptions. Always wire diodes and LEDs by pin name (`d["A"]`, `d["K"]`) rather than raw pin integers.
 
-## Step 4.3: Run SKiDL & Inspect Outputs
+## Step 4.3: Automated Execution, Linting & Outputs (Run by the Agent)
+
+After writing `envelope_follower.py`, **the agent automatically runs the script** inside `.venv` to execute `ERC()` and generate the netlist and BOM files, then lints and formats the Python files with `ruff` (you can re-run these same commands manually any time you tweak `envelope_follower.py`):
 
 ```bash
 .venv/bin/python envelope_follower.py
