@@ -1,0 +1,68 @@
+{
+  "version": 2,
+  "skills": {
+    "bom": {
+      "source": "aklofas/kicad-happy",
+      "commit": "6b9767e19979cdef91631573753b1547efdbeab9",
+      "sourceType": "github",
+      "skillPath": "skills/bom/SKILL.md",
+      "computedHash": "089b7196adb5b1db7573cff4b25a980fd0c471fcd485abec051758d5bdf767cf"
+    },
+    "datasheets": {
+      "source": "aklofas/kicad-happy",
+      "commit": "6b9767e19979cdef91631573753b1547efdbeab9",
+      "sourceType": "github",
+      "skillPath": "skills/datasheets/SKILL.md",
+      "computedHash": "60730b8a43832a316dd7beaeccd84bd109410c6ce3b5406a428ce7d2c918240f"
+    },
+    "eurorack-panel": {
+      "source": "domesticmouse/skills",
+      "commit": "606a5d5e87bb1bdc7c8c5f25ebeccc8a7fb67ba8",
+      "sourceType": "github",
+      "skillPath": "packs/hardware/eurorack-panel/SKILL.md",
+      "computedHash": "5cd190b5d001a0c7acb589bf1c3807d8dde8238ba78b81ce75059b1d98bb475a"
+    },
+    "jlcpcb": {
+      "source": "aklofas/kicad-happy",
+      "commit": "6b9767e19979cdef91631573753b1547efdbeab9",
+      "sourceType": "github",
+      "skillPath": "skills/jlcpcb/SKILL.md",
+      "computedHash": "a03f514c00b6b40d288ad62e7c73e69b40664df0c94398ab1d7816f9af341981"
+    },
+    "kicad": {
+      "source": "aklofas/kicad-happy",
+      "commit": "6b9767e19979cdef91631573753b1547efdbeab9",
+      "sourceType": "github",
+      "skillPath": "skills/kicad/SKILL.md",
+      "computedHash": "aacfb82f4d83f1a48f6ed2671aae0ca66ec46b1c0c7537b27e06cbe507f4b6f9"
+    },
+    "kicad-pcbnew-layout": {
+      "source": "domesticmouse/skills",
+      "commit": "606a5d5e87bb1bdc7c8c5f25ebeccc8a7fb67ba8",
+      "sourceType": "github",
+      "skillPath": "packs/hardware/kicad-pcbnew-layout/SKILL.md",
+      "computedHash": "6a37645d68ba9a06ae0e567782d92fc079e0c2aafb8daaef0254525949934ded"
+    },
+    "kicad-silkscreen-markup": {
+      "source": "domesticmouse/skills",
+      "commit": "606a5d5e87bb1bdc7c8c5f25ebeccc8a7fb67ba8",
+      "sourceType": "github",
+      "skillPath": "packs/hardware/kicad-silkscreen-markup/SKILL.md",
+      "computedHash": "9bc2379bdd34922329d5fcec0b84a422e258cd232865ad4887734aa223b13a70"
+    },
+    "lcsc": {
+      "source": "aklofas/kicad-happy",
+      "commit": "6b9767e19979cdef91631573753b1547efdbeab9",
+      "sourceType": "github",
+      "skillPath": "skills/lcsc/SKILL.md",
+      "computedHash": "d29df04d97a0150bcade1e3bd5bee20fdcf8c46813cdbca2e900eb6dc0131fb2"
+    },
+    "skidl": {
+      "source": "domesticmouse/skills",
+      "commit": "606a5d5e87bb1bdc7c8c5f25ebeccc8a7fb67ba8",
+      "sourceType": "github",
+      "skillPath": "packs/hardware/skidl/SKILL.md",
+      "computedHash": "a6c1af33b809deaf5053d641c3ca72173f6f606040ff36588cbb5881dfe6db71"
+    }
+  }
+}
