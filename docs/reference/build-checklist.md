@@ -15,7 +15,7 @@ Follow this checklist to take the improved design through KiCad PCB layout, dual
 - [ ] Click **Update PCB** and **Close** to load all 62 footprints (`54` populated + `8` `DNP`) and 36 nets onto the canvas.
 
 ### Option B — Automated `.kicad_pcb` Generation (Recommended)
-- [x] Generate `EnvelopeFollower.kicad_pcb` directly from `envelope_follower.net` via `generate_kicad_pcb.py` (`Edge.Cuts`, panel bushing grid, `B.Cu` SMT grouping, `DNP` test points, and dual-sided silkscreen markup), plus `EnvelopeFollower.kicad_sch` from `envelope_follower.py`.
+- [x] Generate `EnvelopeFollower.kicad_pcb` directly from `envelope_follower.net` via `generate_kicad_pcb.py` (`Edge.Cuts`, panel bushing grid, `B.Cu` SMT grouping, `DNP` test points, and dual-sided silkscreen markup).
 
 ---
 
@@ -41,7 +41,7 @@ Follow this checklist to take the improved design through KiCad PCB layout, dual
 - [ ] **Routing, Ground Pour & DRC** (see [Stage 6](../tutorial/stage-6-routing-and-drc.md)):
     - [ ] Route `Power` netclass (`+12V_IN`, `+12V_PROT`, `+12V`, `-12V_IN`, `-12V_PROT`, `-12V`) at `0.60 mm` width and analog signal nets at `0.25 mm` width.
     - [ ] Add `GND` copper pours on both `F.Cu` and `B.Cu` with stitching vias.
-    - [ ] Run **DRC** (`0` errors, `0` clearance violations, `0` unrouted nets) and run `kicad` skill analyzers (`analyze_schematic.py`, `analyze_pcb.py`, `cross_analysis.py`).
+    - [ ] Run **DRC** (`0` errors, `0` clearance violations, `0` unrouted nets) and run `kicad` skill analyzer (`analyze_pcb.py`).
 
 ---
 

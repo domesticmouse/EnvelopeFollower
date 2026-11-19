@@ -14,17 +14,17 @@ Because [Stage 3](stage-3-bom-and-dfm.md) already froze every net, component ref
     - Creating the isolated Python 3.14 `.venv` and installing `skidl`.
     - Inspecting KiCad 10 symbol pins and footprint pad polarities (and optionally querying `jlcpcb_search.py` if any LCSC codes need live verification).
     - Writing [`envelope_follower.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.py) with all `62` components (`2× TL074H`, `45` SMD parts, `9` manual THT parts, and `8` `DNP` `TP1`–`TP8` test points) across `36` nets.
-    - Running `.venv/bin/python envelope_follower.py`, verifying `ERC()` passes with `0` errors and `0` warnings, exporting `envelope_follower.net`, `envelope_follower_bom.xml`, `jlcpcb_bom.csv`, and `EnvelopeFollower.kicad_sch`, and formatting the code with `ruff`.
+    - Running `.venv/bin/python envelope_follower.py`, verifying `ERC()` passes with `0` errors and `0` warnings, exporting `envelope_follower.net`, `envelope_follower_bom.xml`, and `jlcpcb_bom.csv`, and formatting the code with `ruff`.
 
     Steps 4.1–4.3 below show what the agent executes under the hood—and give you the exact commands to re-run manually if you ever edit `envelope_follower.py` by hand.
 
 ## Step 4.1: Environment Setup & Symbol Verification (Run by the Agent)
 
-In response to the `/skidl` prompt, **the agent creates** an isolated `.venv` with `uv` (using Python 3.14 so prebuilt `h5py` wheels install without compiling from source) and installs `skidl` (along with `kinet2pcb` for Stage 5):
+In response to the `/skidl` prompt, **the agent creates** an isolated `.venv` with `uv` (using Python 3.14 so prebuilt `h5py` wheels install without compiling from source) and installs `skidl`:
 
 ```bash
 uv venv --clear --python 3.14 .venv
-uv pip install skidl kinet2pcb
+uv pip install skidl
 ```
 
 Before writing `envelope_follower.py`, **the agent inspects** the local KiCad 10 `.kicad_sym` and `.kicad_mod` definitions—for example via `show("Amplifier_Operational", "TL074")`, `show("Diode", "BAT54S")`, `show("Connector_Audio", "AudioJack2_SwitchT")`, and `show("Connector", "TestPoint")`—to confirm exact pin numbers and pad polarities.
@@ -38,7 +38,7 @@ Because `EnvelopeFollowerBOM.md` ([Stage 3](stage-3-bom-and-dfm.md)) already loc
 
 ## Step 4.2: Anatomy of the Generated `envelope_follower.py`
 
-**The agent generates [`envelope_follower.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.py)** using five SKiDL patterns from the `skidl` skill that make the improved 54-part (+8 `DNP` test points), 36-net circuit modular and fabrication-ready:
+**The agent generates [`envelope_follower.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/envelope_follower.py)** using four SKiDL patterns from the `skidl` skill that make the improved 54-part (+8 `DNP` test points), 36-net circuit modular and fabrication-ready:
 
 1. **Pre-Import Environment Setup**:
     Before importing `skidl`, set `XDG_DATA_HOME`, `MPLCONFIGDIR`, `KICAD10_SYMBOL_DIR`, `KICAD_SYMBOL_DIR`, and `KICAD10_FOOTPRINT_DIR` so SKiDL resolves KiCad 10's `.kicad_sym` libraries cleanly on macOS.
@@ -100,40 +100,31 @@ Because `EnvelopeFollowerBOM.md` ([Stage 3](stage-3-bom-and-dfm.md)) already loc
     - **Panel THT Controls** (`RV1`–`RV4`, `J1`–`J3`, `D4`, `J_PWR`) are tagged `JLCPCB_Class = "Manual THT"` so `generate_jlcpcb_bom()` excludes them from the SMT pick-and-place CSV, while `part.fields["Silkscreen"]` preserves labels such as `"RV1 GAIN A100k"` and `"J_PWR +/-12V"` for PCB layout.
     - **Optional Test Points (`TP1`–`TP8`)** instantiate `Part("Connector", "TestPoint", ref=ref, value=val, footprint="TestPoint:TestPoint_Keystone_5000-5004_Miniature", tag=ref.lower())` with `LCSC = "C5199801"`, `MPN = "RH-5001"`, `JLCPCB_Class = "Manual THT (DNP)"`, `Silkscreen = f"{ref} {val}"`, and `part.dnp = True` so both the JLCPCB BOM and the `.pos` centroid file leave those `1.0 mm` holes unpopulated.
 
-3. **Power `Interface` & `NetClass` Rules**:
-    Power rails (`+12V_IN`, `+12V_PROT`, `+12V`, `-12V_IN`, `-12V_PROT`, `-12V`, `GND`) are bundled into a SKiDL `Interface`, assigned `NetClass("Power", priority=1, trace_width=0.6, clearance=0.25)`, and marked `drive = POWER` on the power-entry rails so ERC verifies every supply connection.
-
-4. **Seven `@subcircuit` Functional Blocks (All 8 `TL074H` Channels Active)**:
-    Each stage uses SKiDL's series network operator (`&`) and pin attachment operator (`+=`), connecting unused normalled jack switches (`j1["TN"]`, `j2["TN"]`, `j3["TN"]`) to `builtins.NC`. Notice how `U2C` and `U2D` now form the Stage 4 active peak detector and JFET buffer:
+3. **Stage-by-Stage Net Wiring in `build_envelope_follower()` (All 8 `TL074H` Channels Active)**:
+    Protected power rails (`v_p12`, `v_n12`, `gnd`) are marked `drive = POWER`, and all 36 named nets wire pins directly via SKiDL's pin attachment operator (`+=`), connecting unused normalled jack switches (`j1["TN"]`, `j2["TN"]`, `j3["TN"]`) to `builtins.NC`. Notice how `U2C` and `U2D` now form the Stage 4 active peak detector and JFET buffer:
 
     ```python
-    # Stage 3: Precision Full-Wave Rectifier (U1B + U1C, 1.0x symmetry with R8 = 20k)
-    preamp_out & r6 & ff_mid & r7 & rect2_inv
-    half_rect & r5 & rect2_inv
-    rect2_inv += u1[9]
-    gnd += u1[10]
-    full_rect += u1[8]
-    rect2_inv & r8 & full_rect
+    # Stage 3: Precision Full-Wave Rectifier (U1B & U1C)
+    rect1_inv += r["R3"][2], u1[6], d1["K"], r["R4"][1]
+    rect1_out += u1[7], d1["A"], d2["K"]
+    half_rect += d2["A"], r["R4"][2], r["R5"][1], tp5[1]
+    ff_mid += r["R6"][2], r["R7"][1]
+    rect2_inv += r["R7"][2], r["R5"][2], u1[9], r["R8"][1]
+    full_rect += u1[8], r["R8"][2], u2[10], tp6[1]
 
-    # Stage 4: Active Zero-Deadzone Peak Detector (U2C) & Buffer (U2D)
-    full_rect += u2[10]
-    pk_fb_inv += u2[9]
-    pk_drv_out += u2[8]
-    pk_drv_out & d3["A", "K"] & atk_in & r9 & atk_mid & rv2[1, 2] & env_cap
-    rv2[2] += rv2[3]
-    pk_fb_inv & d7["A", "K"] & pk_drv_out  # Anti-saturation catch diode
-    pk_fb_inv & c11 & pk_drv_out           # 47 pF C0G loop compensation
-    env_cap & c2 & gnd                     # 220 nF hold cap
-    env_cap & r10 & rel_mid & rv3[1, 2] & gnd
-    rv3[3] += gnd
-    env_cap += u2[12]                      # U2D JFET buffer (+)
-    env_sig += u2[13, 14]                  # U2D (-) tied to output
-    env_sig & r24 & pk_fb_inv              # 100k isolated feedback to U2C
+    # Stage 4: Active Zero-Deadzone Peak Envelope Detector & Buffer (U2C & U2D)
+    pk_fb_inv += u2[9], r["R24"][2], d7["A"], c11[1]
+    pk_drv_out += u2[8], d3["A"], d7["K"], c11[2]
+    atk_in += d3["K"], r["R9"][1]
+    atk_mid += r["R9"][2], rv2[1]
+    env_cap += rv2[2, 3], c2[1], r["R10"][1], u2[12]
+    rel_mid += r["R10"][2], rv3[1]
+    env_sig += u2[14], u2[13], r["R24"][1], u1[12], u2[5], tp7[1]
     ```
 
     Similarly, Stage 5 (`U1D`) and Stage 6 (`U2A`) wire each `BAT54S` dual Schottky rail clamp (`D8` on `AMP_OUT`, `D9` on `INV_AMP_OUT`) with pin `1` (`A`) to `-12V`, pin `2` (`K`) to `+12V`, and pin `3` (`COM`) to the op-amp output ahead of `1/4 W` `1206` resistors `R16`/`R19`, while Stage 7 (`U2B`) places `D4` (`3 mm` LED) between pin `7` (`LED_A`) and pin `6` (`LED_K`) with `R21` (`1.5k`) to `GND`.
 
-5. **Programmatic `erc_assert()` & Exports**:
+4. **Programmatic `erc_assert()` & Exports**:
     Custom net-level pin-count and part-count assertions catch missing or stray connections before `ERC()`, `generate_netlist()`, `generate_xml()`, and `generate_jlcpcb_bom()` (skipping `Manual THT` and `dnp=True`) run:
 
     ```python

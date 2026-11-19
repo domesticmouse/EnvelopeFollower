@@ -67,7 +67,7 @@ nav:
       - "Stage 2: Sketch & Circuit Upgrades": tutorial/stage-2-circuit-upgrades.md
       - "Stage 3: JLCPCB BOM, Walkthrough & Test Points": tutorial/stage-3-bom-and-dfm.md
       - "Stage 4: SKiDL Circuit & ERC": tutorial/stage-4-skidl.md
-      - "Stage 5: Schematic & 6 HP PCB": tutorial/stage-5-schematic-and-pcb.md
+      - "Stage 5: 6 HP Main PCB & Silkscreen": tutorial/stage-5-schematic-and-pcb.md
       - "Stage 6: Routing, Pour & Audit": tutorial/stage-6-routing-and-drc.md
       - "Stage 7: Mated 3U Front Panel": tutorial/stage-7-front-panel.md
       - "Stage 8: JLCPCB PCBA & Assembly": tutorial/stage-8-manufacturing.md

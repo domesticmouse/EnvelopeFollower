@@ -1,37 +1,28 @@
-# Stage 5: Generating the KiCad Schematic, 6 HP Main PCB & Silkscreen Markup
+# Stage 5: Generating the 6 HP Main PCB & Silkscreen Markup (`generate_kicad_pcb.py`)
 
-## Part A: Auto-Generated KiCad Schematic (`EnvelopeFollower.kicad_sch`)
-
-Calling `generate_schematic(...)` at the bottom of `envelope_follower.py` converts the SKiDL netlist into [`EnvelopeFollower.kicad_sch`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_sch) using SKiDL's `schematizer` router:
-
-```python
-import schematizer.engine.gen_schematic as _gs
-
-# Disable two-pin snapping in schematizer so series protection diodes (D5, D6)
-# and series RC resistors (R26, R27) do not overlap J_PWR pins.
-_gs._snap_two_pin_parts = lambda node: None
-```
-
-Disabling `_snap_two_pin_parts` prevents compact series diodes (`D5`, `D6`) and series `10 Ω` resistors (`R26`, `R27`) from visually snapping onto adjacent header pins in the schematic canvas.
-
-![Generated KiCad Schematic](../images/EnvelopeFollower.svg)
-
-*(Exported directly via `kicad-cli sch export svg --output docs/images/ EnvelopeFollower.kicad_sch`.)*
-
----
-
-## Part B: Generating the 6 HP Main PCB (`generate_kicad_pcb.py`)
+Because `envelope_follower.net` ([Stage 4](stage-4-skidl.md)) already contains all 62 component footprints, 36 nets, `dnp` flags, and custom BOM/silkscreen fields (`LCSC`, `MPN`, `JLCPCB_Class`, `Silkscreen`), KiCad's `pcbnew` API and `kinet2pcb` can generate [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb) directly from the netlist without needing an intermediate `.kicad_sch` schematic.
 
 Rather than importing the netlist manually and placing 62 footprints by hand in `pcbnew`, [`generate_kicad_pcb.py`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/generate_kicad_pcb.py) automates the board outline, control grid, single-sided `B.Cu` SMT placement, `DNP` test points, BOM metadata transfer, and dual-sided silkscreen markup.
 
-### AI Agent Prompt
+## AI Agent Prompt
 
-> *"Update `generate_kicad_pcb.py` using KiCad's `pcbnew` Python API and `kinet2pcb` to generate `EnvelopeFollower.kicad_pcb` from `envelope_follower.net` (62 footprints, 36 nets). Size the board for 6 HP (`29.60 x 107.00 mm`) centered behind a `30.00 x 128.50 mm` Doepfer 3U panel. Place the 4 pots (`RV1`–`RV4`), `D4` (LED), and 3 jacks (`J1`–`J3`) on `F.Cu` aligned to the panel grid using exact bushing offsets. Flip `J_PWR` (Pin 1 / `-12V RED STRIPE` at the bottom), `TP1`–`TP8` (`Ronghe RH-5001`, marked `DNP` / `exclude_from_pos_files`), and all 45 SMD parts onto `B.Cu` grouped by subcircuit. Apply the silkscreen rules from `SilkscreenInstructions.md`: show both Reference and Value on `B.SilkS` for every SMD part outside its courtyard, print `TP1`–`TP8` and all 9 THT parts (`RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k`, `J1 IN`, `J2 OUT`, `J3 INV_OUT`, `D4 LED +/-`, `J_PWR +/-12V`) on both `F.SilkS` and `B.SilkS`, and add external Pin-1/cathode/electrolytic `+` polarity marks."*
+> *"`/eurorack-panel` `/kicad` Please create and run `generate_kicad_pcb.py` to generate a 6 HP main PCB (`EnvelopeFollower.kicad_pcb`) from `envelope_follower.net`, following `@EnvelopeFollowerImproved.md` and `@SilkscreenInstructions.md`. Place the 4 pots, 3 jacks, and LED on `F.Cu` aligned to a 6 HP front-panel grid, and place `J_PWR`, the `DNP` test points (`TP1`–`TP8`), and all 45 SMD parts (with their `@SilkscreenInstructions.md` silkscreen labels) on `B.Cu`."*
 
-### How `generate_kicad_pcb.py` Works
+### How the Prompt Delegates to Your Skills & Specs
+
+1. **`/eurorack-panel` + `/kicad` + `generate_kicad_pcb.py` from `envelope_follower.net`**:
+    Converts the SKiDL netlist (`62` footprints, `36` nets, embedded `LCSC`/`MPN`/`JLCPCB_Class`/`Silkscreen` fields, and `dnp` flags) directly into `EnvelopeFollower.kicad_pcb` using `kinet2pcb` and KiCad 10's bundled `pcbnew` Python API, while pulling the 6 HP × 3U Doepfer mechanical envelope (`29.60 × 107.00 mm` main board centered behind a `30.00 × 128.50 mm` panel) and footprint-to-bushing offset rules from `/eurorack-panel`.
+2. **Pots, Jacks & LED on `F.Cu` Aligned to a 6 HP Front-Panel Grid**:
+    Keeps the 8 user-facing through-hole controls (`RV1`–`RV4`, `J1`–`J3`, `D4`) on `F.Cu` facing the front panel and applies each footprint's shaft/bushing offset (`RD901F` pots, `WQP-PJ398SM` jacks, `3 mm` LED) so the physical shafts and jack bushings land on exact millimeter grid coordinates that Stage 7 reads to drill the front panel.
+3. **`J_PWR`, `DNP` Test Points (`TP1`–`TP8`) & 45 SMD Parts on `B.Cu`**:
+    Flips everything that is not a front-panel control onto the rear of the PCB (`B.Cu`)—orienting `J_PWR` with Pin 1/2 (`-12V / RED STRIPE`) at the bottom per `/eurorack-panel`, flagging `TP1`–`TP8` as `DNP` (`exclude_from_pos_files`, `exclude_from_bom`) so JLCPCB leaves the `1.0 mm` probe holes open, and grouping all 45 SMD components by functional stage for single-sided **Bottom Side** JLCPCB Economic PCBA while keeping `F.Cu` completely clear under the pot and jack bodies.
+4. **`@SilkscreenInstructions.md` Labels on `B.Cu` (`B.SilkS`) & Dual-Sided THT/TP Markup**:
+    Follows `@SilkscreenInstructions.md` to print both Reference and Value (`R8 20k`, `C10 47pF`, `U1 TL074H`, etc.) on `B.SilkS` outside every SMD courtyard, print `TP1`–`TP8` and all 9 THT control/power labels (`RV1 GAIN A100k` … `J_PWR +/-12V`) on **both** `F.SilkS` and `B.SilkS`, and add external Pin-1/cathode/electrolytic `+` polarity markers plus the `5 × 5 mm` JLCPCB QR placeholder square.
+
+## How `generate_kicad_pcb.py` Works
 
 1. **Dual-Environment Python Bootstrap**:
-    KiCad's compiled `pcbnew` C++ bindings only load inside KiCad's bundled Python (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3`), while `kinet2pcb` and `simp_sexp` live in `.venv`. If `import pcbnew` fails under `.venv`, the script re-executes itself (`os.execv`) using `KICAD_PYTHON` and appends `.venv/lib/python*/site-packages` to `sys.path`.
+    The agent installs `kinet2pcb` into `.venv` (`uv pip install kinet2pcb`). KiCad's compiled `pcbnew` C++ bindings only load inside KiCad's bundled Python (`/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3`), while `kinet2pcb` and `simp_sexp` live in `.venv`. If `import pcbnew` fails under `.venv`, the script re-executes itself (`os.execv`) using `KICAD_PYTHON` and appends `.venv/lib/python*/site-packages` to `sys.path`.
 
 2. **6 HP Mechanical Coordinates & Bushing Offsets**:
     The target 6 HP × 3U panel measures `30.00 x 128.50 mm` spanning global KiCad coordinates `X = [100.00, 130.00]`, `Y = [10.00, 138.50]`. Leaving `0.20 mm` horizontal clearance per side and `10.75 mm` vertical clearance top/bottom (clearing Eurorack rails and M3 screw heads) yields a main PCB outline of **`29.60 x 107.00 mm`** (`X = [100.20, 129.80]`, `Y = [20.75, 127.75]`).
@@ -54,7 +45,7 @@ Rather than importing the netlist manually and placing 62 footprints by hand in 
     | `J3` | `INV_OUT` (`3.5mm`) | `Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `(0.00, 6.48)` | `0°` | `(0.00, +6.48)` | `(122.00, 109.52)` | `(122.00, 116.00)` |
 
 3. **Single-Sided `B.Cu` SMT Placement & `DNP` Test Points**:
-    Because `RV1`–`RV4` and `J1`–`J3` mount flush against `F.Cu` across the narrow `29.60 mm` board width, placing all **45 SMD components** (`U1`, `U2`, `D1`–`D3`, `D5`–`D9`, `C1`–`C11`, `R1`–`R19`, `R21`, `R24`–`R27`) on **`B.Cu`** keeps `F.Cu` mechanically clear for panel controls while qualifying for **JLCPCB Economic PCBA** (single-sided assembly on **Bottom Side**).
+    Keeping the 8 panel controls (`RV1`–`RV4`, `J1`–`J3`, `D4`) on `F.Cu` and placing all **45 SMD components** (`U1`, `U2`, `D1`–`D3`, `D5`–`D9`, `C1`–`C11`, `R1`–`R19`, `R21`, `R24`–`R27`) on **`B.Cu`** prevents backwards CW/CCW pot lug mirroring and left/right X-axis panel mirroring, avoids mechanical collision with `J_PWR` on `B.Cu`, keeps `F.Cu` clear beneath flush-mounted pot and jack housings across the narrow `29.60 mm` board width, and keeps all 45 SMD parts plus their `B.SilkS` value labels visible from the rear after the front panel is mounted—all at zero extra cost under **JLCPCB Economic PCBA** (single-sided assembly on **Bottom Side**).
     - `J_PWR` sits at `0°` on `B.Cu` with Pins 1–2 (`-12V_IN`) at the **bottom** and Pins 9–10 (`+12V_IN`) at the **top** per Eurorack convention.
     - Local decoupling caps `C5`–`C8` (`100 nF`) sit within `2 mm` of `U1` and `U2` pins 4 and 11; `R26`/`R27` (`10R` `1206`), `D5`/`D6` (`B5819W`), and `C3`/`C4` (`10 µF 50V`) cluster cleanly near `J_PWR`.
     - `TP1`–`TP8` (`TestPoint_Keystone_5000-5004_Miniature`, `1.0 mm` drill) are placed on `B.Cu` near their respective circuit nodes with KiCad's `dnp` / `exclude_from_pos_files` / `exclude_from_bom` attributes enabled so JLCPCB leaves the holes open for optional hand soldering.

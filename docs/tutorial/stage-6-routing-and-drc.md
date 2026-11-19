@@ -43,13 +43,8 @@ At this stage, [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/E
 
 ## 6.2 Automated Design Audit with the `kicad` Skill
 
-After routing, run the `kicad` skill analyzers on both the schematic and routed PCB to verify decoupling proximity, silkscreen-over-pad clearances, `DNP` test-point attributes, and cross-domain net parity:
+After routing, run the `kicad` skill PCB analyzer on the routed board to verify decoupling proximity, silkscreen-over-pad clearances, `DNP` test-point attributes, and copper/DFM checks:
 
 ```bash
-python3 .agents/skills/kicad/scripts/analyze_schematic.py EnvelopeFollower.kicad_sch --analysis-dir analysis/
 python3 .agents/skills/kicad/scripts/analyze_pcb.py EnvelopeFollower.kicad_pcb --full --analysis-dir analysis/
-python3 .agents/skills/kicad/scripts/cross_analysis.py \
-    --schematic analysis/<run_id>/schematic.json \
-    --pcb analysis/<run_id>/pcb.json \
-    --analysis-dir analysis/
 ```
