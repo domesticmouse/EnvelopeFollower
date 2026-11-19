@@ -4,15 +4,16 @@ Instead of buying costly custom-milled aluminum, you can fabricate a rigid `1.6 
 
 ## AI Agent Prompt
 
-> *"Using the `eurorack-panel` skill, inspect `EnvelopeFollower.kicad_pcb` to extract every pot (`RV1`–`RV4`), jack (`J1`–`J3`), and LED (`D4`) bushing coordinate, generate the mated 6 HP × 3U front panel PCB at `panel/EnvelopeFollower_Panel.kicad_pcb` titled `ENV FOLLOW` (`6HP ANALOG`) with panel labels `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, refill `F.Cu`/`B.Cu` `GND` shield planes, run DRC, export Gerbers and drills to `production/panel/`, and verify the Gerbers with the `kicad` skill."*
+> *"`/eurorack-panel` Please inspect `@EnvelopeFollower.kicad_pcb` to extract every pot (`RV1`–`RV4`), jack (`J1`–`J3`), and LED (`D4`) bushing coordinate, generate the mated 6 HP × 3U front panel PCB at `panel/EnvelopeFollower_Panel.kicad_pcb` titled `ENV FOLLOW` (`6HP ANALOG`) with panel labels `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, refill `F.Cu`/`B.Cu` `GND` shield planes, run DRC, export Gerbers and drills to `production/panel/`, and verify the Gerbers with the `kicad` skill."*
 
-## Step 6.1: Inspect Mechanical Coordinates
+## Step 6.1: Inspect Mechanical Coordinates & Panel Labels
 
 Run `generate_eurorack_panel.py --inspect` against the main PCB:
 
 ```bash
 python3 .agents/skills/eurorack-panel/scripts/generate_eurorack_panel.py \
     --main-pcb EnvelopeFollower.kicad_pcb \
+    --label D4=ENV \
     --inspect
 ```
 
@@ -24,22 +25,25 @@ Main PCB Outline   : 29.60 x 107.00 mm (X: 100.20..129.80, Y: 20.75..127.75)
 Target Front Panel : 6HP x 3U (30.00 x 128.50 mm), Vertical rail overhang = 10.75 mm top/bottom
 Panel Origin (0,0) : Global (100.00, 10.00) mm -> (130.00, 138.50) mm
 
-Ref   Panel Label / Role       FP Origin (X, Y)     Bushing Global (X, Y)   Panel-Local (X, Y)   Drill
--------------------------------------------------------------------------------------------------------
-RV1   GAIN (A100k)             (112.50,  36.50)     (115.00,  29.00)        ( 15.00,  19.00)     7.2 mm
-RV2   ATK (A50k)               (112.50,  53.00)     (115.00,  45.50)        ( 15.00,  35.50)     7.2 mm
-RV3   REL (A1M)                (112.50,  69.50)     (115.00,  62.00)        ( 15.00,  52.00)     7.2 mm
-RV4   OFFSET (B10k)            (112.50,  86.00)     (115.00,  78.50)        ( 15.00,  68.50)     7.2 mm
-J1    IN (3.5mm_Jack)          (108.00,  91.52)     (108.00,  98.00)        (  8.00,  88.00)     6.2 mm
-D4    ENV (LED_3mm)            (120.73,  98.00)     (122.00,  98.00)        ( 22.00,  88.00)     3.2 mm
-J2    OUT (3.5mm_Jack)         (108.00, 109.52)     (108.00, 116.00)        (  8.00, 106.00)     6.2 mm
-J3    INV_OUT (3.5mm_Jack)     (122.00, 109.52)     (122.00, 116.00)        ( 22.00, 106.00)     6.2 mm
+Ref       Value       Label      FP Origin (X, Y)     Bushing Global (X, Y)   Panel-Local (X, Y)   Drill
+--------------------------------------------------------------------------------------------------------
+RV1       A100k       GAIN       (112.50,  36.50)     (115.00,  29.00)        ( 15.00,  19.00)     7.2 mm
+RV2       A50k        ATK        (112.50,  53.00)     (115.00,  45.50)        ( 15.00,  35.50)     7.2 mm
+RV3       A1M         REL        (112.50,  69.50)     (115.00,  62.00)        ( 15.00,  52.00)     7.2 mm
+RV4       B10k        OFFSET     (112.50,  86.00)     (115.00,  78.50)        ( 15.00,  68.50)     7.2 mm
+J1        IN          IN         (108.00,  91.52)     (108.00,  98.00)        (  8.00,  88.00)     6.2 mm
+D4        LED_3mm     ENV        (120.73,  98.00)     (122.00,  98.00)        ( 22.00,  88.00)     3.2 mm
+J2        OUT         OUT        (108.00, 109.52)     (108.00, 116.00)        (  8.00, 106.00)     6.2 mm
+J3        INV_OUT     INV OUT    (122.00, 109.52)     (122.00, 116.00)        ( 22.00, 106.00)     6.2 mm
 ```
 
-Notice how sharing the same global KiCad coordinate space (`100.00, 10.00` to `130.00, 138.50`) ensures every hole cutout aligns to the exact micron with the main PCB's shaft and bushing centers.
+Whether your Stage 5 main PCB places the 8 controls in a single centered pot column + 2 jack rows (`29.60 × 107.00 mm`) or a `2 × 4` two-column grid (`30.00 × 108.00 mm`, `X = 8.00, 22.00 mm` at `Y = 26.00, 46.00, 66.00, 86.00 mm` as in trace `11-ff4fe23f`), `generate_eurorack_panel.py` extracts each footprint's rotated shaft/bushing `fp_circle` directly from `EnvelopeFollower.kicad_pcb` and keeps both boards in the same global KiCad coordinate space so every hole aligns 1:1.
 
-!!! tip "Mapping Sequential References (`RV1`–`RV4`, `J1`–`J3`, `D4`) to Panel Labels"
-    In `generate_eurorack_panel.py`, `clean_label(value, ref)` uses `Value` directly whenever `Value` is descriptive (e.g., `GAIN`, `ATK`, `REL`, `OFFSET`, `IN`, `ENV`, `OUT`, `INV_OUT`), and only falls back to `Reference` (stripping `RV_`/`J_`/`SW_` or mapping `LED*` $\rightarrow$ `ENV`) when `Value` is generic (`100k`, `50k`, `1M`, `3.5mm_Jack`, `LED_3mm`). Keeping functional names in each front-panel footprint's `Value` (or using `RV_GAIN` / `J_IN` style references) ensures `generate_eurorack_panel.py` automatically generates `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT` while `B.SilkS`/`F.SilkS` on the main PCB retains full build labels (`RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k`).
+!!! tip "Deriving Functional Panel Labels from `Silkscreen` & Avoiding the `INV OUT` Input-Box Trap"
+    Running `generate_eurorack_panel.py` on a Stage 5 PCB surfaced two edge cases in trace `11-ff4fe23f` that are fixed in the generator:
+
+    1. **`Silkscreen`-Driven Panel Labels (`derive_panel_label`) & `--label REF=TEXT`**: Because Stage 4/5 footprints store electrical values in `Value` (`A100k`, `A50k`, `A1M`, `B10k`, `LED_3mm`) and full assembly labels in `Silkscreen` (`"RV1 GAIN A100k"`, `"RV2 ATK A50k"`, `"RV3 REL A1M"`, `"RV4 OFFSET B10k"`, `"D4 LED"`), reading `Value` alone would print `"A100k"` instead of `"GAIN"`. `derive_panel_label()` extracts `(property "Silkscreen" "...")` and strips the leading `<REF>` token and trailing `<Value>` tokens to isolate `"GAIN"`, `"ATK"`, `"REL"`, and `"OFFSET"`, while `--label D4=ENV` overrides `"D4 LED"` to `"ENV"`.
+    2. **Token-Based Input Callout Box Detection (`INV OUT` vs. `IN`)**: A naive `startswith("IN")` check falsely classifies `"INV OUT"` as an input jack and draws an input box around it. Checking whole tokens (`tokens[0] in ("IN", "INPUT") and "OUT" not in tokens and "OUTPUT" not in tokens`) boxes `"IN"` (`J1`) while keeping `"INV OUT"` (`J3`) unboxed.
 
 ## Step 6.2: Generate the Panel PCB, Run DRC & Package Gerbers
 
@@ -49,6 +53,7 @@ python3 .agents/skills/eurorack-panel/scripts/generate_eurorack_panel.py \
     --output panel/EnvelopeFollower_Panel.kicad_pcb \
     --title "ENV FOLLOW" \
     --subtitle "6HP ANALOG" \
+    --label D4=ENV \
     --gerber-dir production/panel \
     --zip production/EnvelopeFollower_Panel.zip \
     --drc
@@ -73,14 +78,25 @@ Packaged fabrication archive at production/EnvelopeFollower_Panel.zip
 | :---: | :---: |
 | ![3U Front Panel — Front Face](../images/panel_front.png) | ![3U Front Panel — Rear Grounding Face](../images/panel_back.png) |
 
-## Step 6.3: Verify Panel PCB & Gerbers with `kicad` Analyzers
+## Step 6.3: Verify Panel PCB, Gerbers & 3D Renders with `kicad`
 
 ```bash
 python3 .agents/skills/kicad/scripts/analyze_pcb.py panel/EnvelopeFollower_Panel.kicad_pcb --full --output /tmp/panel_pcb.json
 python3 .agents/skills/kicad/scripts/analyze_gerbers.py production/panel/ --full --output /tmp/panel_gerbers.json
+
+/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli pcb render \
+    --side top --width 800 --height 2400 --output /tmp/panel_front.png panel/EnvelopeFollower_Panel.kicad_pcb
+/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli pcb render \
+    --side bottom --width 800 --height 2400 --output /tmp/panel_back.png panel/EnvelopeFollower_Panel.kicad_pcb
 ```
+
+!!! warning "Catching Obsolete `JLCJLCJLCJLC` Markings via 3D Render Inspection"
+    Inspecting `/tmp/panel_back.png` in trace `11-ff4fe23f` caught the legacy `JLCJLCJLCJLC` order-number placeholder emitted by an older version of `eurorack-panel`. Because JLCPCB now uses a **`5 × 5 mm` solid silkscreen square** (`gr_rect` with `(fill yes)` on `B.SilkS`) for order QR code placement, you can fix an older template with this follow-up prompt:
+
+    > *"Please remove the JLCJLCJLC marking, it is obsolete. Please add a 5mm x 5mm filled square to B.SilkS for replacement with the JLCPCB QR Code during ordering."*
 
 Verified analyzer results on [`panel/EnvelopeFollower_Panel.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/panel/EnvelopeFollower_Panel.kicad_pcb) and [`production/panel/`](https://github.com/domesticmouse/EnvelopeFollower/tree/main/production/panel):
 
 - **PCB Analyzer**: `0` errors, `0` warnings, `10` footprints (`8` controls + `2` M3 slots), `2` filled copper zones (`F.Cu`, `B.Cu`), `30.0 x 128.5 mm` outline, `routing_complete: True`.
 - **Gerber Analyzer**: `0` findings across all severities; `9/9` Gerber layers complete (`B.Cu`, `B.Mask`, `B.Paste`, `B.SilkS`, `Edge.Cuts`, `F.Cu`, `F.Mask`, `F.Paste`, `F.SilkS`); `7` PTH component holes (`3 × 6.2 mm`, `4 × 7.2 mm`) and `3` NPTH mounting/LED holes (`3.2 mm` LED hole + `2` M3 oval slots).
+- **3D Renders (`kicad-cli pcb render`)**: Confirms clean front solder mask tenting, boxed `IN` vs. unboxed `INV OUT`, exposed rear `B.Mask` grounding rings, mirrored `ENV FOLLOW 6HP`, and the `5 × 5 mm` solid QR square on `B.SilkS`.

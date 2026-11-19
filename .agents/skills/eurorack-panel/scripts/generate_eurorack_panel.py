@@ -221,10 +221,14 @@ def parse_main_pcb(pcb_path: pathlib.Path) -> tuple[dict[str, float], list[dict]
         cy = float(circle_m.group(2)) if circle_m else def_cy
         dx, dy = rotate_offset(cx, cy, rot)
 
+        silk_m = re.search(r'\(property\s+"Silkscreen"\s+"([^"]*)"', match.group(0))
+        silk = silk_m.group(1) if silk_m else None
+
         jacks.append(
             {
                 "ref": ref,
                 "value": val,
+                "label": derive_panel_label(ref, val, silk),
                 "kind": spec["kind"],
                 "footprint": fp_lib,
                 "fp_x": fp_x,
@@ -280,16 +284,17 @@ def print_inspection_report(
         f"-> ({panel_x0 + panel_w:.2f}, {panel_y0 + PANEL_HEIGHT_3U_MM:.2f}) mm\n"
     )
     print(
-        f"{'Ref':<5} {'Value':<10} {'FP Origin (X, Y)':<20} "
+        f"{'Ref':<9} {'Value':<11} {'Label':<10} {'FP Origin (X, Y)':<20} "
         f"{'Bushing Global (X, Y)':<23} {'Panel-Local (X, Y)':<20} {'Drill'}"
     )
-    print("-" * 88)
+    print("-" * 104)
     for j in jacks:
         lx = round(j["bushing_x"] - panel_x0, 2)
         ly = round(j["bushing_y"] - panel_y0, 2)
         drill_mm = j.get("drill_mm", JACK_DRILL_MM)
+        lbl = clean_label(j.get("label", j["value"]), j["ref"])
         print(
-            f"{j['ref']:<5} {j['value']:<10} "
+            f"{j['ref']:<9} {j['value']:<11} {lbl:<10} "
             f"({j['fp_x']:6.2f}, {j['fp_y']:6.2f})     "
             f"({j['bushing_x']:6.2f}, {j['bushing_y']:6.2f})        "
             f"({lx:6.2f}, {ly:6.2f})     {drill_mm:.1f} mm"
@@ -338,12 +343,42 @@ def format_jack_footprint(
 \t\t\t(uuid "{det_uuid(ns, f"fp_{ref}_pad1")}")
 \t\t)"""
 
-    return f"""\t(footprint "Eurorack_Panel:JackHole_3.5mm_Thonkiconn_{drill_mm:g}mm"
+    kind_meta = {
+        "jack": (
+            f"Eurorack_Panel:JackHole_3.5mm_Thonkiconn_{drill_mm:g}mm",
+            "eurorack panel hole thonkiconn 3.5mm",
+        ),
+        "pot": (
+            f"Eurorack_Panel:PotHole_9mm_Vertical_{drill_mm:g}mm",
+            "eurorack panel hole pot 9mm vertical",
+        ),
+        "switch": (
+            f"Eurorack_Panel:SwitchHole_SubMini_{drill_mm:g}mm",
+            "eurorack panel hole switch toggle",
+        ),
+        "led_3mm": (
+            f"Eurorack_Panel:LEDHole_3mm_{drill_mm:g}mm_NPTH",
+            "eurorack panel hole led 3mm npth",
+        ),
+        "led_5mm": (
+            f"Eurorack_Panel:LEDHole_5mm_{drill_mm:g}mm_NPTH",
+            "eurorack panel hole led 5mm npth",
+        ),
+    }
+    fp_name, fp_tags = kind_meta.get(
+        jack.get("kind", "jack"),
+        (
+            f"Eurorack_Panel:JackHole_3.5mm_Thonkiconn_{drill_mm:g}mm",
+            "eurorack panel hole thonkiconn 3.5mm",
+        ),
+    )
+
+    return f"""\t(footprint "{fp_name}"
 \t\t(layer "F.Cu")
 \t\t(uuid "{det_uuid(ns, f"fp_{ref}")}")
 \t\t(at {bx:g} {by:g})
 \t\t(descr "{descr}")
-\t\t(tags "eurorack panel hole thonkiconn 3.5mm")
+\t\t(tags "{fp_tags}")
 \t\t(attr board_only exclude_from_pos_files exclude_from_bom)
 \t\t(property "Reference" "{ref}"
 \t\t\t(at 0 0 0)
@@ -468,24 +503,43 @@ def format_mount_slot_footprint(ns: str, ref: str, x: float, y: float) -> str:
 def clean_label(raw_value: str, ref: str = "") -> str:
     """Format a net/component value like `IN_1` or `OUT_1A` into `IN 1` or `OUT 1A`.
 
-    When `raw_value` is a generic electrical/part value (e.g. `100k`, `3.5mm_Jack`,
-    `LED_3mm`) and `ref` is provided, derive a readable front-panel label from `ref`
-    (e.g. `RV_GAIN -> GAIN`, `J_INV_OUT -> INV OUT`, `LED1 -> ENV`).
+    When `raw_value` is a generic electrical/part value (e.g. `100k`, `A100k`,
+    `3.5mm_Jack`, `LED_3mm`) and `ref` is provided, derive a readable front-panel
+    label from `ref` (e.g. `RV_GAIN -> GAIN`, `J_INV_OUT -> INV OUT`, `LED1 -> ENV`).
     """
     val = raw_value.strip()
     is_generic = bool(
         re.match(
-            r"^(\d+(\.\d+)?\s*[kKmMΩR]?|.*jack.*|.*led.*|.*pot.*)$",
+            r"^([A-Za-z]?\d+(\.\d+)?\s*[kKmMΩR]?|.*jack.*|.*led.*|.*pot.*)$",
             val,
             re.IGNORECASE,
         )
     )
     if is_generic and ref:
-        if ref.upper().startswith("LED"):
+        if ref.upper().startswith(("LED", "D")):
             return "ENV"
         cleaned_ref = re.sub(r"^(RV|J|SW)_", "", ref.strip(), flags=re.IGNORECASE)
         return cleaned_ref.replace("_", " ").strip()
     return val.replace("_", " ").strip()
+
+
+def derive_panel_label(ref: str, val: str, silk: str | None) -> str:
+    """Derive a concise front-panel label from the `Silkscreen` property or `Value`."""
+    if silk:
+        tokens = silk.strip().split()
+        if tokens and tokens[0].upper() == ref.upper():
+            tokens = tokens[1:]
+        val_tokens = val.strip().split()
+        if (
+            val_tokens
+            and len(tokens) > len(val_tokens)
+            and [t.upper() for t in tokens[-len(val_tokens) :]]
+            == [t.upper() for t in val_tokens]
+        ):
+            tokens = tokens[: -len(val_tokens)]
+        if tokens:
+            return clean_label(" ".join(tokens), ref)
+    return clean_label(val, ref)
 
 
 def build_panel_sexpr(
@@ -564,9 +618,15 @@ def build_panel_sexpr(
 
         for j in row:
             jx = j["bushing_x"]
-            lbl = clean_label(j["value"], j["ref"])
+            lbl = clean_label(j.get("label", j["value"]), j["ref"])
             ref_id = j["ref"].lower()
-            is_input = bool(re.match(r"^IN(?:\b|\d)", lbl.upper()))
+            tokens = lbl.upper().split()
+            is_input = (
+                bool(tokens)
+                and tokens[0] in ("IN", "INPUT")
+                and "OUT" not in tokens
+                and "OUTPUT" not in tokens
+            )
 
             if is_input:
                 jack_graphics.append(
@@ -1099,12 +1159,33 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help="Draw normalled cascade arrow between row groups (default: auto when title contains MULT).",
     )
+    parser.add_argument(
+        "-l",
+        "--label",
+        action="append",
+        default=[],
+        metavar="REF=TEXT",
+        help="Override panel silkscreen label for a component reference (e.g. D4=ENV).",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     bbox, jacks = parse_main_pcb(args.main_pcb)
+
+    if args.label:
+        overrides: dict[str, str] = {}
+        for spec in args.label:
+            if "=" not in spec:
+                raise ValueError(f"Invalid --label format {spec!r}; expected REF=TEXT")
+            ref_key, lbl_text = spec.split("=", 1)
+            overrides[ref_key.strip().upper()] = lbl_text.strip()
+        for j in jacks:
+            ref_u = j["ref"].upper()
+            if ref_u in overrides:
+                j["label"] = overrides[ref_u]
+
     pcb_w = bbox["max_x"] - bbox["min_x"]
     hp, panel_w = infer_hp_and_width(pcb_w, args.hp)
 
