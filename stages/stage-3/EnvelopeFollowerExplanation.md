@@ -351,7 +351,7 @@ Eurorack patch cables frequently get plugged into the wrong jack—or accidental
 | `C2` | `1 µF 63 V` | **Metallized Polyester Film** (`WIMA MKS2`, THT) | Immune to DC-bias capacitance collapse, microphonics, and leakage during `1 s` envelope releases. |
 
 ### Assembly Split (`49` SMD + `10` Manual THT)
-* **JLCPCB Economic SMT (`49` components / `19` BOM lines):** Both `TL074HIDR` ICs, all diodes (`D1`–`D3`, `D5`–`D11`), all resistors (`R1`–`R8B`, `R10`–`R19`, `R24`–`R26`, `R28`–`R30`), and caps `C1`, `C3`–`C13`. *(Note: LCSC part codes for `C9`–`C13` are marked `PENDING_VERIFY` in [`EnvelopeFollowerBOM.md`](./EnvelopeFollowerBOM.md) and must be resolved via JLCPCB search before assembly upload.)*
+* **JLCPCB Economic SMT (`49` components / `19` BOM lines):** Both `TL074HIDR` ICs, all diodes (`D1`–`D3`, `D5`–`D11`), all resistors (`R1`–`R8B`, `R10`–`R19`, `R24`–`R26`, `R28`–`R30`), and caps `C1`, `C3`–`C13`. *(All `49` SMD components and optional `DNP` `RH-5001` test points are live-verified in [`EnvelopeFollowerBOM.md`](./EnvelopeFollowerBOM.md).)*
 * **Manual Through-Hole (`10` parts):**
   * **Front (`F.Cu`) at `10.5 mm` panel standoff:** `J1`–`J3` (`WQP-PJ398SM` jacks), `RV1`–`RV4` (`9 mm` pots: `A100k`, `A50k`, `A1M`, `B10k`), and `D4` (`3 mm` LED).
   * **Rear (`B.Cu`):** `J_PWR` (`2×5` shrouded IDC header, pin 1 red stripe = `-12Vin`) and `C2` (`1 µF` WIMA `MKS2` film cap, `10.0 mm` tall—mounted on the rear to clear the `10.5 mm` front panel).

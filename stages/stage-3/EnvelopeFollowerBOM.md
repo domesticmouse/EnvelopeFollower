@@ -13,8 +13,8 @@
 | **All SMD Resistors (`R1`–`R8B`, `R10`–`R19`, `R24`–`R26`, `R28`–`R30`)** | **Yes** | 8 Basic lines (`0603` 1% + `10 Ω 1206`) + 1 Extended `2512 1 W 1%` line (`C54315`). |
 | **MLCC Decoupling/Coupling & Electrolytics (`C1`, `C3`–`C8`)** | **Yes** | `100 nF` (`C14663`, Basic), `10 µF 50 V 1206` (`C5449000`, Extended), `22 µF 35 V D5×L5.4` (`C2887274`, Extended). |
 | **`C2` Film & THT Parts (`C2`, `J_PWR`, `D4`, `J1`–`J3`, `RV1`–`RV4`)** | **Yes** | `1uF film` & `470nF film` returned **zero SMD film parts** on JLCPCB; resolved `C2` to **`WIMA MKS2` (`C92673`, `P=5mm`, Manual THT)**. `J_PWR` (`C53207560`) & `3 mm` LEDs (`C84774`/`C85161`/`C99761`) verified; `WQP-PJ398SM` THT jacks & `RK09` 9 mm pots absent on JLCPCB (source externally). |
-| **Small `NP0` Feedback Caps (`C9`–`C13`: `15 pF`, `47 pF`, `100 pF`)** | **PENDING** | Query `"15pF/47pF/100pF 50V 0603 C0G"` matched only `1 nF NP0` (`C18255878`) because JLCPCB catalogs `NP0` rather than `C0G`. The follow-up `"15pF/47pF/100pF NP0 0603"` command timed out after `60 s` waiting on permission approval. Marked `PENDING_VERIFY` below (do not guess codes). |
-| **Optional DNP THT Test Points (`TP1`–`TP8`: Ronghe `RH-5001`)** | **PENDING** | Live lookup via `search_lcsc.py "RH-5001" --details --json` failed in sandbox (`urlopen` DNS error) and timed out after `60 s` waiting on permission approval for `BypassSandbox: true`. Marked **`DNP`** and **`PENDING_VERIFY`** below (LCSC code, stock/price, and pin/drill dimensions must be verified before PCB footprint finalization). |
+| **Small `C0G`/`NP0` Feedback Caps (`C9`–`C13`: `15 pF`, `47 pF`, `100 pF`)** | **Yes** | Samsung `CL10C` `50 V C0G ±5%` `0603` **Basic** parts verified live: `15 pF` (`C1644`), `47 pF` (`C1671`), `100 pF` (`C14858`). |
+| **Optional DNP THT Test Points (`TP1`–`TP8`: Ronghe `RH-5001`)** | **Yes** | Live-verified on JLCPCB/LCSC: **`C5199801`** (`ronghe RH-5001`, `2.5mm Black Pin Type (Through-Board)`, `103,200` JLCPCB / `106,585` LCSC stock, `$0.0839`). Marked **`DNP`** below. |
 
 ---
 
@@ -40,9 +40,9 @@
 | `C5, C6, C7, C8` | 4 | `100 nF 50 V X7R ±10%` | `0603` | `Capacitor_SMD:C_0603_1608Metric` | `CC0603KRX7R9BB104` | YAGEO | **`C14663`** | **Basic** | 53,995,509 | $0.0060 | $0.0240 |
 | `C1` | 1 | `10 µF 50 V X7R ±10%` | `1206` | `Capacitor_SMD:C_1206_3216Metric` | `TCC1206X7R106K500HT` | CCTC | **`C5449000`** | **Extended** | 40,854 | $0.1065 | $0.1065 |
 | `C3, C4` | 2 | `22 µF 35 V ±20%` Elec | `D5×L5.4mm` | `Capacitor_SMD:CP_Elec_5x5.4` | `RVT22UF35V67RV0104` | KNSCHA | **`C2887274`** | **Extended** | 18,620 | $0.0354 | $0.0708 |
-| `C10` | 1 | `15 pF 50 V NP0 ±5%` | `0603` | `Capacitor_SMD:C_0603_1608Metric` | `PENDING_VERIFY` | — | **`PENDING_VERIFY`** | *(Basic exp.)* | — | — | — |
-| `C9, C11, C12` | 3 | `47 pF 50 V NP0 ±5%` | `0603` | `Capacitor_SMD:C_0603_1608Metric` | `PENDING_VERIFY` | — | **`PENDING_VERIFY`** | *(Basic exp.)* | — | — | — |
-| `C13` | 1 | `100 pF 50 V NP0 ±5%` | `0603` | `Capacitor_SMD:C_0603_1608Metric` | `PENDING_VERIFY` | — | **`PENDING_VERIFY`** | *(Basic exp.)* | — | — | — |
+| `C10` | 1 | `15 pF 50 V C0G ±5%` | `0603` | `Capacitor_SMD:C_0603_1608Metric` | `CL10C150JB8NNNC` | Samsung Electro-Mechanics | **`C1644`** | **Basic** | 969,879 | $0.0111 | $0.0111 |
+| `C9, C11, C12` | 3 | `47 pF 50 V C0G ±5%` | `0603` | `Capacitor_SMD:C_0603_1608Metric` | `CL10C470JB8NNNC` | Samsung Electro-Mechanics | **`C1671`** | **Basic** | 650,545 | $0.0063 | $0.0189 |
+| `C13` | 1 | `100 pF 50 V C0G ±5%` | `0603` | `Capacitor_SMD:C_0603_1608Metric` | `CL10C101JB8NNNC` | Samsung Electro-Mechanics | **`C14858`** | **Basic** | 3,103,615 | $0.0084 | $0.0084 |
 
 **Alternate Verified SMD Options:**
 - **`U1`, `U2` Stock Backup:** If `TL074HIDR` (`C2878713`, `469` stock) sells out before ordering, `TL074HIPWR` (`C4370424`, `TSSOP-14`, `10,585` stock, `$0.3396`) and `TL074HIDYYR` (`C5116353`, `SOT-23-14-THIN`, `10,398` stock, `$0.4158`) are in high stock (requires updating footprint).
@@ -71,13 +71,13 @@
 
 | Designator | Qty | Value / Function | MPN | Manufacturer | LCSC Part # | DNP | KiCad Symbol & Footprint | Sourcing & Assembly Notes |
 |---|---:|---|---|---|---|---|---|---|
-| `TP1` (`GND`), `TP2` (`+12V_PROT`), `TP3` (`-12V_PROT`), `TP4` (`PREAMP_OUT`), `TP5` (`HALF_WAVE`), `TP6` (`RECT_OUT`), `TP7` (`PEAK_DET`), `TP8` (`ENV_RAW_BUF`) | 8 *(opt.)* | Bench Test Point (`RH-5001`) | `RH-5001` | Ronghe | **`PENDING_VERIFY`** | **Yes (`DNP`)** | `Connector:TestPoint` / `TestPoint:TestPoint_Keystone_5000-5004_Miniature` *(tentative `1.0 mm` drill / `2.0 mm` pad — verify `RH-5001` pin dimensions vs. drill before layout; or `TestPoint_THTPad_D2.0mm_Drill1.0mm`)* | **DNP / Exclude from BOM** (`dnp=True`, `exclude_from_bom=True`). Leave unpopulated to needle-probe plated pads from either side, or optionally hand-solder `RH-5001` loops on **`B.Cu`** (rear) to stay clear of the `10.5 mm` front-panel standoff. Verify LCSC code, stock, and exact `RH-5001` hole fit before ordering/layout. |
+| `TP1` (`GND`), `TP2` (`+12V_PROT`), `TP3` (`-12V_PROT`), `TP4` (`PREAMP_OUT`), `TP5` (`HALF_WAVE`), `TP6` (`RECT_OUT`), `TP7` (`PEAK_DET`), `TP8` (`ENV_RAW_BUF`) | 8 *(opt.)* | Bench Test Point (`RH-5001`) | `RH-5001` | Ronghe | **`C5199801`** | **Yes (`DNP`)** | `Connector:TestPoint` / `TestPoint:TestPoint_Keystone_5000-5004_Miniature` *(`1.0 mm` drill / `2.0 mm` pad; or `TestPoint_THTPad_D2.0mm_Drill1.0mm`)* | **Live-verified on JLCPCB/LCSC:** `103,200` JLCPCB / `106,585` LCSC stock (`$0.0839`/ea; Extended if ever assembled, `$0.00` as **DNP**). Marked **DNP / Exclude from BOM** (`dnp=True`, `exclude_from_bom=True`). Leave unpopulated to needle-probe plated pads from either side, or optionally hand-solder `RH-5001` loops on **`B.Cu`** (rear) to stay clear of the `10.5 mm` front-panel standoff. Datasheet: [LCSC PDF](https://datasheet.lcsc.com/datasheet/pdf/4adec3e10718fa4444bfddc0d5622733.pdf?productCode=C5199801). |
 
 ---
 
 ## 3. JLCPCB SMT BOM Upload Table (`Comment,Designator,Footprint,LCSC Part #`)
 
-> Exported for **JLCPCB Economic Assembly** (SMD only; manual THT parts `C2`, `J_PWR`, `D4`, `J1`–`J3`, `RV1`–`RV4` and DNP test points `TP1`–`TP8` excluded — also filter `TP1`–`TP8` out of JLCPCB CPL before upload to avoid orphan-designator rejection). Populate the 3 `PENDING_VERIFY` `NP0` capacitor codes (`C9`–`C13`) before upload.
+> Exported for **JLCPCB Economic Assembly** (SMD only; manual THT parts `C2`, `J_PWR`, `D4`, `J1`–`J3`, `RV1`–`RV4` and DNP test points `TP1`–`TP8` excluded — also filter `TP1`–`TP8` out of JLCPCB CPL before upload to avoid orphan-designator rejection).
 
 ```csv
 Comment,Designator,Footprint,LCSC Part #
@@ -97,9 +97,9 @@ B5819W,"D10,D11",D_SOD-123,C8598
 100nF 50V X7R,"C5,C6,C7,C8",C_0603_1608Metric,C14663
 10uF 50V X7R,"C1",C_1206_3216Metric,C5449000
 22uF 35V Elec,"C3,C4",CP_Elec_5x5.4,C2887274
-15pF 50V NP0,C10,C_0603_1608Metric,PENDING_VERIFY
-47pF 50V NP0,"C9,C11,C12",C_0603_1608Metric,PENDING_VERIFY
-100pF 50V NP0,C13,C_0603_1608Metric,PENDING_VERIFY
+15pF 50V C0G,C10,C_0603_1608Metric,C1644
+47pF 50V C0G,"C9,C11,C12",C_0603_1608Metric,C1671
+100pF 50V C0G,C13,C_0603_1608Metric,C14858
 ```
 
 ---
@@ -107,23 +107,12 @@ B5819W,"D10,D11",D_SOD-123,C8598
 ## 4. Basic vs. Extended Line Count & Per-Board Cost Breakdown
 
 - **Unique JLCPCB SMT BOM Lines (`19` total):**
-  - **Live-Verified Basic Lines:** **`12`** lines (`37` SMD components) → `$0.00` feeder setup fee.
-  - **Pending `NP0` Feedback Cap Lines:** **`3`** lines (`5` SMD components: `C10`, `C9/C11/C12`, `C13`) — expected Basic once queried with `"NP0"` keyword (`~$0.01–$0.03`/board est.).
+  - **Live-Verified Basic Lines:** **`15`** lines (`42` SMD components) → `$0.00` feeder setup fee.
   - **Live-Verified Extended Lines:** **`4`** lines (`7` SMD components: `U1/U2`, `R16/R19`, `C1`, `C3/C4`) → `4 × $3.00 = $12.00` total one-time Extended feeder setup fee per assembly order.
-- **Per-Board JLCPCB SMT Component Subtotal (44 live-verified SMD parts; excludes 5 pending `NP0` pF caps, PCB fab, and PCBA assembly labor/stencil):**
-  - **Basic SMD parts (`37` pcs):** **`$0.2225`**
+- **Per-Board JLCPCB SMT Component Subtotal (`49` live-verified SMD parts; excludes PCB fab and PCBA assembly labor/stencil):**
+  - **Basic SMD parts (`42` pcs):** **`$0.2609`**
   - **Extended SMD parts (`7` pcs):** **`$0.7563`**
-  - **Verified SMD parts subtotal (`44` pcs):** **`$0.9788 / board`**
-  - **Amortized Extended feeder fees (`$12.00 / N`):** `+$2.4000 / board` at 5 boards (`$3.3788` parts + feeder/board) or `+$0.1200 / board` at 100 boards (`$1.0988` parts + feeder/board).
+  - **Total verified SMD parts subtotal (`49` pcs):** **`$1.0172 / board`**
+  - **Amortized Extended feeder fees (`$12.00 / N`):** `+$2.4000 / board` at 5 boards (`$3.4172` parts + feeder/board) or `+$0.1200 / board` at 100 boards (`$1.1372` parts + feeder/board).
 - **LCSC-Sourced Manual THT Parts Subtotal (optional to bundle with order):**
-  - `C2` (`C92673`, `$1.1443`) + `J_PWR` (`C53207560`, `$0.1241`) + `D4` (`C84774`, `$0.0359`) = **`$1.3043 / board`** *(plus externally sourced `3× WQP-PJ398SM` jacks and `4× 9 mm` potentiometers `A100k`, `A50k`, `A1M`, `B10k`; `TP1`–`TP8` Ronghe `RH-5001` test points are marked **DNP** / `$0.00` required BOM cost)*.
-
-### Commands to Resolve Remaining `PENDING_VERIFY` LCSC Codes
-
-```bash
-python3 /Users/brett/Documents/GitHub/EnvelopeFollower/stages/stage-1/.agents/skills/skidl/scripts/jlcpcb_search.py --in-stock-only \
-  "15pF NP0 0603" "47pF NP0 0603" "100pF NP0 0603"
-
-python3 /Users/brett/Documents/GitHub/EnvelopeFollower/stages/stage-1/.agents/skills/lcsc/scripts/search_lcsc.py \
-  "RH-5001" --details --json
-```
+  - `C2` (`C92673`, `$1.1443`) + `J_PWR` (`C53207560`, `$0.1241`) + `D4` (`C84774`, `$0.0359`) = **`$1.3043 / board`** *(plus externally sourced `3× WQP-PJ398SM` jacks and `4× 9 mm` potentiometers `A100k`, `A50k`, `A1M`, `B10k`; `TP1`–`TP8` Ronghe `RH-5001` [`C5199801`] test points are marked **DNP** / `$0.00` required BOM cost)*.
