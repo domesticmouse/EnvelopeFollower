@@ -1,8 +1,8 @@
-# Stage 5: Interactive KiCad Work (Routing, Ground Pours & Verification)
+# Stage 6: Interactive KiCad Work (Routing, Ground Pours & Verification)
 
 At this stage, [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb) has all 62 footprints (`54` populated + `8` `DNP` test points) positioned, `Edge.Cuts` defined, dual-sided silkscreen labels placed, and all 36 nets loaded as an unrouted ratsnest (`0` copper tracks, `0` copper zones). Open `EnvelopeFollower.kicad_pcb` in **KiCad 10 PCB Editor** to complete routing and verification.
 
-## 5.1 Routing Strategy
+## 6.1 Routing Strategy
 
 1. **Verify Grid & Netclass Setup**:
     In **File → Board Setup → Design Rules → Net Classes**, confirm the `Power` netclass (`0.60 mm` track width, `0.25 mm` clearance, `0.80 mm` via diameter, `0.40 mm` drill) is assigned to `+12V_IN`, `+12V_PROT`, `+12V`, `-12V_IN`, `-12V_PROT`, `-12V`, and `GND`. Leave the `Default` netclass at `0.25 mm` width for analog signal nets.
@@ -41,7 +41,7 @@ At this stage, [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/E
 
     Confirm `0` DRC errors, `0` clearance violations, and `0` unrouted nets.
 
-## 5.2 Automated Design Audit with the `kicad` Skill
+## 6.2 Automated Design Audit with the `kicad` Skill
 
 After routing, run the `kicad` skill analyzers on both the schematic and routed PCB to verify decoupling proximity, silkscreen-over-pad clearances, `DNP` test-point attributes, and cross-domain net parity:
 

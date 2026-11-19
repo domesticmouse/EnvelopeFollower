@@ -1,6 +1,6 @@
 # Envelope Follower — Improved Netlist, JLCPCB BOM, Capture Guide & Silkscreen Schedule
 
-This reference provides the complete Bill of Materials (`45` SMD + `9` Manual THT + `8` optional `DNP` test points), ready-to-upload `jlcpcb_bom.csv`, **36-net** connection list, 8-step manual KiCad capture guide, and dual-sided silkscreen schedule for the improved Eurorack Envelope Follower ([Stage 2](../tutorial/stage-2-circuit-upgrades.md)).
+This reference provides the complete Bill of Materials (`45` SMD + `9` Manual THT + `8` optional `DNP` test points), ready-to-upload `jlcpcb_bom.csv`, **36-net** connection list, 8-step manual KiCad capture guide, and dual-sided silkscreen schedule for the improved Eurorack Envelope Follower ([Stage 2](../tutorial/stage-2-circuit-upgrades.md) & [Stage 3](../tutorial/stage-3-bom-and-dfm.md)).
 
 ---
 
@@ -146,7 +146,7 @@ BAT54SLT1G,"D8, D9",SOT-23,C19726
 
 ## 4. Manual KiCad Schematic Capture Checklist
 
-If capturing the schematic manually in KiCad instead of generating it via SKiDL in [Stage 3](../tutorial/stage-3-skidl.md):
+If capturing the schematic manually in KiCad instead of generating it via SKiDL in [Stage 4](../tutorial/stage-4-skidl.md):
 
 ### Step 1: Project Setup & Op-Amp Allocation
 - [ ] Create `EnvelopeFollower.kicad_pro` and open `EnvelopeFollower.kicad_sch` in KiCad 10.

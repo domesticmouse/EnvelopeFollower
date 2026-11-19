@@ -1,6 +1,6 @@
-# Stage 7: JLCPCB PCBA Export, Assembly & Bench Bring-Up
+# Stage 8: JLCPCB PCBA Export, Assembly & Bench Bring-Up
 
-## 7.1 Export Main PCB Manufacturing Files
+## 8.1 Export Main PCB Manufacturing Files
 
 Once you finish routing [`EnvelopeFollower.kicad_pcb`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.kicad_pcb) in KiCad and pass DRC (`0` violations), export Gerbers, Excellon drills, and the bottom-side SMD Centroid (`.pos`) file for JLCPCB SMT assembly:
 
@@ -29,7 +29,7 @@ Notice how `--smd-only` skips the 9 manual THT parts while `--exclude-dnp` autom
 
 ---
 
-## 7.2 Ordering on JLCPCB & Cost Breakdown
+## 8.2 Ordering on JLCPCB & Cost Breakdown
 
 ### AI Agent Prompt (Capturing Ordering Notes)
 
@@ -57,7 +57,7 @@ Before uploading your Gerbers and BOM, have your agent write a concise ordering 
 
 #### Verifying the JLCPCB Placement Preview Against `B.SilkS`
 
-Because every SMD part carries both its reference and value on `B.SilkS` ([Stage 4](stage-4-schematic-and-pcb.md)), you can verify JLCPCB's 3D assembly preview and post-assembly DFM report directly against the board image without cross-referencing every unmarked `0603`/`0805` MLCC line by line:
+Because every SMD part carries both its reference and value on `B.SilkS` ([Stage 5](stage-5-schematic-and-pcb.md)), you can verify JLCPCB's 3D assembly preview and post-assembly DFM report directly against the board image without cross-referencing every unmarked `0603`/`0805` MLCC line by line:
 
 | BOM Value | `B.SilkS` Label | Designators | Package | LCSC # | What to Verify in JLCPCB Preview / Report |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -86,7 +86,7 @@ Because every SMD part carries both its reference and value on `B.SilkS` ([Stage
 
 ---
 
-## 7.3 Stress-Free Mechanical Assembly & Bench Bring-Up
+## 8.3 Stress-Free Mechanical Assembly & Bench Bring-Up
 
 When your assembled PCBs arrive, hand-solder the `9` required `Manual THT` parts (plus optional `TP1`–`TP8` wire-loop test points):
 

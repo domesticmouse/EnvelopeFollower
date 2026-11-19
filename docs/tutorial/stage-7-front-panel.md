@@ -1,4 +1,4 @@
-# Stage 6: Mated 3U Eurorack Front Panel Construction
+# Stage 7: Mated 3U Eurorack Front Panel Construction
 
 Instead of buying costly custom-milled aluminum, you can fabricate a rigid `1.6 mm` FR4 PCB front panel (matte black solder mask with crisp white silkscreen) directly from the finalized coordinates in `EnvelopeFollower.kicad_pcb`.
 
@@ -6,7 +6,7 @@ Instead of buying costly custom-milled aluminum, you can fabricate a rigid `1.6 
 
 > *"Using the `eurorack-panel` skill, inspect `EnvelopeFollower.kicad_pcb` to extract every pot (`RV1`–`RV4`), jack (`J1`–`J3`), and LED (`D4`) bushing coordinate, generate the mated 6 HP × 3U front panel PCB at `panel/EnvelopeFollower_Panel.kicad_pcb` titled `ENV FOLLOW` (`6HP ANALOG`) with panel labels `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, refill `F.Cu`/`B.Cu` `GND` shield planes, run DRC, export Gerbers and drills to `production/panel/`, and verify the Gerbers with the `kicad` skill."*
 
-## Step 6.1: Inspect Mechanical Coordinates
+## Step 7.1: Inspect Mechanical Coordinates
 
 Run `generate_eurorack_panel.py --inspect` against the main PCB:
 
@@ -41,7 +41,7 @@ Notice how sharing the same global KiCad coordinate space (`100.00, 10.00` to `1
 !!! tip "Mapping Sequential References (`RV1`–`RV4`, `J1`–`J3`, `D4`) to Panel Labels"
     In `generate_eurorack_panel.py`, `clean_label(value, ref)` uses `Value` directly whenever `Value` is descriptive (e.g., `GAIN`, `ATK`, `REL`, `OFFSET`, `IN`, `ENV`, `OUT`, `INV_OUT`), and only falls back to `Reference` (stripping `RV_`/`J_`/`SW_` or mapping `LED*` $\rightarrow$ `ENV`) when `Value` is generic (`100k`, `50k`, `1M`, `3.5mm_Jack`, `LED_3mm`). Keeping functional names in each front-panel footprint's `Value` (or using `RV_GAIN` / `J_IN` style references) ensures `generate_eurorack_panel.py` automatically generates `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT` while `B.SilkS`/`F.SilkS` on the main PCB retains full build labels (`RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k`).
 
-## Step 6.2: Generate the Panel PCB, Run DRC & Package Gerbers
+## Step 7.2: Generate the Panel PCB, Run DRC & Package Gerbers
 
 ```bash
 python3 .agents/skills/eurorack-panel/scripts/generate_eurorack_panel.py \
@@ -73,7 +73,7 @@ Packaged fabrication archive at production/EnvelopeFollower_Panel.zip
 | :---: | :---: |
 | ![3U Front Panel — Front Face](../images/panel_front.png) | ![3U Front Panel — Rear Grounding Face](../images/panel_back.png) |
 
-## Step 6.3: Verify Panel PCB & Gerbers with `kicad` Analyzers
+## Step 7.3: Verify Panel PCB & Gerbers with `kicad` Analyzers
 
 ```bash
 python3 .agents/skills/kicad/scripts/analyze_pcb.py panel/EnvelopeFollower_Panel.kicad_pcb --full --output /tmp/panel_pcb.json

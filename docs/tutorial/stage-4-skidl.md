@@ -1,16 +1,16 @@
-# Stage 3: Translating the Improved Circuit to SKiDL (`envelope_follower.py`)
+# Stage 4: Translating the Improved Circuit to SKiDL (`envelope_follower.py`)
 
 Defining the circuit in **SKiDL** turns the netlist into testable, version-controlled Python code that enforces `ERC()` assertions and outputs both a KiCad netlist and a JLCPCB-ready BOM in one execution—while keeping optional `DNP` test points and manual THT panel hardware cleanly separated from the SMT PCBA BOM.
 
 ## AI Agent Prompt
 
-Because Stage 2 already froze every net, component reference, LCSC code, and `DNP` attribute inside `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, you only need a one-line prompt to drive the `/skidl` skill:
+Because [Stage 3](stage-3-bom-and-dfm.md) already froze every net, component reference, LCSC code, and `DNP` attribute inside `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, you only need a one-line prompt to drive the `/skidl` skill:
 
 > *"`/skidl` Please turn `@EnvelopeFollowerImproved.md` and `@EnvelopeFollowerBOM.md` into a SKiDL circuit."*
 
 That single prompt instructs the agent (using `skidl` alongside the BOM/LCSC skills) to implement all `62` components (`2× TL074H`, `45` SMD parts, `9` manual THT parts, and `8` `DNP` `TP1`–`TP8` test points), verify `ERC()` passes with 0 errors and 0 warnings, and export `envelope_follower.net`, `envelope_follower_bom.xml`, `jlcpcb_bom.csv`, and `EnvelopeFollower.kicad_sch`.
 
-## Step 3.1: Set Up the Python Environment & Query Parts
+## Step 4.1: Set Up the Python Environment & Query Parts
 
 Create an isolated `.venv` with `uv` (Python 3.14 avoids compiling `h5py` from source) and install `skidl` and `kinet2pcb`:
 
@@ -28,7 +28,7 @@ Verify live JLCPCB stock and Basic vs. Extended pricing for the active ICs, clam
 
 You can also inspect exact KiCad 10 symbol pins before coding (`show("Amplifier_Operational", "TL074")`, `show("Diode", "BAT54S")`, `show("Connector_Audio", "AudioJack2_SwitchT")`, `show("Connector", "TestPoint")`).
 
-## Step 3.2: Anatomy of `envelope_follower.py`
+## Step 4.2: Anatomy of `envelope_follower.py`
 
 In `envelope_follower.py`, five SKiDL patterns make the improved 54-part (+8 `DNP` test points), 36-net circuit modular and fabrication-ready:
 
@@ -148,7 +148,7 @@ In `envelope_follower.py`, five SKiDL patterns make the improved 54-part (+8 `DN
     - **`Device:C_Polarized` (`CP_Elec_6.3x5.4`)**: Pin `1` is `+` and Pin `2` is `-`. On the `-12V` rail, **`c4[1]` connects to `GND`** (`0 V`) and **`c4[2]` connects to `-12V`** (`-11.78 V`).
     - **`Diode:1N4148W`, `Device:D_Schottky`, and `Device:LED`**: Pin `1` is **`K` (cathode)** and Pin `2` is **`A` (anode)**—the opposite of intuitive "1 = anode" assumptions. Always wire diodes and LEDs by pin name (`d["A"]`, `d["K"]`) rather than raw pin integers.
 
-## Step 3.3: Run SKiDL & Inspect Outputs
+## Step 4.3: Run SKiDL & Inspect Outputs
 
 ```bash
 .venv/bin/python envelope_follower.py

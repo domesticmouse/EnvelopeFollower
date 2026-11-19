@@ -1,4 +1,4 @@
-# Stage 4: Generating the KiCad Schematic, 6 HP Main PCB & Silkscreen Markup
+# Stage 5: Generating the KiCad Schematic, 6 HP Main PCB & Silkscreen Markup
 
 ## Part A: Auto-Generated KiCad Schematic (`EnvelopeFollower.kicad_sch`)
 

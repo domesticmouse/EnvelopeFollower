@@ -11,15 +11,16 @@ Each stage uses a **hybrid workflow**: you will see both the **AI agent prompt**
 ```mermaid
 flowchart TD
     S0["0. Hagiwo Sketch<br/>EnvelopeFollower.jpg / .webp"] --> S1["1. Install 7 Agent Skills<br/>skidl, eurorack-panel, kicad,<br/>bom, datasheets, jlcpcb, lcsc"]
-    S1 --> S2["2. Iterative Design & Upgrades<br/>Extract -> Critique -> Harden -> BOM<br/>-> Audio Walkthrough -> Test Points & Silkscreen"]
-    S2 --> S3["3. SKiDL Circuit & ERC<br/>envelope_follower.py (54+8 DNP parts, 36 nets)"]
-    S3 --> S4A["4a. KiCad Schematic<br/>EnvelopeFollower.kicad_sch"]
-    S3 --> S4B["4b. Netlist & JLCPCB BOM<br/>envelope_follower.net + jlcpcb_bom.csv (18 lines)"]
-    S4B --> S4C["4c. 6 HP Main PCB Placement & Silkscreen<br/>generate_kicad_pcb.py -> EnvelopeFollower.kicad_pcb"]
-    S4C --> S5["5. Interactive KiCad Work<br/>Routing, GND Pour, DRC & kicad Analyzers"]
-    S5 --> S6["6. Mated 3U Front Panel<br/>generate_eurorack_panel.py -> panel/EnvelopeFollower_Panel.kicad_pcb"]
-    S5 --> S7["7. Fab, PCBA & Bring-Up<br/>Gerbers, Drills, B.Cu CPL, THT & TP1-TP8 Probing"]
-    S6 --> S7
+    S1 --> S2["2. Sketch & Analog Upgrades<br/>Extract -> Critique -> Eurorack Protections"]
+    S2 --> S3["3. JLCPCB BOM, Walkthrough & DFM<br/>Basic/Extended BOM -> Audio Walkthrough -> TP1-TP8 & Silkscreen"]
+    S3 --> S4["4. SKiDL Circuit & ERC<br/>envelope_follower.py (54+8 DNP parts, 36 nets)"]
+    S4 --> S5A["5a. KiCad Schematic<br/>EnvelopeFollower.kicad_sch"]
+    S4 --> S5B["5b. Netlist & JLCPCB BOM<br/>envelope_follower.net + jlcpcb_bom.csv (18 lines)"]
+    S5B --> S5C["5c. 6 HP Main PCB Placement & Silkscreen<br/>generate_kicad_pcb.py -> EnvelopeFollower.kicad_pcb"]
+    S5C --> S6["6. Interactive KiCad Work<br/>Routing, GND Pour, DRC & kicad Analyzers"]
+    S6 --> S7["7. Mated 3U Front Panel<br/>generate_eurorack_panel.py -> panel/EnvelopeFollower_Panel.kicad_pcb"]
+    S6 --> S8["8. Fab, PCBA & Bring-Up<br/>Gerbers, Drills, B.Cu CPL, THT & TP1-TP8 Probing"]
+    S7 --> S8
 ```
 
 ---
@@ -55,12 +56,13 @@ flowchart TD
 ## Stage-by-Stage Guide
 
 1. **[Stage 1: Hardware Agent Skills](tutorial/stage-1-agent-skills.md)** — Install all 7 hardware design and fabrication skills (`skidl`, `eurorack-panel`, `kicad`, `bom`, `datasheets`, `jlcpcb`, `lcsc`) into `.agents/skills/`.
-2. **[Stage 2: Sketch & Circuit Upgrades](tutorial/stage-2-circuit-upgrades.md)** — Walk through the 6-step iterative design workflow: extracting Hagiwo's sketch, critiquing analog flaws (`OFFSET` pot loading, passive diode deadzone, LED bias glow), adding Eurorack protections, researching JLCPCB Basic/Extended parts (`2x TL074HIDR`, all 8 channels active), documenting the audio signal path, and defining `TP1`–`TP8` + dual-sided silkscreen rules.
-3. **[Stage 3: SKiDL Circuit & ERC](tutorial/stage-3-skidl.md)** — Express the 54 populated components + 8 `DNP` test points (62 footprints, 36 nets) in Python (`envelope_follower.py`), verify live LCSC stock across 18 JLCPCB SMT BOM lines, and pass `ERC()` with zero errors or warnings.
-4. **[Stage 4: Schematic & 6 HP PCB](tutorial/stage-4-schematic-and-pcb.md)** — Export `EnvelopeFollower.kicad_sch` and automate the `29.60 × 107.00 mm` main PCB placement (`generate_kicad_pcb.py`) with `F.Cu` panel controls, `B.Cu` single-sided SMT + `J_PWR` + `TP1`–`TP8`, and automated `Reference + Value` / dual-sided silkscreen markup.
-5. **[Stage 5: Routing, Pour & Audit](tutorial/stage-5-routing-and-drc.md)** — Route protected power rails, sensitive summing junctions, and the high-impedance `ENV_CAP` node in KiCad 10, pour stitched `GND` zones, verify zero silkscreen pad clipping, pass DRC, and run automated schematic/PCB/cross-domain audits.
-6. **[Stage 6: Mated 3U Front Panel](tutorial/stage-6-front-panel.md)** — Inspect main PCB bushing coordinates and generate a grounded `1.6 mm` FR4 3U front panel (`panel/EnvelopeFollower_Panel.kicad_pcb`) with clean functional labels (`GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, `INV OUT`), Gerbers, and DRC verification.
-7. **[Stage 7: JLCPCB PCBA & Assembly](tutorial/stage-7-manufacturing.md)** — Export Gerbers, Excellon drills, and bottom-side CPL files (excluding `DNP` test points) for single-sided JLCPCB Economic PCBA (\$0.85/board SMD + \$9.00 Extended setup), verify placement previews against `B.SilkS` values, hand-solder THT controls/test loops, and probe `TP1`–`TP8` on the bench.
+2. **[Stage 2: Sketch & Circuit Upgrades](tutorial/stage-2-circuit-upgrades.md)** — Extract Hagiwo's hand-drawn sketch (`EnvelopeFollower.md`), critique and fix analog flaws (`OFFSET` pot loading, passive diode deadzone and loop stability using `U2C`/`U2D` + `D7` + `C11`, active V-to-I LED driver), and add Eurorack hardware protections (`EnvelopeFollowerImprovements.md`).
+3. **[Stage 3: JLCPCB BOM, Walkthrough & Test Points](tutorial/stage-3-bom-and-dfm.md)** — Research live JLCPCB Basic/Extended SMT parts vs. manual THT controls (`EnvelopeFollowerImproved.md` & `EnvelopeFollowerBOM.md`), document the 7-stage audio signal path (`EnvelopeFollowerExplanation.md`), and define `TP1`–`TP8` (`DNP`) test points and dual-sided silkscreen rules (`SilkscreenInstructions.md`).
+4. **[Stage 4: SKiDL Circuit & ERC](tutorial/stage-4-skidl.md)** — Express the 54 populated components + 8 `DNP` test points (62 footprints, 36 nets) in Python (`envelope_follower.py`), verify live LCSC stock across 18 JLCPCB SMT BOM lines, and pass `ERC()` with zero errors or warnings.
+5. **[Stage 5: Schematic & 6 HP PCB](tutorial/stage-5-schematic-and-pcb.md)** — Export `EnvelopeFollower.kicad_sch` and automate the `29.60 × 107.00 mm` main PCB placement (`generate_kicad_pcb.py`) with `F.Cu` panel controls, `B.Cu` single-sided SMT + `J_PWR` + `TP1`–`TP8`, and automated `Reference + Value` / dual-sided silkscreen markup.
+6. **[Stage 6: Routing, Pour & Audit](tutorial/stage-6-routing-and-drc.md)** — Route protected power rails, sensitive summing junctions, and the high-impedance `ENV_CAP` node in KiCad 10, pour stitched `GND` zones, verify zero silkscreen pad clipping, pass DRC, and run automated schematic/PCB/cross-domain audits.
+7. **[Stage 7: Mated 3U Front Panel](tutorial/stage-7-front-panel.md)** — Inspect main PCB bushing coordinates and generate a grounded `1.6 mm` FR4 3U front panel (`panel/EnvelopeFollower_Panel.kicad_pcb`) with clean functional labels (`GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, `INV OUT`), Gerbers, and DRC verification.
+8. **[Stage 8: JLCPCB PCBA & Assembly](tutorial/stage-8-manufacturing.md)** — Export Gerbers, Excellon drills, and bottom-side CPL files (excluding `DNP` test points) for single-sided JLCPCB Economic PCBA (\$0.85/board SMD + \$9.00 Extended setup), verify placement previews against `B.SilkS` values, hand-solder THT controls/test loops, and probe `TP1`–`TP8` on the bench.
 
 ### Technical References
 
