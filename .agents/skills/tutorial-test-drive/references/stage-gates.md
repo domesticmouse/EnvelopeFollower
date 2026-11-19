@@ -6,6 +6,7 @@ Always read the corresponding `docs/tutorial/stage-N-*.md` file at runtime to ex
 
 ## Stage 1: Hardware Agent Skills (`docs/tutorial/stage-1-agent-skills.md`)
 
+- **Init:** `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py init-stage 1`
 - **Output directory:** `stages/stage-1/`
 - **Execution:** `tutorial-runner` runs both `npx skills add` commands inside `stages/stage-1/`.
 - **Expected layout:**
@@ -20,6 +21,7 @@ Always read the corresponding `docs/tutorial/stage-N-*.md` file at runtime to ex
 
 ## Stage 2: Sketch Extraction & Circuit Upgrades (`docs/tutorial/stage-2-circuit-upgrades.md`)
 
+- **Init:** `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py init-stage 2` (clones full `stages/stage-1/` directory, including `.agents/skills/` and `skills-lock.json`, into `stages/stage-2/`)
 - **Output directory:** `stages/stage-2/`
 - **Prep:** Download `EnvelopeFollower.webp` inside `stages/stage-2/` using the `curl -LO` command in Stage 2; verify with `file` (`Web/P image`, not `HTML document`).
 - **Turns (3 fresh subagents):**
@@ -32,10 +34,10 @@ Always read the corresponding `docs/tutorial/stage-N-*.md` file at runtime to ex
 
 ## Stage 3: JLCPCB BOM, Walkthrough & DFM (`docs/tutorial/stage-3-bom-and-dfm.md`)
 
-- **Inputs (read-only):** `stages/stage-2/EnvelopeFollower.md`, `stages/stage-2/EnvelopeFollowerImprovements.md`
+- **Init:** `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py init-stage 3` (clones full `stages/stage-2/` directory, including `.agents/skills/`, `EnvelopeFollower.webp`, `EnvelopeFollower.md`, and `EnvelopeFollowerImprovements.md`, into `stages/stage-3/`)
 - **Output directory:** `stages/stage-3/`
 - **Turns:**
-  1. Step `3.1` (fresh subagent) → `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md` (run live `jlcpcb_search.py` / `search_lcsc.py`).
+  1. Step `3.1` (fresh subagent) → `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md` (run live `stages/stage-3/.agents/skills/skidl/scripts/jlcpcb_search.py` / `stages/stage-3/.agents/skills/lcsc/...`).
   2. Step `3.2` (fresh subagent) → `EnvelopeFollowerExplanation.md` (7-stage audio signal arc + power/dielectrics).
   3. Step `3.3` (ONE subagent, 3 sequential turns via `send_message`):
      - `3.3a`: Test-point recommendations (must avoid raw `ENV_CAP`/`ENV_RAW` and virtual-ground `IN-` nodes).
@@ -47,9 +49,9 @@ Always read the corresponding `docs/tutorial/stage-N-*.md` file at runtime to ex
 
 ## Stage 4: SKiDL Circuit & ERC (`docs/tutorial/stage-4-skidl.md`)
 
-- **Inputs (read-only):** `stages/stage-3/EnvelopeFollowerImproved.md`, `stages/stage-3/EnvelopeFollowerBOM.md`, `stages/stage-3/SilkscreenInstructions.md`
+- **Init:** `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py init-stage 4` (clones full `stages/stage-3/` directory, including `.agents/skills/`, `EnvelopeFollowerImproved.md`, `EnvelopeFollowerBOM.md`, and `SilkscreenInstructions.md`, into `stages/stage-4/`)
 - **Output directory:** `stages/stage-4/`
-- **Turns (1 fresh subagent):** Run `/skidl` prompt.
+- **Turns (1 fresh subagent):** Run `/skidl` prompt using `stages/stage-4/.agents/skills/skidl/`.
 - **Expected outputs:** `.venv/` (gitignored), `envelope_follower.py`, `envelope_follower_sklib.py`, `envelope_follower.erc`, `envelope_follower.log`, `envelope_follower.net`, `envelope_follower_bom.xml`, `jlcpcb_bom.csv`.
 - **Gate checks:**
   - `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py check-stage4`
@@ -66,14 +68,14 @@ Always read the corresponding `docs/tutorial/stage-N-*.md` file at runtime to ex
 
 ## Stage 5: 6 HP Main PCB (`docs/tutorial/stage-5-schematic-and-pcb.md`)
 
-- **Inputs:** Copy or reference `stages/stage-4/envelope_follower.net` (plus `.venv` or reuse `stages/stage-4/.venv` with `kinet2pcb`) and read-only `stages/stage-3/{EnvelopeFollowerImproved.md,SilkscreenInstructions.md}`. Keep Stage 4 files unmodified.
+- **Init:** `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py init-stage 5` (clones full `stages/stage-4/` directory, including `.agents/skills/`, `.venv/`, `envelope_follower.net`, and Stage 3 specs, into `stages/stage-5/`)
 - **Output directory:** `stages/stage-5/`
 - **Turns:**
-  1. Step `5.1` (fresh subagent) → `generate_kicad_pcb.py` and `EnvelopeFollower.kicad_pcb`.
+  1. Step `5.1` (fresh subagent) → `generate_kicad_pcb.py` and `EnvelopeFollower.kicad_pcb` using `stages/stage-5/.agents/skills/`.
   2. Verify:
      - `/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli pcb drc --refill-zones --exit-code-violations --format json --output /tmp/stage5_drc.json stages/stage-5/EnvelopeFollower.kicad_pcb`
-     - `python3 stages/stage-1/.agents/skills/kicad/scripts/analyze_pcb.py stages/stage-5/EnvelopeFollower.kicad_pcb --full --analysis-dir stages/stage-5/analysis/`
-     - `python3 stages/stage-1/.agents/skills/kicad-silkscreen-markup/scripts/silk_annotator.py --inspect stages/stage-5/EnvelopeFollower.kicad_pcb`
+     - `python3 stages/stage-5/.agents/skills/kicad/scripts/analyze_pcb.py stages/stage-5/EnvelopeFollower.kicad_pcb --full --analysis-dir stages/stage-5/analysis/`
+     - `python3 stages/stage-5/.agents/skills/kicad-silkscreen-markup/scripts/silk_annotator.py --inspect stages/stage-5/EnvelopeFollower.kicad_pcb`
      - Top/bottom `kicad-cli pcb render` checks.
   3. Step `5.2` (ONE fresh subagent for Audit → conditional Fix via `send_message`):
      - Audit `generate_kicad_pcb.py` and `EnvelopeFollower.kicad_pcb` against `SilkscreenInstructions.md` and `envelope_follower.net`.
@@ -84,23 +86,23 @@ Always read the corresponding `docs/tutorial/stage-N-*.md` file at runtime to ex
 
 ## Stage 6: Mated 3U Front Panel (`docs/tutorial/stage-6-front-panel.md`)
 
-- **Inputs (read-only):** `stages/stage-5/EnvelopeFollower.kicad_pcb`
+- **Init:** `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py init-stage 6` (clones full `stages/stage-5/` directory, including `.agents/skills/`, `.venv/`, and `EnvelopeFollower.kicad_pcb`, into `stages/stage-6/`)
 - **Output directory:** `stages/stage-6/`
 - **Turns (1 subagent; conditional `send_message` if `JLCJLCJLC` appears):**
-  - Run `/eurorack-panel` prompt producing `panel/EnvelopeFollower_Panel.kicad_pcb`, `production/panel/`, and `production/EnvelopeFollower_Panel.zip`.
+  - Run `/eurorack-panel` prompt using `stages/stage-6/.agents/skills/eurorack-panel/` producing `panel/EnvelopeFollower_Panel.kicad_pcb`, `production/panel/`, and `production/EnvelopeFollower_Panel.zip`.
 - **Verify:**
   - `kicad-cli pcb drc --refill-zones --exit-code-violations` on `panel/EnvelopeFollower_Panel.kicad_pcb`
-  - `python3 stages/stage-1/.agents/skills/kicad/scripts/analyze_pcb.py stages/stage-6/panel/EnvelopeFollower_Panel.kicad_pcb --full --output /tmp/stage6_panel_pcb.json`
-  - `python3 stages/stage-1/.agents/skills/kicad/scripts/analyze_gerbers.py stages/stage-6/production/panel/ --full --output /tmp/stage6_panel_gerbers.json`
+  - `python3 stages/stage-6/.agents/skills/kicad/scripts/analyze_pcb.py stages/stage-6/panel/EnvelopeFollower_Panel.kicad_pcb --full --output /tmp/stage6_panel_pcb.json`
+  - `python3 stages/stage-6/.agents/skills/kicad/scripts/analyze_gerbers.py stages/stage-6/production/panel/ --full --output /tmp/stage6_panel_gerbers.json`
   - Top/bottom `kicad-cli pcb render` checks (`IN` boxed, `INV OUT` unboxed, `5 × 5 mm` `B.SilkS` QR square, no `JLCJLCJLC`).
 
 ---
 
 ## Stage 7: Manufacturing & Assembly (`docs/tutorial/stage-7-manufacturing.md`)
 
-- **Inputs:** Stage 4 `jlcpcb_bom.csv`, Stage 5 `EnvelopeFollower.kicad_pcb`, Stage 6 `panel/EnvelopeFollower_Panel.kicad_pcb` + `production/panel/` (copied into `stages/stage-7/` workspace or referenced read-only without mutating Stages 4–6).
+- **Init:** `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py init-stage 7` (clones full `stages/stage-6/` directory, including `.agents/skills/`, `jlcpcb_bom.csv`, `EnvelopeFollower.kicad_pcb`, `panel/EnvelopeFollower_Panel.kicad_pcb`, and `production/panel/`, into `stages/stage-7/`)
 - **Output directory:** `stages/stage-7/`
-- **Turns (1 fresh subagent):** Run the `/kicad` `/jlcpcb` Stage 7 prompt producing `production/main/`, `production/main/EnvelopeFollower_cpl.csv`, `production/EnvelopeFollower_Main.zip`, `production/EnvelopeFollower_Panel.zip`, and `OrderingNotes.md`.
+- **Turns (1 fresh subagent):** Run the `/kicad` `/jlcpcb` Stage 7 prompt using `stages/stage-7/.agents/skills/` producing `production/main/`, `production/main/EnvelopeFollower_cpl.csv`, `production/EnvelopeFollower_Main.zip`, `production/EnvelopeFollower_Panel.zip`, and `OrderingNotes.md`.
 - **Gate checks:**
   - `python3 .agents/skills/tutorial-test-drive/scripts/check_stage.py check-stage7`
-  - `python3 stages/stage-1/.agents/skills/kicad/scripts/analyze_gerbers.py stages/stage-7/production/main/ --full --output /tmp/stage7_main_gerbers.json` (`9/9` Gerber layers, `0` paste on `F.Paste`, `0` errors).
+  - `python3 stages/stage-7/.agents/skills/kicad/scripts/analyze_gerbers.py stages/stage-7/production/main/ --full --output /tmp/stage7_main_gerbers.json` (`9/9` Gerber layers, `0` paste on `F.Paste`, `0` errors).

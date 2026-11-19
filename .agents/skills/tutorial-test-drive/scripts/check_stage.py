@@ -179,6 +179,50 @@ def cmd_check_clean_root(repo_root: Path, strict: bool) -> int:
     return 1 if failures else 0
 
 
+def cmd_init_stage(repo_root: Path, stage: int) -> int:
+    """Initialize `stages/stage-N` (empty for Stage 1, full clone of `stage-(N-1)` for 2-7)."""
+    if not 1 <= stage <= 7:
+        print(f"[FAIL] Stage must be between 1 and 7, got {stage}", file=sys.stderr)
+        return 1
+
+    stages_root = repo_root / "stages"
+    stages_root.mkdir(parents=True, exist_ok=True)
+    target_dir = stages_root / f"stage-{stage}"
+
+    if stage == 1:
+        if target_dir.exists():
+            shutil.rmtree(target_dir)
+        target_dir.mkdir(parents=True, exist_ok=True)
+        print("[OK] Initialized empty stages/stage-1")
+        return 0
+
+    prev_dir = stages_root / f"stage-{stage - 1}"
+    if not prev_dir.is_dir():
+        print(f"[FAIL] Missing previous stage directory: {prev_dir}", file=sys.stderr)
+        return 1
+
+    prev_skills_dir = prev_dir / ".agents" / "skills"
+    missing_skills = [
+        skill
+        for skill in EXPECTED_SKILLS
+        if not (prev_skills_dir / skill / "SKILL.md").is_file()
+    ]
+    if not prev_skills_dir.is_dir() or missing_skills:
+        print(
+            f"[FAIL] {prev_dir} missing expected skills in .agents/skills/: {missing_skills}",
+            file=sys.stderr,
+        )
+        return 1
+
+    if target_dir.exists():
+        shutil.rmtree(target_dir)
+    shutil.copytree(prev_dir, target_dir, symlinks=True)
+    print(
+        f"[OK] Copied full directory stages/stage-{stage - 1} -> stages/stage-{stage}"
+    )
+    return 0
+
+
 def cmd_check_stage1(repo_root: Path) -> int:
     """Verify Stage 1 installed all 9 copied hardware skills and helper files cleanly."""
     stage1 = repo_root / "stages" / "stage-1"
@@ -421,6 +465,16 @@ def build_parser() -> argparse.ArgumentParser:
         help="Fail if stray .erc/.log files exist at repo root.",
     )
 
+    init_p = sub.add_parser(
+        "init-stage",
+        help="Initialize stages/stage-N (empty for Stage 1, full copy of stage-(N-1) for 2-7).",
+    )
+    init_p.add_argument(
+        "stage",
+        type=int,
+        choices=range(1, 8),
+        help="Stage number (1-7) to initialize.",
+    )
     sub.add_parser("check-stage1", help="Verify Stage 1 skill installation and layout.")
     sub.add_parser("check-stage4", help="Verify Stage 4 ERC, netlist, and BOM CSV.")
     sub.add_parser(
@@ -439,6 +493,8 @@ def main() -> int:
         return cmd_reset(repo_root, dry_run=args.dry_run)
     if args.command == "check-clean-root":
         return cmd_check_clean_root(repo_root, strict=args.strict)
+    if args.command == "init-stage":
+        return cmd_init_stage(repo_root, stage=args.stage)
     if args.command == "check-stage1":
         return cmd_check_stage1(repo_root)
     if args.command == "check-stage4":
