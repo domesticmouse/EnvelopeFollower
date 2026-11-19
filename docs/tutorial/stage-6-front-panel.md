@@ -4,7 +4,7 @@ Instead of buying costly custom-milled aluminum, you can fabricate a rigid `1.6 
 
 ## AI Agent Prompt
 
-> *"`/eurorack-panel` Please inspect `@EnvelopeFollower.kicad_pcb` to extract every pot (`RV1`–`RV4`), jack (`J1`–`J3`), and LED (`D4`) bushing coordinate, generate the mated 6 HP × 3U front panel PCB at `panel/EnvelopeFollower_Panel.kicad_pcb` titled `ENV FOLLOW` (`6HP ANALOG`) with panel labels `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, refill `F.Cu`/`B.Cu` `GND` shield planes, run DRC, export Gerbers and drills to `production/panel/`, and verify the Gerbers with the `kicad` skill."*
+> *"`/eurorack-panel` Please inspect `@EnvelopeFollower.kicad_pcb` to extract every pot (`RV1`–`RV4`), jack (`J1`–`J3`), and LED (`D4`) bushing coordinate, generate the mated 6 HP × 3U front panel PCB at `panel/EnvelopeFollower_Panel.kicad_pcb` titled `ENV FOLLOW` (`6HP ANALOG`) with panel labels `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, refill `F.Cu`/`B.Cu` `GND` shield planes, run DRC, export Gerbers and drills to `production/panel/`, package `production/EnvelopeFollower_Panel.zip`, and verify the Gerbers with the `kicad` skill."*
 
 ## Step 6.1: Inspect Mechanical Coordinates & Panel Labels
 
@@ -93,7 +93,7 @@ python3 .agents/skills/kicad/scripts/analyze_gerbers.py production/panel/ --full
 !!! warning "Catching Obsolete `JLCJLCJLCJLC` Markings via 3D Render Inspection"
     Inspecting `/tmp/panel_back.png` in trace `11-ff4fe23f` caught the legacy `JLCJLCJLCJLC` order-number placeholder emitted by an older version of `eurorack-panel`. Because JLCPCB now uses a **`5 × 5 mm` solid silkscreen square** (`gr_rect` with `(fill yes)` on `B.SilkS`) for order QR code placement, you can fix an older template with this follow-up prompt:
 
-    > *"Please remove the JLCJLCJLC marking, it is obsolete. Please add a 5mm x 5mm filled square to B.SilkS for replacement with the JLCPCB QR Code during ordering."*
+    > *"Please remove the obsolete `JLCJLCJLC` marking from `panel/EnvelopeFollower_Panel.kicad_pcb`, add a `5 mm × 5 mm` filled square to `B.SilkS` for replacement with the JLCPCB QR code during ordering, and re-export `production/panel/` and `production/EnvelopeFollower_Panel.zip`."*
 
 Verified analyzer results on `panel/EnvelopeFollower_Panel.kicad_pcb` and `production/panel/`:
 

@@ -4,9 +4,9 @@ Defining the circuit in **SKiDL** turns the netlist into testable, version-contr
 
 ## AI Agent Prompt
 
-Because [Stage 3](stage-3-bom-and-dfm.md) already froze every net, component reference, LCSC code, and `DNP` attribute inside `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, you only need a single prompt to drive the `/skidl` skill:
+Because [Stage 3](stage-3-bom-and-dfm.md) already froze every net, component reference, LCSC code, `DNP` attribute, and silkscreen schedule inside `EnvelopeFollowerImproved.md`, `EnvelopeFollowerBOM.md`, and `SilkscreenInstructions.md`, you only need a single prompt to drive the `/skidl` skill:
 
-> *"`/skidl` Please turn `@EnvelopeFollowerImproved.md` and `@EnvelopeFollowerBOM.md` into a SKiDL circuit."*
+> *"`/skidl` Please turn `@EnvelopeFollowerImproved.md`, `@EnvelopeFollowerBOM.md`, and `@SilkscreenInstructions.md` into a SKiDL circuit in `envelope_follower.py`, run ERC (`envelope_follower.erc`), and export `envelope_follower.net`, `envelope_follower_bom.xml`, and `jlcpcb_bom.csv`."*
 
 !!! note "One Prompt Runs the Entire Stage"
     **You do not need to run the commands below manually.** Sending this single prompt causes the AI agent (guided by `.agents/skills/skidl/SKILL.md`) to execute Steps 4.1–4.3 automatically behind the scenes:

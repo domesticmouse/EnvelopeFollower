@@ -73,7 +73,7 @@ Finally, define bench test points (`TP1`–`TP8`, marked **`DNP`** so JLCPCB lea
 >
 > *"Please add these test points to `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`. I'll be using Ronghe `RH-5001`. Mark as DNP in the BOM."*
 >
-> *"Please create `SilkscreenInstructions.md` for capturing instructions on how to mark up components on the silkscreens. Marking test points on both sides is a useful instruction. I also want the component values marked on the silkscreen for ease of comparing the populated component against its required value in the JLCPCB reports."*
+> *"Given `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, please create `SilkscreenInstructions.md` for capturing instructions on how to mark up components on the silkscreens. Marking test points on both sides is a useful instruction. I also want the component values marked on the silkscreen for ease of comparing the populated component against its required value in the JLCPCB reports."*
 
 ### `TP1`–`TP8` Test Point Schedule (`Ronghe RH-5001`, LCSC `C5199801`, `DNP`)
 
