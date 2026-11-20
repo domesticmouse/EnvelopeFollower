@@ -10,15 +10,15 @@ Now ask the agent to verify live JLCPCB SMT availability, consolidate values ont
 
 ### AI Agent Prompt
 
-> *"Given `EnvelopeFollower.md` and `EnvelopeFollowerImprovements.md`, I'd like to research part availability on JLCPCB. I'd like the TL074s to be TL074H (SOIC), and most of the parts to be surface mount parts for JLCPCB construction. The jacks, pots, IDC power header, and 3mm indicator LED will be THT parts, mounted later. Incorporate the circuit improvements and Eurorack protections, use `U2C` and `U2D` for the active zero-deadzone peak detector and buffer, and adopt the improved potentiometer values (`A100k`, `A50k`, `A1M`, `B10k`). Save the updated circuit specification to `EnvelopeFollowerImproved.md` and the BOM to `EnvelopeFollowerBOM.md`."*
+> *"Given `EnvelopeFollower.md` and `EnvelopeFollowerImprovements.md`, I'd like to research part availability on JLCPCB. I'd like the TL074s to be TL074H (SOIC), and most of the parts to be surface mount parts placed on the bottom side (`B.Cu`) for single-sided JLCPCB Economic PCBA. Reserve the front side (`F.Cu`) for the panel-facing THT controls (jacks, pots, and 3mm indicator LED), and mount the THT IDC power header on the rear (`B.Cu`), all hand-soldered later. Incorporate the circuit improvements and Eurorack protections, use `U2C` and `U2D` for the active zero-deadzone peak detector and buffer, and adopt the improved potentiometer values (`A100k`, `A50k`, `A1M`, `B10k`). Save the updated circuit specification to `EnvelopeFollowerImproved.md` and the BOM to `EnvelopeFollowerBOM.md`."*
 
 ### Consolidated Assembly Strategy
 
-- **Single-Sided SMT PCBA (`45` SMD components across `18` BOM lines)**:
+- **Single-Sided Bottom-Side (`B.Cu`) SMT PCBA (`45` SMD components across `18` BOM lines)**:
   - **15 JLCPCB Basic lines** (`$0` feeder loading fee): All `24` fixed resistors (`0603` & `1206`), `9` ceramic capacitors (`C1`, `C2`, `C5`–`C11`), and `6` `SOD-123` diodes (`D1`–`D3`, `D5`–`D7`).
   - **3 JLCPCB Extended lines** (`$3.00`/line = `$9.00` setup): `TL074HIDR` (`C2878713`, fallbacks `TL074CDR` `C12594` / `TL074CDT` `C6963`), `BAT54SLT1G` (`C19726`), and `10 µF 50V` SMD electrolytic (`C72488`).
   - **Per-board SMD part cost**: **~$0.85 USD**.
-- **Manual Post-Reflow THT (`9` required parts)**: `J_PWR` (`2×5` IDC header), `J1`–`J3` (`WQP-PJ398SM` jacks), `RV1`–`RV4` (9 mm vertical pots), and `D4` (`3 mm` LED).
+- **Manual Post-Reflow THT (`9` required parts)**: `J_PWR` (`2×5` IDC header on `B.Cu`), plus the panel-facing controls on `F.Cu`—`J1`–`J3` (`WQP-PJ398SM` jacks), `RV1`–`RV4` (9 mm vertical pots), and `D4` (`3 mm` LED).
 
 ---
 
@@ -71,9 +71,9 @@ Finally, define bench test points (`TP1`–`TP8`, marked **`DNP`** so JLCPCB lea
 
 > *"Are there useful places to add test points to `EnvelopeFollowerImproved.md`? I'd prefer to use through-hole test points that I can optionally solder in."*
 >
-> *"Please add these test points to `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`. I'll be using Ronghe `RH-5001`. Mark as DNP in the BOM."*
+> *"Please add these test points to `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md` on the rear (`B.Cu`) side so they stay accessible behind the front panel. I'll be using Ronghe `RH-5001`. Mark them as DNP in the BOM."*
 >
-> *"Given `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, please create `SilkscreenInstructions.md` for capturing instructions on how to mark up components on the silkscreens. Marking test points on both sides is a useful instruction. I also want the component values marked on the silkscreen for ease of comparing the populated component against its required value in the JLCPCB reports—for resistors and capacitors, label just the concise value on the silkscreen (keeping their reference designators on `.Fab`) so the narrow 6 HP board doesn't get overcrowded."*
+> *"Given `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, please create `SilkscreenInstructions.md` for capturing instructions on how to mark up components on the silkscreens for our single-sided bottom-side (`B.Cu`) JLCPCB PCBA layout (with `F.Cu` reserved for panel-facing THT controls and all SMT parts, rear power header, and `DNP` test points on `B.Cu`). Marking test points and THT controls/power header on both `F.SilkS` and `B.SilkS` is a useful instruction. I also want the component values marked on `B.SilkS` for ease of comparing the populated SMT components against their required values in the JLCPCB reports—for resistors and capacitors, label just the concise value on `B.SilkS` (keeping their reference designators on `B.Fab`) so the narrow 6 HP board doesn't get overcrowded."*
 
 ### `TP1`–`TP8` Test Point Schedule (`Ronghe RH-5001`, LCSC `C5199801`, `DNP`)
 
