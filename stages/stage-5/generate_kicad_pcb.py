@@ -82,15 +82,15 @@ def build_placements() -> dict[str, tuple[float, float, float, bool]]:
         # --- 11 Rear THT on B.Cu ---
         "J4": (
             13.73,
-            99.30,
+            98.20,
             0.0,
             True,
         ),  # vertical 2x5 shrouded IDC, centered at X=15.00
         "C1": (3.50, 54.50, 0.0, True),
         "C2": (13.60, 52.50, 270.0, True),
         "TP1": (27.30, 105.20, 0.0, True),  # GND
-        "TP2": (12.90, 35.20, 0.0, True),  # +12V
-        "TP3": (12.60, 31.90, 0.0, True),  # -12V
+        "TP2": (13.15, 35.05, 0.0, True),  # +12V
+        "TP3": (12.20, 31.90, 0.0, True),  # -12V
         "TP4": (27.60, 6.20, 0.0, True),  # IN_BUF
         "TP5": (15.00, 4.20, 0.0, True),  # PREAMP_OUT
         "TP6": (27.60, 33.80, 0.0, True),  # RECT_OUT
@@ -511,7 +511,9 @@ def apply_silkscreen_and_fab(
             j4_fab_ys.extend((pcbnew.ToMM(bb.GetTop()), pcbnew.ToMM(bb.GetBottom())))
     bar_x0 = min(j4_fab_xs)
     bar_x1 = max(j4_fab_xs)
-    bar_y0 = max(j4_fab_ys) + 0.35  # 0.23+ mm clear of J4 bottom B.SilkS edge
+    bar_y0 = (
+        max(j4_fab_ys) + 0.65
+    )  # clear of J4 bottom B.SilkS edge & 3D housing overhang
     bar_y1 = bar_y0 + 0.85
     add_silk_rect(
         board, pcbnew.B_SilkS, bar_x0, bar_y0, bar_x1, bar_y1, filled=True, width=0.15
@@ -540,7 +542,7 @@ def apply_silkscreen_and_fab(
         (0, "6HP ±12V EURORACK", (7.2, 3.8), 4.0),
         (0, "REV 1.0", (7.2, 5.6), 4.0),
         # J4 rail polarity & callouts
-        (1, "RED STRIPE / -12V", (15.0, bar_y1 + 0.95), 4.0),
+        (1, "RED STRIPE / -12V", (15.0, bar_y1 + 1.00), 4.0),
         (1, "GND", (21.2, j4_mid_y), 6.0),
         (1, "+12V", (21.4, j4_top_y), 5.0),
         (0, "-12V Pin 1", (p1x - 3.5, p1y), 6.0),
@@ -601,6 +603,7 @@ def apply_silkscreen_and_fab(
         "TP2",
         "TP3",
         "TP5",
+        "R8B",
         "TP6",
         "TP7",
         "D4",
@@ -927,7 +930,7 @@ class HVGridRouter(GridRouter):
             elif self.can_place_via(cx, cy, net_code) and (
                 vstate in targets or self.is_passable(nl, cx, cy, net_code)
             ):
-                silk_pen = 20.0 if self.silk_via_avoid[cy * self.nx + cx] else 0.0
+                silk_pen = 3.5 if self.silk_via_avoid[cy * self.nx + cx] else 0.0
                 ng = cg + 6.0 + silk_pen
                 if ng < best_g.get(vstate, 1e18):
                     best_g[vstate] = ng
@@ -1041,6 +1044,7 @@ def route_board(
                     pcbnew.ToMM(bb.GetTop()),
                     pcbnew.ToMM(bb.GetRight()),
                     pcbnew.ToMM(bb.GetBottom()),
+                    margin=0.45,
                 )
 
     # 2. Register all pads into GridRouter, blocking SMD pads from receiving vias (VP-001)
@@ -1150,7 +1154,7 @@ def route_board(
                         else (-0.2 if inward < 0 else 0.0)
                     )
                     silk_pen = (
-                        10.0 if router.silk_via_avoid[gy * router.nx + gx] else 0.0
+                        4.0 if router.silk_via_avoid[gy * router.nx + gx] else 0.0
                     )
                     cands.append((d + bias + silk_pen, gx, gy))
             cands.sort()
@@ -1285,6 +1289,16 @@ def route_board(
         x2, y2 = router.to_mm(a2[1], a2[2])
         add_pre_seg(nname, layer, x1, y1, x2, y2, 0.25)
 
+    # Pre-reserve upward F.Cu escape stub for RV2.2/RV2.3 (ENV_NODE) into the clear corridor between RV2.MP pads
+    rv2_p2 = next(p for p in fps["RV2"].Pads() if p.GetNumber() == "2").GetPosition()
+    rv2_x, rv2_y = pcbnew.ToMM(rv2_p2.x), pcbnew.ToMM(rv2_p2.y)
+    egx, egy = router.to_grid(rv2_x, rv2_y - 1.75)
+    ex, ey = router.to_mm(egx, egy)
+    add_pre_seg("ENV_NODE", 0, rv2_x, rv2_y, ex, ey, 0.25)
+    pre_anchors[("RV2", "2")] = (0, egx, egy)
+    pre_anchors[("RV2", "3")] = (0, egx, egy)
+    pre_junctions.setdefault("ENV_NODE", set()).add((0, egx, egy))
+
     # 5. Order remaining nets: tight constrained pins & cross-board spines first, then power, then short signals
     net_map = {n["name"]: n for n in nets}
     net_order: list[str] = []
@@ -1393,7 +1407,6 @@ def route_board(
             "+12V": [("U1", "4", "C_DEC1", "1"), ("U2", "4", "C_DEC3", "1")],
             "-12V": [("U1", "11", "C_DEC2", "1"), ("U2", "11", "C_DEC4", "1")],
             "PREAMP_OUT": [("RV1", "2", "RV1", "3")],
-            "ENV_NODE": [("RV2", "2", "RV2", "3")],
             "IN_BUF": [("U2", "13", "U2", "14")],
         }
         paired_anchors: dict[tuple[int, int, int], tuple[int, int, int]] = {}
