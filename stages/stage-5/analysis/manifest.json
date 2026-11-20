@@ -1,7 +1,7 @@
 {
   "version": 1,
   "project": "EnvelopeFollower.kicad_pro",
-  "current": "2026-11-21_0048",
+  "current": "2026-11-21_0529",
   "runs": {
     "2026-11-21_0032": {
       "source_hashes": {
@@ -40,6 +40,19 @@
         "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
       },
       "generated": "2026-11-21T00:54:20+11:00",
+      "pinned": false
+    },
+    "2026-11-21_0529": {
+      "source_hashes": {
+        "EnvelopeFollower.kicad_pcb": "sha256:355f0875716d2cd097ad2fb272dd782f4d8d872624204ec44294b8e5843f3e6d"
+      },
+      "outputs": {
+        "pcb": "pcb.json"
+      },
+      "scripts": {
+        "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
+      },
+      "generated": "2026-11-21T05:29:09+11:00",
       "pinned": false
     }
   }
