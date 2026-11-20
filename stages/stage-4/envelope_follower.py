@@ -4,6 +4,7 @@
 import builtins
 import csv
 import os
+import re
 from pathlib import Path
 
 os.chdir(Path(__file__).resolve().parent)
@@ -635,7 +636,7 @@ def stage4_peak_detector(
     r27 = make_r10k(
         "R27", notes="U2C active peak-detector feedback (ENV_NODE -> DET_FB)"
     )
-    env_node & r27 & det_fb
+    det_fb & r27 & env_node
 
 
 @subcircuit
@@ -885,11 +886,16 @@ def generate_jlcpcb_bom(
         key = (comment, footprint, lcsc)
         groups.setdefault(key, []).append(part.ref)
 
+    def _ref_sort_key(ref: str) -> tuple[str, int]:
+        m = re.match(r"^([A-Za-z]+)(\d+)$", ref)
+        return (m.group(1), int(m.group(2))) if m else (ref, 0)
+
     with open(file_, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["Comment", "Designator", "Footprint", "LCSC Part #"])
         for (comment, footprint, lcsc), refs in groups.items():
-            writer.writerow([comment, ", ".join(refs), footprint, lcsc])
+            sorted_refs = sorted(refs, key=_ref_sort_key)
+            writer.writerow([comment, ", ".join(sorted_refs), footprint, lcsc])
 
 
 def build_circuit() -> None:
