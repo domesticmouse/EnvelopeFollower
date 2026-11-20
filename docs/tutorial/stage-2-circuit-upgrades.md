@@ -110,3 +110,14 @@ Next, harden the design against reverse-plugged ribbon cables, noisy digital pow
    - Add **`BAT54SLT1G` (`SOT-23`)** dual series Schottky rail clamps (`D8` on `AMP_OUT`, `D9` on `INV_AMP_OUT`) wired from `-12V` to `+12V` on the op-amp side of `R16`/`R19` to steer ESD zaps and over-voltage spikes safely into the supply rails.
 5. **Op-Amp Channel Utilization (`U2C`, `U2D`)**:
    - Never leave spare op-amp pins floating. In this improved build, **all 8 channels** across `2× TL074H` are actively used (`U2C`/`U2D` implement the Stage 4 active peak detector and buffer); any build leaving spare channels must wire them as unity-gain followers with `+` tied to `GND`.
+
+---
+
+## Step 2.4: Optional Feature Exploration — What Else Can Antigravity Suggest?
+
+When you ask an open-ended circuit review prompt like Step 2.2 (*"Are there improvements that could be made to the circuit?"*), Antigravity does not stop at fixing analog bugs—it also proposes **optional musical and functional enhancements** tailored to a Eurorack modular environment.
+
+For example, while generating `EnvelopeFollowerImprovements.md`, the agent noted that input capacitor `C1` blocks sub-audio control voltages and suggested adding a panel-mounted **AC / DC Input Coupling Switch (`SW1`)** in parallel across `C1` (as well as an optional Gate/Trigger threshold comparator). When asked to elaborate on the `AC / DC` switch idea, Antigravity generated a complete engineering feasibility analysis showing how a single SPST toggle switch converts the module into a **DC-coupled precision full-wave CV rectifier ($2\times$ LFO frequency doubler), asymmetric unipolar slew limiter / Gate-to-AR envelope generator, and dual-output polarizer/offset shaper**—while catching a critical design interaction with inter-stage AC coupling and op-amp input offset voltage ($V_{\text{os}}$).
+
+!!! tip "Explore the Optional DC-Coupled CV & Slew Direction"
+    We keep the main tutorial flow ([Stage 3](stage-3-bom-and-dfm.md) through [Stage 7](stage-7-manufacturing.md)) focused on the core 8-control envelope follower (`4` pots, `3` jacks, `1` LED) so the baseline 6 HP layout stays simple. If you want to see the full engineering analysis Antigravity generated—or incorporate `SW1` into your own build—read **[Optional Direction: DC-Coupled CV / LFO Slew & Precision Rectification Mode](optional-dc-coupled-mode.md)**.
