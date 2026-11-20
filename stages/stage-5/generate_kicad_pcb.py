@@ -89,7 +89,7 @@ def build_placements() -> dict[str, tuple[float, float, float, bool]]:
         ),  # vertical 2x5 shrouded IDC, centered at X=15.00
         "C1": (3.50, 54.50, 0.0, True),
         "C2": (13.60, 52.50, 270.0, True),
-        "TP1": (27.50, 106.25, 0.0, True),  # GND
+        "TP1": (27.30, 105.20, 0.0, True),  # GND
         "TP2": (13.40, 35.20, 0.0, True),  # +12V
         "TP3": (12.10, 31.90, 0.0, True),  # -12V
         "TP4": (27.60, 6.20, 0.0, True),  # IN_BUF
@@ -150,7 +150,7 @@ def build_placements() -> dict[str, tuple[float, float, float, bool]]:
         "C4": (4.40, 99.80, 270.0, True),
         "R_PWR_P": (27.60, 84.60, 90.0, True),
         "D_PWR_P": (27.60, 90.00, 270.0, True),
-        "C3": (25.60, 99.80, 270.0, True),
+        "C3": (25.60, 98.50, 270.0, True),
     }
 
 
