@@ -35,7 +35,7 @@ Follow this checklist to take the improved design through KiCad PCB layout, dual
     - [ ] Place `D8`/`D9` (`BAT54SLT1G` `SOT-23`) and `R16`/`R19` (`1 kΩ` `1/4 W` `1206`) near `J2` (`OUT`) and `J3` (`INV_OUT`).
     - [ ] Place `C10`/`C11` (`47 pF` C0G), `D7` (`1N4148W`), `R24` (`100 kΩ`), `C9` (`100 nF`), and remaining `0603`/`0805`/`SOD-123` passives near their respective stages, keeping `ENV_CAP` (`C2` `220 nF`) compact and away from power rails.
 - [ ] **Silkscreen Markup (`F.SilkS` & `B.SilkS`)**:
-    - [ ] Display both Reference and Value on `B.SilkS` outside component courtyards for all 45 SMD parts (`U1 TL074H`, `R8 20k`, `C10 47pF`, `D8 BAT54S`, etc.).
+    - [ ] Display concise value-only labels on `B.SilkS` for `R*`/`C*` passives (`20k`, `47pF`, `100nF`, `10uF`, keeping `<REF>` on `B.Fab`) and `<REF> + <VAL>` for ICs and diodes (`U1 TL074H`, `D1 1N4148W`, `D8 BAT54S`), verified with `0` tether drift (`RESULT: PASS`) in `silk_annotator.py --inspect`.
     - [ ] Label `TP1 GND`–`TP8 OFS` and all 9 THT parts (`RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k`, `J1 IN`, `J2 OUT`, `J3 INV_OUT`, `D4 LED +/-`, `J_PWR +/-12V`) on **both `F.SilkS` and `B.SilkS`**.
     - [ ] Verify external Pin-1 dots (`U1`, `U2`), diode cathode bars (`|`), electrolytic `+` marks, `>= 0.8 mm` text height, `>= 0.15 mm` stroke, `>= 0.20 mm` pad clearance, and `5 × 5 mm` JLCPCB QR placeholder square.
 - [ ] **Routing, Ground Pour & DRC** (see [Stage 5](../tutorial/stage-5-schematic-and-pcb.md)):

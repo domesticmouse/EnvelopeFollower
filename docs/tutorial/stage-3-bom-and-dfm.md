@@ -73,7 +73,7 @@ Finally, define bench test points (`TP1`–`TP8`, marked **`DNP`** so JLCPCB lea
 >
 > *"Please add these test points to `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`. I'll be using Ronghe `RH-5001`. Mark as DNP in the BOM."*
 >
-> *"Given `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, please create `SilkscreenInstructions.md` for capturing instructions on how to mark up components on the silkscreens. Marking test points on both sides is a useful instruction. I also want the component values marked on the silkscreen for ease of comparing the populated component against its required value in the JLCPCB reports."*
+> *"Given `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md`, please create `SilkscreenInstructions.md` for capturing instructions on how to mark up components on the silkscreens. Marking test points on both sides is a useful instruction. I also want the component values marked on the silkscreen for ease of comparing the populated component against its required value in the JLCPCB reports—for resistors and capacitors, label just the concise value on the silkscreen (keeping their reference designators on `.Fab`) so the narrow 6 HP board doesn't get overcrowded."*
 
 ### `TP1`–`TP8` Test Point Schedule (`Ronghe RH-5001`, LCSC `C5199801`, `DNP`)
 
@@ -90,7 +90,7 @@ Finally, define bench test points (`TP1`–`TP8`, marked **`DNP`** so JLCPCB lea
 
 ### Four Core Silkscreen Rules (`SilkscreenInstructions.md`)
 
-1. **Reference + Value on SMD Silkscreen (`B.SilkS`)**: Display both the reference designator and concise value/MPN (`U1 TL074H`, `R8 20k`, `C10 47pF`, `D8 BAT54S`) outside component courtyards and pads so unmarked `0603`/`0805` MLCCs and `SOD-123`/`SOT-23` diodes can be verified directly in JLCPCB's 3D/DFM preview.
+1. **Density-Adaptive SMD Silkscreen (`B.SilkS` — Value-Only Passives, `<REF> + <VAL>` Actives/Diodes)**: For `R*` and `C*` passives on dense `B.Cu`, display only the concise primary value token (`20k`, `47pF`, `100nF`, `10uF`, `1k`, `10R`) on `B.SilkS` (keeping their `Reference` designators on `B.Fab`), while displaying `<REF> + <VAL>` (`U1 TL074H`, `D1 1N4148W`, `D5 B5819W`, `D8 BAT54S`) for ICs and diodes—all tethered locally outside component courtyards and pads so unmarked `0603`/`0805` MLCCs and `SOD-123`/`SOT-23` diodes can be verified directly in JLCPCB's 3D/DFM preview without saturating the board.
 2. **Dual-Sided Test Point Labels (`F.SilkS` & `B.SilkS`)**: Print `TP1 GND` through `TP8 OFS` on **both** `F.SilkS` (for bare-board bring-up) and `B.SilkS` (for rear bench probing once the 3U front panel hides `F.Cu`).
 3. **Dual-Sided THT Control & Power Labels (`F.SilkS` & `B.SilkS`)**: Print `RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k`, `J1 IN`, `J2 OUT`, `J3 INV_OUT`, `D4 LED` (`+`/`-`), and `J_PWR +/-12V` (`-12V / RED STRIPE` on pins 1–2) on **both** sides so identical-footprint pots cannot be swapped during hand assembly.
 4. **Visible Orientation Marks & JLCPCB Geometry**: Keep Pin-1 dots (`U1`, `U2`), diode cathode bars (`|`), and electrolytic `+` symbols outside component bodies; enforce $\ge 0.8\text{ mm}$ text height (`0.9–1.2 mm` recommended), $\ge 0.15\text{ mm}$ stroke thickness, $\ge 0.20\text{ mm}$ pad clearance, `0°`/`90°` rotations only, and include a `5 × 5 mm` solid filled silkscreen square as the JLCPCB 2D QR code placeholder (JLCPCB's legacy `JLCJLCJLC` text placeholder string is obsolete and no longer used).
