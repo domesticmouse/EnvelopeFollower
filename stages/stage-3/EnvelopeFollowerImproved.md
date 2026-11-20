@@ -109,6 +109,28 @@ Both quad op-amps use **Texas Instruments `TL074HIDR`** (`SOIC-14`, `Package_SO:
 | **`J3`** | `INV_OUT` | 3.5 mm mono switched jack (`WQP-PJ398SM`) | `Tip` → `R19B`; `Sleeve` → `GND`; **`Tip-Normal (TN)` → `NC`** |
 | **`J4`** | `PWR` | `2×5` (`10-pin`) `2.54 mm` shrouded keyed Eurorack IDC | Pins `1–2` = `-12V_IN` (`RED STRIPE`), Pins `3–8` = `GND`, Pins `9–10` = `+12V_IN` |
 
+### 2.7 Test Points (8 Total — THT, Optional / DNP)
+
+Tier 1 core bench test points (`TP1`–`TP8`) use **Ronghe `RH-5001`** (`2.5 mm` black pin-type through-board test points, LCSC **`C5199801`**) marked **DNP (Do Not Populate)** in the BOM. Bare plated through-hole pads on `B.Cu` allow immediate probe contact on unstuffed boards, with optional hand-soldering of `RH-5001` pins on `B.Cu` for clip-on oscilloscope/DMM grabbers. Every test point sits exclusively on a low-impedance power rail or buffered/closed-loop op-amp output node.
+
+*(KiCad footprint: `TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm` or `TestPoint:TestPoint_Keystone_5000-5004_Miniature` — verify exact drill diameter against the `C5199801` datasheet before PCB drill freeze.)*
+
+| Ref | Net Name | Stage | Expected Signal / Range | Bench & Troubleshooting Role |
+|---|---|---|---|---|
+| **`TP1`** | **`GND`** | Stage 0 | `0.000 V` reference | Dedicated clip-on return for oscilloscope ground leads and DMM black probe |
+| **`TP2`** | **`+12V`** | Stage 0 | `≈ +11.55 V` DC (`±1%`) | Verifies `D_PWR_P` orientation, `R_PWR_P`/`C3` RC drop, and `U1.4`/`U2.4` rail health |
+| **`TP3`** | **`-12V`** | Stage 0 | `≈ -11.55 V` DC (`±1%`) | Verifies reversed `D_PWR_N` orientation, `R_PWR_N`/`C4` RC drop, and `U1.11`/`U2.11` rail health |
+| **`TP4`** | **`IN_BUF`** | Stage 1A | `±V_in` AC (`0 V` DC) | Confirms `J1` tip/normalled ground, `C1` DC blocking (`f_c = 1.58 Hz`), `D_IN` clamp, and `U2D` buffer without loading `IN_AC` |
+| **`TP5`** | **`PREAMP_OUT`** | Stage 1B | `(-0.10× to -9.17×)·IN_BUF` | Verifies `RV1` (`GAIN`) range, audio taper, and `U1A` clipping headroom ahead of rectifier |
+| **`TP6`** | **`RECT_OUT`** | Stages 2–3 | `+1.000·\|PREAMP_OUT\|` | Verifies `U1B`/`D1_D2`/`U1C` full-wave rectification and `0.1%` half-cycle symmetry |
+| **`TP7`** | **`OUT_CLAMP`** | Stage 5 | `1.476×–1.529× ENV ± 5.09 V` | Measures closed-loop `U1D` output (`R16A` in-loop); with `RV4` centered (`0.000 V` idle), doubles as buffered `1.476× ENV_NODE` monitor |
+| **`TP8`** | **`INV_OUT_CLAMP`** | Stage 5 | `-1.000 × V(OUT_CLAMP)` | Verifies `U2A` inverter, `D_INV_OUT` clamp, and `0.00%` tracking symmetry vs. `TP7` |
+
+**Sensitive & Virtual-Ground Nodes Deliberately Omitted:**
+- **`IN_AC` & `U2D_IN` (Stage 1A)**: High-impedance `100 kΩ` / `1 µF` AC-coupling node; scope probe capacitance and unshielded test pins inject `50/60 Hz` hum that `U1A` amplifies up to `-9.17×` (probe **`TP4` `IN_BUF`** instead).
+- **`U1A_INV`, `U1B_INV`, `U1C_INV`, `U1D_INV`, `U2A_INV`, `LED_K` (`U2B-`)**: Op-amp inverting summing / virtual-ground / feedback pins; adding THT pad + probe capacitance (`~10–20 pF`) degrades phase margin (risking HF peaking/oscillation on `U1A` with `C_HF = 47 pF` or instability inside `U2B`'s nonlinear LED loop).
+- **`ENV_NODE`, `ATK_IN`, `REL_POT_TOP`, `U1D_IN`, `U2B_IN` (Stage 4)**: High-impedance peak-hold node (`C2 = 1 µF` discharging into up to `1.01 MΩ`); a `1 MΩ` (`1×`) or `10 MΩ` (`10×`) probe distorts `1 s` release decay, and residual solder flux on an unwashed THT pin creates leakage droop (center `RV4` and monitor buffered `ENV_NODE` at **`TP7` `OUT_CLAMP`**).
+
 ---
 
 ## 3. Component Orientation, Pinout & Polarity Reference
@@ -207,7 +229,7 @@ J1 (IN) ─► [R_IN_PROT 1k] ─► [C1 1µF] ─► IN_AC ([R1 100k→GND] + [
 
 ## 5. Complete Pin-Level Netlist
 
-Pin conventions: `U1`/`U2` = `TL074HIDR` (`SOIC-14`); 2-pin passives = `.1`, `.2`; polarized caps = `.+`, `.-`; 2-pin diodes & LED (`1N4148WS`, `B5819W`, `LED`) = `.K` (Pin 1) and `.A` (Pin 2); `SOT-23` dual series diodes (`BAV99`, `BAT54S`) = `.1` (`A1`), `.2` (`K2`), `.3` (`COM = K1/A2`); pots = `.1` (CCW), `.2` (Wiper), `.3` (CW); jacks = `.S` (Sleeve), `.T` (Tip), `.TN` (Tip-Normal).
+Pin conventions: `U1`/`U2` = `TL074HIDR` (`SOIC-14`); 2-pin passives = `.1`, `.2`; polarized caps = `.+`, `.-`; 2-pin diodes & LED (`1N4148WS`, `B5819W`, `LED`) = `.K` (Pin 1) and `.A` (Pin 2); `SOT-23` dual series diodes (`BAV99`, `BAT54S`) = `.1` (`A1`), `.2` (`K2`), `.3` (`COM = K1/A2`); pots = `.1` (CCW), `.2` (Wiper), `.3` (CW); jacks = `.S` (Sleeve), `.T` (Tip), `.TN` (Tip-Normal); test points (`TP1`–`TP8`) = `.1`.
 
 | Net Name | Connected Pins |
 |---|---|
@@ -215,24 +237,24 @@ Pin conventions: `U1`/`U2` = `TL074HIDR` (`SOIC-14`); 2-pin passives = `.1`, `.2
 | **`-12V_IN`** | `J4.1`, `J4.2`, `D_PWR_N.K` |
 | **`+12V_PROT`** | `D_PWR_P.K`, `R_PWR_P.1` |
 | **`-12V_PROT`** | `D_PWR_N.A`, `R_PWR_N.1` |
-| **`+12V`** | `R_PWR_P.2`, `C3.+`, `C_DEC1.1`, `C_DEC3.1`, `U1.4` (`V+`), `U2.4` (`V+`), `D_IN.2` (`K2`), `D_OUT.2` (`K2`), `D_INV_OUT.2` (`K2`), `R11.1` |
-| **`-12V`** | `R_PWR_N.2`, `C4.-`, `C_DEC2.1`, `C_DEC4.1`, `U1.11` (`V-`), `U2.11` (`V-`), `D_IN.1` (`A1`), `D_OUT.1` (`A1`), `D_INV_OUT.1` (`A1`), `R12.1` |
-| **`GND`** | `J4.3`, `J4.4`, `J4.5`, `J4.6`, `J4.7`, `J4.8`, `C3.-`, `C4.+`, `C_DEC1.2`, `C_DEC2.2`, `C_DEC3.2`, `C_DEC4.2`, `J1.S`, `J1.TN`, `R1.2`, `U1.3` (`U1A+`), `U1.5` (`U1B+`), `U1.10` (`U1C+`), `C2.2`, `RV3.2`, `RV3.3`, `J2.S`, `U2.3` (`U2A+`), `J3.S`, `R_LED.2` |
+| **`+12V`** | `R_PWR_P.2`, `C3.+`, `C_DEC1.1`, `C_DEC3.1`, `U1.4` (`V+`), `U2.4` (`V+`), `D_IN.2` (`K2`), `D_OUT.2` (`K2`), `D_INV_OUT.2` (`K2`), `R11.1`, `TP2.1` |
+| **`-12V`** | `R_PWR_N.2`, `C4.-`, `C_DEC2.1`, `C_DEC4.1`, `U1.11` (`V-`), `U2.11` (`V-`), `D_IN.1` (`A1`), `D_OUT.1` (`A1`), `D_INV_OUT.1` (`A1`), `R12.1`, `TP3.1` |
+| **`GND`** | `J4.3`, `J4.4`, `J4.5`, `J4.6`, `J4.7`, `J4.8`, `C3.-`, `C4.+`, `C_DEC1.2`, `C_DEC2.2`, `C_DEC3.2`, `C_DEC4.2`, `J1.S`, `J1.TN`, `R1.2`, `U1.3` (`U1A+`), `U1.5` (`U1B+`), `U1.10` (`U1C+`), `C2.2`, `RV3.2`, `RV3.3`, `J2.S`, `U2.3` (`U2A+`), `J3.S`, `R_LED.2`, `TP1.1` |
 | **`IN_TIP`** | `J1.T`, `R_IN_PROT.1` |
 | **`IN_AC_PRE`** | `R_IN_PROT.2`, `C1.1` |
 | **`IN_AC`** | `C1.2`, `R1.1`, `D_IN.3` (`COM`), `R_IN_BUF.1` |
 | **`U2D_IN`** | `R_IN_BUF.2`, `U2.12` (`U2D+`) |
-| **`IN_BUF`** | `U2.14` (`U2D_OUT`), `U2.13` (`U2D-`), `R2.1` |
+| **`IN_BUF`** | `U2.14` (`U2D_OUT`), `U2.13` (`U2D-`), `R2.1`, `TP4.1` |
 | **`U1A_INV`** | `R2.2`, `U1.2` (`U1A-`), `R_GAIN_MIN.1`, `R_GAIN_FAIL.1`, `C_HF.1` |
 | **`GAIN_POT_1`** | `R_GAIN_MIN.2`, `RV1.1` |
-| **`PREAMP_OUT`** | `U1.1` (`U1A_OUT`), `RV1.2`, `RV1.3`, `R_GAIN_FAIL.2`, `C_HF.2`, `R3.1`, `R4.1` |
+| **`PREAMP_OUT`** | `U1.1` (`U1A_OUT`), `RV1.2`, `RV1.3`, `R_GAIN_FAIL.2`, `C_HF.2`, `R3.1`, `R4.1`, `TP5.1` |
 | **`U1B_INV`** | `R3.2`, `U1.6` (`U1B-`), `R6.1`, `D1_D2.2` (`K2`, `D1.K`) |
 | **`U1B_OUT`** | `U1.7` (`U1B_OUT`), `D1_D2.3` (`COM`, `D1.A`/`D2.K`) |
 | **`RECT_HW`** | `D1_D2.1` (`A1`, `D2.A`), `R6.2`, `R7.1` |
 | **`FF_MID`** | `R4.2`, `R5.1` |
 | **`U1C_INV`** | `R5.2`, `R7.2`, `U1.9` (`U1C-`), `R8A.1` |
 | **`RECT_FB_MID`** | `R8A.2`, `R8B.1` |
-| **`RECT_OUT`** | `U1.8` (`U1C_OUT`), `R8B.2`, `U2.10` (`U2C+`) |
+| **`RECT_OUT`** | `U1.8` (`U1C_OUT`), `R8B.2`, `U2.10` (`U2C+`), `TP6.1` |
 | **`U2C_OUT`** | `U2.8` (`U2C_OUT`), `D3.A` |
 | **`ATK_IN`** | `D3.K`, `U2.9` (`U2C-`), `R_ATK_MIN.1` |
 | **`ATK_POT_1`** | `R_ATK_MIN.2`, `RV2.1` |
@@ -244,11 +266,11 @@ Pin conventions: `U1`/`U2` = `TL074HIDR` (`SOIC-14`); 2-pin passives = `.1`, `.2
 | **`OFF_WIPER`** | `RV4.2`, `R13.1` |
 | **`U1D_INV`** | `R13.2`, `R15.1`, `C_OUT1.1`, `U1.13` (`U1D-`) |
 | **`U1D_OUT`** | `U1.14` (`U1D_OUT`), `C_OUT1.2`, `R16A.1` |
-| **`OUT_CLAMP`** | `R16A.2`, `R15.2`, `D_OUT.3` (`COM`), `R16B.1`, `R17.1` |
+| **`OUT_CLAMP`** | `R16A.2`, `R15.2`, `D_OUT.3` (`COM`), `R16B.1`, `R17.1`, `TP7.1` |
 | **`OUT_TIP`** | `R16B.2`, `J2.T` |
 | **`U2A_INV`** | `R17.2`, `R18.1`, `C_OUT2.1`, `U2.2` (`U2A-`) |
 | **`U2A_OUT`** | `U2.1` (`U2A_OUT`), `C_OUT2.2`, `R19A.1` |
-| **`INV_OUT_CLAMP`** | `R19A.2`, `R18.2`, `D_INV_OUT.3` (`COM`), `R19B.1` |
+| **`INV_OUT_CLAMP`** | `R19A.2`, `R18.2`, `D_INV_OUT.3` (`COM`), `R19B.1`, `TP8.1` |
 | **`INV_OUT_TIP`** | `R19B.2`, `J3.T` |
 | **`U2B_IN`** | `R20.2`, `U2.5` (`U2B+`) |
 | **`U2B_OUT`** | `U2.7` (`U2B_OUT`), `D4.A`, `D_LED_CLAMP.K` |
@@ -264,10 +286,11 @@ Pin conventions: `U1`/`U2` = `TL074HIDR` (`SOIC-14`); 2-pin passives = `.1`, `.2
    - Front-panel THT parts (`J1`–`J3`, `RV1`–`RV4`, `D4`) mount on `F.Cu` and align to the `3U` Eurorack front panel (`~10.5 mm` board-to-panel standoff).
    - `J4` (`2×5` shrouded IDC header) mounts on **`B.Cu`** (rear side) with silkscreen `RED STRIPE / -12V` marking Pins `1–2`.
    - `C1` and `C2` (`B32529D1105J000`, `7.2 × 6.0 × 11.0 mm` box film) exceed `10.5 mm` if mounted upright on `F.Cu`; mount `C1` and `C2` on **`B.Cu`** (same hand-soldering pass as `J4`) so `F.Cu` clears the front panel cleanly.
+   - `TP1`–`TP8` (`Ronghe RH-5001` through-board test pins, **DNP** in PCBA BOM) are plated through-hole pads accessible from **`B.Cu`**, allowing bare-pad probing or optional rear-side pin installation (`F.Cu` remains flush behind the front panel, and probing works with the module mounted to the faceplate). Label each pad clearly on `B.SilkS` (`TP1 GND`, `TP2 +12V`, `TP3 -12V`, `TP4 IN_BUF`, `TP5 PREAMP`, `TP6 RECT`, `TP7 OUT`, `TP8 INV_OUT`) and keep `≥ 2.5–3.0 mm` clip clearance around adjacent `J4`/`C1`/`C2` bodies.
 3. **Critical Layout Rules**:
    - Place `C_DEC1`–`C_DEC4` (`100 nF`) within `< 3–5 mm` of `U1.4`, `U1.11`, `U2.4`, and `U2.11` with direct vias to the ground plane.
    - Keep `C_HF` (`47 pF`) and `R_GAIN_FAIL` (`1 MΩ`) close to `U1.1`/`U1.2` to minimize stray capacitance at the summing node.
-   - Keep the `ATK_IN` / `ENV_NODE` traces (`U2.9`, `D3.K`, `C2.1`) compact and guarded away from `PREAMP_OUT` and clock/power traces.
+   - Keep the `ATK_IN` / `ENV_NODE` traces (`U2.9`, `D3.K`, `C2.1`) compact and guarded away from `PREAMP_OUT`, clock/power traces, and test-point THT pads.
    - Give `R16A/B` and `R19A/B` (`1210`, `0.5 W`) generous copper pad/pour area for thermal relief during continuous output-to-output rail clashes.
 4. **Potentiometer Rotation Verification**:
    - `RV1` (`GAIN`, `A100k`): `1` = `GAIN_POT_1`, `2+3` = `PREAMP_OUT` → clockwise increases gain (`-0.10×` → `-9.17×`).
