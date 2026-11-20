@@ -60,6 +60,10 @@ flowchart TD
 6. **[Stage 6: Mated 3U Front Panel](tutorial/stage-6-front-panel.md)** — Inspect main PCB bushing coordinates and generate a grounded `1.6 mm` FR4 3U front panel (`panel/EnvelopeFollower_Panel.kicad_pcb`) with clean functional labels (`GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, `INV OUT`), Gerbers, and DRC verification.
 7. **[Stage 7: JLCPCB PCBA & Assembly](tutorial/stage-7-manufacturing.md)** — Export Gerbers, Excellon drills, and bottom-side CPL files (excluding `DNP` test points) for single-sided JLCPCB Economic PCBA (\$0.85/board SMD + \$9.00 Extended setup), verify placement previews against `B.SilkS` values, hand-solder THT controls/test loops, and probe `TP1`–`TP8` on the bench.
 
+### Optional Explorations
+
+- **[Optional Direction: DC-Coupled CV / LFO Slew & Precision Rectification Mode](tutorial/optional-dc-coupled-mode.md)** — An example of using Antigravity to explore functional circuit modifications beyond the main tutorial flow: adding an `AC / DC` input coupling switch (`SW1` across `C1`) to unlock full-wave CV rectification, LFO frequency doubling, and gate-to-AR slew limiting.
+
 ### Technical References
 
 - **[Netlist, BOM & Capture Guide](reference/netlist-and-bom.md)** — Complete JLCPCB SMD + Manual THT Bill of Materials, ready-to-upload 18-line CSV, all 36 nets with IC pin numbers, 8-step manual KiCad capture guide, and complete silkscreen schedule.
