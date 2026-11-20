@@ -6,7 +6,7 @@ Updated circuit specification incorporating the improvements and Eurorack protec
 
 ## 1. Overview & Specifications
 
-This module is a dual-supply analog **precision full-wave envelope follower** engineered for **Eurorack (`±12 V`) modular synthesizer** operation and **JLCPCB SMT assembly** (with panel-mounted controls, jacks, IDC power header, 3 mm LED, and box film capacitors mounted through-hole).
+This module is a dual-supply analog **precision full-wave envelope follower** engineered for **Eurorack (`±12 V`) modular synthesizer** operation and **JLCPCB SMT assembly** (with panel-mounted controls, jacks, IDC power header, 3 mm LED, box film capacitors, and optional `DNP` diagnostic test points mounted through-hole).
 
 | Parameter | Improved Specification | Notes / Baseline Comparison |
 |---|---|---|
@@ -21,6 +21,7 @@ This module is a dual-supply analog **precision full-wave envelope follower** en
 | **Outputs (`OUT`, `INV_OUT`)** | `1.000×` envelope gain + `±8.89 V` `OFFSET` | `U2A` virtual-ground summer (`0%` gain shift) + `U1D` inverter; `CW = +OUT` |
 | **Output Protection** | `1 kΩ` (`1 W` `2512`) + `BAT54S` rail clamps | Survives continuous `±12 V` output-to-output patching (`0.56 W < 1 W`); `J2`/`J3` normal = `NC` |
 | **Indicator (`LED1`)** | Active V-to-I driver (`U2B`), `I_LED = V_env / 1.5 kΩ` | `0.00 mA` at `0 V` (zero idle glow), `3.33 mA` at `5 V`, `6.67 mA` at `10 V`; `D10` clamp |
+| **Test Points (`TP1`–`TP8`)** | `8×` optional THT rings (`RH-5001`, `DNP`) | `GND`, `+12V`, `-12V`, `PREAMP_OUT`, `FWR_OUT`, `ENV_NODE`, `ENV_OUT`, `INV_OUT_RAW`; `TestPoint_Keystone_5000-5004_Miniature` |
 
 ### Signal Flow
 
@@ -145,6 +146,15 @@ Both `U1` and `U2` use **`TL074HIDR`** (`Package_SO:SOIC-14_3.9x8.7mm_P1.27mm`):
 - `D10` (`1N4148W`) is connected anti-parallel across `LED1` (Anode to `LED_FB`, Cathode to `LED_ANODE`) to protect `LED1` against reverse breakdown if `V_env` swings slightly negative.
 - **Transfer function:** `I_LED = V_env / 1.5 kΩ` (`0.00 mA` at `0 V` = zero idle glow, `3.33 mA` at `5 V`, `6.67 mA` at `10 V`), independent of LED color or `V_f` and eliminating the baseline `R22`/`R23` `-12V` bleed divider.
 
+### 4.6 Diagnostic Test Points (`TP1`–`TP8`, Optional THT / `DNP`)
+- **Hardware & BOM Status:** `TP1`–`TP8` use KiCad footprint `TestPoint:TestPoint_Keystone_5000-5004_Miniature` sized for **Ronghe `RH-5001`** (`2.5 mm` OD black high-temp nylon bead, `4.6 mm` height above PCB, `7.6 ± 0.4 mm` overall length, `0.25 mm` thick silver-plated phosphor bronze legs with `1.4 mm` splayed retention span). All 8 test points are marked **`DNP` (`exclude_from_bom = True`)** so JLCPCB leaves plated through-holes open for direct needle probing or optional manual soldering on `B.Cu`.
+- **Selected Low-Z Bring-Up Nodes:**
+  - **Core Power & Signal Chain (`TP1`–`TP6`):** `TP1` (`GND` reference clip anchor), `TP2` (`+12V` protected rail downstream of `D4`), `TP3` (`-12V` protected rail downstream of `D5`), `TP4` (`PREAMP_OUT`, `U1A` Pin 1), `TP5` (`FWR_OUT`, `U1C` Pin 8 — SMD-only), and `TP6` (`ENV_NODE`, `U2D` Pin 14 — SMD-only buffered peak output).
+  - **Extended Output Isolation (`TP7`–`TP8`):** `TP7` (`ENV_OUT`, `U1D` Pin 14 pre-`R16`/`D7`) and `TP8` (`INV_OUT_RAW`, `U2A` Pin 1 pre-`R19`/`D8`) allow isolating op-amp summers from output resistors/jacks (`J2`, `J3`).
+- **Sensitive Nodes Deliberately Excluded:**
+  - **Virtual-ground / inverting (`-`) summing nodes** (`PREAMP_INV`, `RECT_SUM`, `FWR_SUM`, `DET_FB`, `INV_SUM`, `OUT_SUM`, `LED_FB`) and **`DET_OP_OUT`** (`U2.8`) carry no diagnostic benefit over op-amp outputs while THT pad/probe shunt capacitance across `100–200 kΩ` feedback (`C10`, `C17`, `C16`) would erode phase margin.
+  - **`ENV_CAP` (`C2.1` / `U2.12`)** discharges through up to `1 MΩ` (`RV3`); probing it directly loads `C2` and risks flux leakage. Always probe **`TP6` (`ENV_NODE`)** instead, which mirrors `C2` (`±1 mV`) via `U2D` with zero capacitor loading.
+
 ---
 
 ## 5. Complete Pin-to-Pin Netlist
@@ -153,9 +163,9 @@ Both `U1` and `U2` use **`TL074HIDR`** (`Package_SO:SOIC-14_3.9x8.7mm_P1.27mm`):
 |---|---|
 | **`+12V_IN`** | `J4.9`, `J4.10`, `D4.2` (`A`) |
 | **`-12V_IN`** | `J4.1`, `J4.2`, `D5.1` (`K`) |
-| **`+12V`** | `D4.1` (`K`), `C3.1` (`+`), `C5.1`, `C7.1`, `U1.4`, `U2.4`, `D6.2` (`K2`), `D7.2` (`K2`), `D8.2` (`K2`), `R11.1` |
-| **`-12V`** | `D5.2` (`A`), `C4.2` (`-`), `C6.1`, `C8.1`, `U1.11`, `U2.11`, `D6.1` (`A1`), `D7.1` (`A1`), `D8.1` (`A1`), `R12.1` |
-| **`GND`** | `J4.3`, `J4.4`, `J4.5`, `J4.6`, `J4.7`, `J4.8`, `C3.2` (`-`), `C4.1` (`+`), `C5.2`, `C6.2`, `C7.2`, `C8.2`, `J1.S`, `J1.TN`, `R24.2`, `R1.2`, `R2.2`, `R26.2`, `U1.5`, `U1.10`, `C2.2`, `RV3.2`, `RV3.3`, `C11.2` (`-`), `C12.2`, `C13.1` (`+`), `C14.2`, `C15.2`, `U2.3`, `U1.12`, `J2.S`, `J3.S`, `R21.2` |
+| **`+12V`** | `D4.1` (`K`), `C3.1` (`+`), `C5.1`, `C7.1`, `U1.4`, `U2.4`, `D6.2` (`K2`), `D7.2` (`K2`), `D8.2` (`K2`), `R11.1`, `TP2.1` |
+| **`-12V`** | `D5.2` (`A`), `C4.2` (`-`), `C6.1`, `C8.1`, `U1.11`, `U2.11`, `D6.1` (`A1`), `D7.1` (`A1`), `D8.1` (`A1`), `R12.1`, `TP3.1` |
+| **`GND`** | `J4.3`, `J4.4`, `J4.5`, `J4.6`, `J4.7`, `J4.8`, `C3.2` (`-`), `C4.1` (`+`), `C5.2`, `C6.2`, `C7.2`, `C8.2`, `J1.S`, `J1.TN`, `R24.2`, `R1.2`, `R2.2`, `R26.2`, `U1.5`, `U1.10`, `C2.2`, `RV3.2`, `RV3.3`, `C11.2` (`-`), `C12.2`, `C13.1` (`+`), `C14.2`, `C15.2`, `U2.3`, `U1.12`, `J2.S`, `J3.S`, `R21.2`, `TP1.1` |
 | **`IN_TIP`** | `J1.T`, `R25.1` |
 | **`IN_CLAMP`** | `R25.2`, `D6.3` (`K1/A2`), `C1.1` |
 | **`AC_IN`** | `C1.2`, `RV1.3` (`CW`) |
@@ -163,36 +173,36 @@ Both `U1` and `U2` use **`TL074HIDR`** (`Package_SO:SOIC-14_3.9x8.7mm_P1.27mm`):
 | **`GAIN_WIPER`** | `RV1.2` (`Wiper`), `R1.1`, `R28.1` |
 | **`PREAMP_IN`** | `R28.2`, `U1.3` (`U1A+`) |
 | **`PREAMP_INV`** | `U1.2` (`U1A-`), `R2.1`, `R29.1`, `C10.1` |
-| **`PREAMP_OUT`** | `U1.1` (`U1A OUT`), `R29.2`, `C10.2`, `C9.1` |
+| **`PREAMP_OUT`** | `U1.1` (`U1A OUT`), `R29.2`, `C10.2`, `C9.1`, `TP4.1` |
 | **`AC_PRE`** | `C9.2`, `R26.1`, `R3.1`, `R4.1` |
 | **`RECT_SUM`** | `R3.2`, `D1.1` (`K`), `R6.1`, `U1.6` (`U1B-`) |
 | **`RECT_OUT_N`** | `U1.7` (`U1B OUT`), `D1.2` (`A`), `D2.1` (`K`) |
 | **`RECT_HALF`** | `D2.2` (`A`), `R6.2`, `R7.1` |
 | **`FF_MID`** | `R4.2`, `R5.1` |
 | **`FWR_SUM`** | `R5.2`, `R7.2`, `R8.1`, `C17.1`, `U1.9` (`U1C-`) |
-| **`FWR_OUT`** | `U1.8` (`U1C OUT`), `R8.2`, `C17.2`, `U2.10` (`U2C+`) |
+| **`FWR_OUT`** | `U1.8` (`U1C OUT`), `R8.2`, `C17.2`, `U2.10` (`U2C+`), `TP5.1` |
 | **`DET_FB`** | `U2.9` (`U2C-`), `D9.2` (`A`), `C16.1`, `R27.1` |
 | **`DET_OP_OUT`** | `U2.8` (`U2C OUT`), `D9.1` (`K`), `C16.2`, `D3.2` (`A`) |
 | **`RECT_DIODE_OUT`** | `D3.1` (`K`), `R9.1` |
 | **`ATK_IN`** | `R9.2`, `RV2.1` (`CCW`) |
 | **`ENV_CAP`** | `RV2.2`, `RV2.3`, `C2.1`, `R10.1`, `U2.12` (`U2D+`) |
 | **`REL_MID`** | `R10.2`, `RV3.1` (`CCW`) |
-| **`ENV_NODE`** | `U2.14` (`U2D OUT`), `U2.13` (`U2D-`), `R27.2`, `R17.1`, `R20.1` |
+| **`ENV_NODE`** | `U2.14` (`U2D OUT`), `U2.13` (`U2D-`), `R27.2`, `R17.1`, `R20.1`, `TP6.1` |
 | **`OFFSET_TOP`** | `R11.2`, `C11.1` (`+`), `C12.1`, `RV4.3` (`CW`) |
 | **`OFFSET_BOT`** | `R12.2`, `C13.2` (`-`), `C14.1`, `RV4.1` (`CCW`) |
 | **`OFFSET_WIPER`** | `RV4.2` (`Wiper`), `C15.1`, `R13.1` |
 | **`INV_SUM`** | `R17.2`, `R13.2`, `R18.1`, `U2.2` (`U2A-`) |
-| **`INV_OUT_RAW`** | `U2.1` (`U2A OUT`), `R18.2`, `R14.1`, `D8.3` (`K1/A2`), `R19.1` |
+| **`INV_OUT_RAW`** | `U2.1` (`U2A OUT`), `R18.2`, `R14.1`, `D8.3` (`K1/A2`), `R19.1`, `TP8.1` |
 | **`INV_OUT_TIP`** | `R19.2`, `J3.T` |
 | **`OUT_SUM`** | `R14.2`, `R15.1`, `U1.13` (`U1D-`) |
-| **`ENV_OUT`** | `U1.14` (`U1D OUT`), `R15.2`, `D7.3` (`K1/A2`), `R16.1` |
+| **`ENV_OUT`** | `U1.14` (`U1D OUT`), `R15.2`, `D7.3` (`K1/A2`), `R16.1`, `TP7.1` |
 | **`OUT_TIP`** | `R16.2`, `J2.T` |
 | **`LED_BUF_IN`** | `R20.2`, `U2.5` (`U2B+`) |
 | **`LED_ANODE`** | `U2.7` (`U2B OUT`), `D10.1` (`K`), `LED1.2` (`A`) |
 | **`LED_FB`** | `U2.6` (`U2B-`), `D10.2` (`A`), `LED1.1` (`K`), `R21.1` |
 | **`NC`** | `J2.TN`, `J3.TN` |
 
-*(KiCad pad polarity conventions: `D_SOD-123` Pin `1 = K`, `2 = A`; `BAV99` / `BAT54S` `SOT-23` Pin `1 = A1`, `2 = K2`, `3 = K1/A2`; `CP_Elec_6.3x5.4` Pin `1 = +`, `2 = -`; `LED_D3.0mm` Pin `1 = K`, `2 = A`; Potentiometers `1 = CCW`, `2 = Wiper`, `3 = CW` viewed from shaft side.)*
+*(KiCad pad polarity conventions: `D_SOD-123` Pin `1 = K`, `2 = A`; `BAV99` / `BAT54S` `SOT-23` Pin `1 = A1`, `2 = K2`, `3 = K1/A2`; `CP_Elec_6.3x5.4` Pin `1 = +`, `2 = -`; `LED_D3.0mm` Pin `1 = K`, `2 = A`; Potentiometers `1 = CCW`, `2 = Wiper`, `3 = CW` viewed from shaft side; Test points `TP1`–`TP8` Pin `1` = single plated THT test ring pad.)*
 
 ---
 
@@ -206,7 +216,8 @@ Both `U1` and `U2` use **`TL074HIDR`** (`Package_SO:SOIC-14_3.9x8.7mm_P1.27mm`):
 - **Panel & Mechanical Clearance (`10.5 mm` Eurorack Standoff):**
   - All SMD components (`SOIC-14` `1.75 mm`, `2512` `0.6 mm`, `CP_Elec_6.3x5.4` `5.4 mm`) clear the `10.5 mm` front-panel standoff effortlessly.
   - `WIMA MKS2` (`1 µF 63 V`, `7.2 × 5.0 × 10.0 mm`, `P = 5.0 mm`) sits just under `10.5 mm` when mounted flush on `F.Cu` (or mount on `B.Cu` for extra margin). Because JLCPCB has `0` stock of `470 nF–1 µF` SMD film or high-value `C0G` MLCCs, `C1`, `C2`, `C9` can be included in JLCPCB Standard THT assembly or soldered alongside `J1`–`J4`, `RV1`–`RV4`, and `LED1` after panel fit.
+  - **Optional THT Test Points (`TP1`–`TP8`, Ronghe `RH-5001`, `DNP`):** Place `TP1`–`TP8` in open `B.Cu` routing corridors clear of `RV1`–`RV4`, `J1`–`J3`, `C1`/`C2`/`C9`, and `J4` shroud clearances, with dual-sided silkscreen labels (`F.SilkS` and `B.SilkS`) and short branch stubs off `U1.1`, `U1.8`, `U2.14`, `U1.14`, and `U2.1`. When soldering `RH-5001` rings (`4.6 mm` protrusion), mount from `B.Cu` so they remain accessible while the front panel is bolted on.
 - **Bring-Up Verification:**
-  1. Power `J4` with `±12 V` (current-limited); verify `+12V ≈ +11.65 V`, `-12V ≈ -11.65 V`, `OFFSET_TOP ≈ +9.71 V`, `OFFSET_BOT ≈ -9.71 V`, and reversed-polarity protection draws `0 mA`.
-  2. With `J1` unpatched and `RV4` centered, confirm `PREAMP_OUT ≈ 0 V`, `FWR_OUT ≈ 0 V`, `ENV_NODE ≈ 0 V`, `OUT ≈ 0 V`, `INV_OUT ≈ 0 V`, and `LED1` completely dark (`0.00 mA`).
-  3. Inject a `1 kHz`, `2 Vpp` (`±1 V`) sine wave at `J1`; verify `FWR_OUT` is a clean positive `1.0×` full-wave waveform, `ENV_NODE` tracks peak amplitude cleanly down to `20 mVpp` (`0 V` diode deadzone), `OUT` & `INV_OUT` swing symmetrically around `RV4` offset, and `LED1` brightens smoothly.
+  1. Power `J4` with `±12 V` (current-limited), clipping the multimeter/scope ground lead to **`TP1` (`GND`)**; verify **`TP2` (`+12V`)** `≈ +11.65 V`, **`TP3` (`-12V`)** `≈ -11.65 V`, `OFFSET_TOP ≈ +9.71 V`, `OFFSET_BOT ≈ -9.71 V`, and reversed-polarity protection draws `0 mA` at `TP2`/`TP3`.
+  2. With `J1` unpatched and `RV4` centered, confirm **`TP4` (`PREAMP_OUT`)** `≈ 0 V`, **`TP5` (`FWR_OUT`)** `≈ 0 V`, **`TP6` (`ENV_NODE`)** `≈ 0 V`, **`TP7` (`ENV_OUT`)** / `OUT ≈ 0 V`, **`TP8` (`INV_OUT_RAW`)** / `INV_OUT ≈ 0 V`, and `LED1` completely dark (`0.00 mA`).
+  3. Inject a `1 kHz`, `2 Vpp` (`±1 V`) sine wave at `J1`; verify **`TP4` (`PREAMP_OUT`)** scales smoothly (`0.494×`–`11.0×`), **`TP5` (`FWR_OUT`)** is a clean positive `1.0×` full-wave waveform (`< 0.8%` asymmetry), **`TP6` (`ENV_NODE`)** tracks peak amplitude cleanly down to `20 mVpp` (`0 V` diode deadzone), **`TP7` (`ENV_OUT`)** & **`TP8` (`INV_OUT_RAW`)** (and `J2`/`J3`) swing symmetrically around `RV4` offset, and `LED1` brightens smoothly.

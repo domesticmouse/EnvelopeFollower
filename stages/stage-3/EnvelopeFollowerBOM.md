@@ -38,9 +38,9 @@ These components are surface-mount (`SMT`) and placed automatically by JLCPCB PC
 
 ---
 
-## 2. Through-Hole (THT) Parts — Mounted Later / User-Sourced (12 Components, 9 Unique Lines)
+## 2. Through-Hole (THT) Parts — Mounted Later / User-Sourced & Optional DNP (20 Footprints: 12 Populated + 8 DNP, 10 Unique Lines)
 
-Per build requirements, panel hardware, the IDC power header, and the 3 mm LED are THT parts mounted manually after SMT assembly. In addition, JLCPCB carries `0` SMT stock of `470 nF–1 µF` film or high-value `C0G` capacitors (`1uF C0G`, `470nF C0G`, `220nF C0G` all `0` stock; `ECHU` PPS tops out at `22 nF`), so `C1`, `C2`, `C9` use the stocked `WIMA MKS2` THT box film capacitor (`C92673`).
+Per build requirements, panel hardware, the IDC power header, and the 3 mm LED are THT parts mounted manually after SMT assembly. In addition, JLCPCB carries `0` SMT stock of `470 nF–1 µF` film or high-value `C0G` capacitors (`1uF C0G`, `470nF C0G`, `220nF C0G` all `0` stock; `ECHU` PPS tops out at `22 nF`), so `C1`, `C2`, `C9` use the stocked `WIMA MKS2` THT box film capacitor (`C92673`). Finally, `TP1`–`TP8` (`Ronghe RH-5001`, `C5199801`) are **marked `DNP`** (`exclude_from_bom = True`) so the bare plated holes can be probed directly or optionally hand-soldered on `B.Cu`.
 
 | Qty | Designators | Value / Comment | MPN | Manufacturer | Package / KiCad Footprint | LCSC Part # | Sourcing / Assembly Status | Live JLCPCB Stock | Unit Price (USD) | Notes |
 |---:|---|---|---|---|---|---|---|---:|---:|---|
@@ -52,6 +52,7 @@ Per build requirements, panel hardware, the IDC power header, and the 3 mm LED a
 | **1** | `RV2` | `A50k` | `RV09AF-40-15K-A50K` *(or `RD901F-40-A50K`)* | Alpha (Taiwan) | `Through-Hole 9mm` (`Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical`) | `N/A (User-Sourced)` | **User-Sourced / Manual THT** | 0 | — | `50 kΩ` audio/log taper 9 mm vertical panel pot (`ATK`) |
 | **1** | `RV3` | `A1M` | `RV09AF-40-15K-A1M` *(or `RD901F-40-A1M`)* | Alpha (Taiwan) | `Through-Hole 9mm` (`Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical`) | `N/A (User-Sourced)` | **User-Sourced / Manual THT** | 0 | — | `1 MΩ` audio/log taper 9 mm vertical panel pot (`Release`) |
 | **1** | `RV4` | `B10k` | `RV09AF-40-15K-B10K` *(or center-detent `B10K`)* | Alpha (Taiwan) | `Through-Hole 9mm` (`Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical`) | `C2839839` *(catalog ref)* | **User-Sourced / Manual THT** | 0 | — | `10 kΩ` linear taper 9 mm vertical panel pot (`OFFSET`) |
+| **8** *(DNP)* | `TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8` | `RH-5001 (DNP)` | `RH-5001` | ronghe | `Through-Board, D=2.5mm` (`TestPoint:TestPoint_Keystone_5000-5004_Miniature`) | `C5199801` | **DNP (Optional Manual THT)** *(Extended)* | 103,200 | $0.0839 | `2.5 mm` black nylon test ring (`4.6 mm` above PCB, `7.6 mm` total, `1.4 mm` leg span); marked `DNP` — probe bare PTHs or optionally hand-solder on `B.Cu` |
 
 *Verified LCSC 3 mm THT LED Color Alternates:*
 - Green (`204-10SYGD/S530-E3`, `2.0 V`, `100 mcd`): `C85161` (stock `37,383`, `$0.0361`)
@@ -60,7 +61,7 @@ Per build requirements, panel hardware, the IDC power header, and the 3 mm LED a
 
 ---
 
-## 3. Complete Itemized Component Reference (All 65 Parts)
+## 3. Complete Itemized Component Reference (All 73 Footprints: 65 Populated + 8 DNP)
 
 | Ref | Type | Value | MPN | LCSC # | Mount / Class | Footprint | Circuit Function |
 |---|---|---|---|---|---|---|---|
@@ -129,14 +130,22 @@ Per build requirements, panel hardware, the IDC power header, and the 3 mm LED a
 | `J2` | 3.5mm Jack | `PJ398SM` | `WQP-PJ398SM` | `C9900009788` *(ref)* | THT / Manual | `Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `OUT` envelope CV jack (`TN → NC`) |
 | `J3` | 3.5mm Jack | `PJ398SM` | `WQP-PJ398SM` | `C9900009788` *(ref)* | THT / Manual | `Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `INV_OUT` inverted CV jack (`TN → NC`) |
 | `J4` | IDC Header | `2x5 2.54mm` | `IDC2.54-2*5PZ` | `C53207560` | THT / Manual | `IDC-Header_2x05_P2.54mm_Vertical` | Keyed Eurorack `±12V` power header (`B.Cu`) |
+| `TP1` | Test Point | `RH-5001 (DNP)` | `RH-5001` | `C5199801` | THT / DNP | `TestPoint_Keystone_5000-5004_Miniature` | `GND` reference test point (scope ground clip anchor) |
+| `TP2` | Test Point | `RH-5001 (DNP)` | `RH-5001` | `C5199801` | THT / DNP | `TestPoint_Keystone_5000-5004_Miniature` | `+12V` protected rail test point (downstream of `D4`, `≈ +11.65 V`) |
+| `TP3` | Test Point | `RH-5001 (DNP)` | `RH-5001` | `C5199801` | THT / DNP | `TestPoint_Keystone_5000-5004_Miniature` | `-12V` protected rail test point (downstream of `D5`, `≈ -11.65 V`) |
+| `TP4` | Test Point | `RH-5001 (DNP)` | `RH-5001` | `C5199801` | THT / DNP | `TestPoint_Keystone_5000-5004_Miniature` | `PREAMP_OUT` (`U1A` Pin 1) Stage 1 scaled AC test point |
+| `TP5` | Test Point | `RH-5001 (DNP)` | `RH-5001` | `C5199801` | THT / DNP | `TestPoint_Keystone_5000-5004_Miniature` | `FWR_OUT` (`U1C` Pin 8) precision full-wave rectifier test point |
+| `TP6` | Test Point | `RH-5001 (DNP)` | `RH-5001` | `C5199801` | THT / DNP | `TestPoint_Keystone_5000-5004_Miniature` | `ENV_NODE` (`U2D` Pin 14) buffered zero-deadzone envelope test point |
+| `TP7` | Test Point | `RH-5001 (DNP)` | `RH-5001` | `C5199801` | THT / DNP | `TestPoint_Keystone_5000-5004_Miniature` | `ENV_OUT` (`U1D` Pin 14) non-inverted output test point (pre-`R16`/`D7`) |
+| `TP8` | Test Point | `RH-5001 (DNP)` | `RH-5001` | `C5199801` | THT / DNP | `TestPoint_Keystone_5000-5004_Miniature` | `INV_OUT_RAW` (`U2A` Pin 1) inverted output test point (pre-`R19`/`D8`) |
 
-*(Baseline `R22` and `R23` are intentionally removed per IMP-06 active V-to-I LED driver redesign.)*
+*(Baseline `R22` and `R23` are intentionally removed per IMP-06 active V-to-I LED driver redesign. `TP1`–`TP8` are marked `DNP` / `exclude_from_bom`.)*
 
 ---
 
 ## 4. JLCPCB PCBA Upload CSV (Economic SMT-Only Assembly)
 
-Use the grouped CSV below for **JLCPCB Economic PCBA** (SMT only; omits THT parts `C1, C2, C9, J1–J4, RV1–RV4, LED1` which are mounted later). If ordering **JLCPCB Standard Assembly** with `C1, C2, C9` pre-mounted, append the `MKS2` row (`1uF 63V Film,"C1, C2, C9",C_Rect_L7.2mm_W5.0mm_P5.00mm,C92673`).
+Use the grouped CSV below for **JLCPCB Economic PCBA** (SMT only; omits THT parts `C1, C2, C9, J1–J4, RV1–RV4, LED1` which are mounted later, as well as `DNP` test points `TP1–TP8` which must also be filtered from the CPL so JLCPCB does not flag orphan designators). If ordering **JLCPCB Standard Assembly** with `C1, C2, C9` pre-mounted, append the `MKS2` row (`1uF 63V Film,"C1, C2, C9",C_Rect_L7.2mm_W5.0mm_P5.00mm,C92673`).
 
 ```csv
 Comment,Designator,Footprint,LCSC Part #
@@ -169,8 +178,8 @@ BAT54S,"D7, D8",SOT-23,C47546
 ```text
 BOM Summary — Project: EnvelopeFollowerImproved (5 Boards, JLCPCB Economic SMT + Manual THT)
 ===========================================================================================
-Unique lines:      29  (20 JLCPCB SMT [14 Basic, 6 Extended] + 9 THT mounted later)
-Total components:  65  (53 JLCPCB SMT + 12 THT)
+Unique lines:      30  (20 JLCPCB SMT [14 Basic, 6 Extended] + 9 populated THT + 1 DNP THT)
+Total footprints:  73  (65 populated [53 JLCPCB SMT + 12 manual THT] + 8 DNP test points)
 
 JLCPCB SMT Assembly (per board, excluding PCB fab & SMT labor):
   Basic SMT parts (14 lines, 36 pcs):     $0.2293 / board  ($0.00 feeder fees)
@@ -178,11 +187,14 @@ JLCPCB SMT Assembly (per board, excluding PCB fab & SMT labor):
   SMT Subtotal (5 boards):                ~$23.95 total    (~$4.79 / board incl. feeder fees)
   Tip — 2x C122538 in series for R8:      saves $3.00 feeder fee ($15.00 batch extended fee total)
 
-LCSC-Stocked THT Parts (mounted later, per board):
+LCSC-Stocked Populated THT Parts (mounted later, per board):
   C1, C2, C9 (3x WIMA MKS2 C92673):       $3.4329 / board
   J4 (1x 2x5 IDC Header C53207560):       $0.1241 / board
   LED1 (1x 3mm Yellow LED C85160):        $0.0366 / board
   LCSC THT Subtotal:                      $3.5936 / board  ($17.97 for 5 boards)
+
+Optional DNP Test Points (excluded from BOM / PCBA by default):
+  TP1–TP8 (8x Ronghe RH-5001 C5199801):   $0.00 (DNP) — or $0.6712 / board ($3.36 for 5 boards @ $0.0839/ea, $0.0656/ea @ 50+) if optionally soldered
 
 Consigned / User-Sourced Panel Hardware (separate vendor order, per board):
   J1–J3 (3x WQP-PJ398SM Thonkiconn) + RV1–RV4 (4x 9mm pots: A100k, A50k, A1M, B10k)
