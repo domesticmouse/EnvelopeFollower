@@ -188,7 +188,7 @@ If capturing the schematic manually in KiCad instead of generating it via SKiDL 
 
 ## 5. Complete Component-by-Component Silkscreen Schedule
 
-Follow these exact layer assignments (`B.SilkS` for single-sided `B.Cu` SMD assembly; dual-sided `F.SilkS` + `B.SilkS` for manual THT controls and `TP1`–`TP8` test points):
+Follow these exact layer assignments (`B.SilkS` for single-sided `B.Cu` SMD assembly—concise value-only tokens for dense `R*`/`C*` passives with `<REF>` kept on `B.Fab`, and `<REF> + <VAL>` for ICs and diodes; dual-sided `F.SilkS` + `B.SilkS` for manual THT controls and `TP1`–`TP8` test points):
 
 | Ref | Package / Side | `F.SilkS` Label | `B.SilkS` Label | Required Polarity / Orientation Mark |
 | :--- | :--- | :--- | :--- | :--- |
@@ -196,21 +196,21 @@ Follow these exact layer assignments (`B.SilkS` for single-sided `B.Cu` SMD asse
 | `D1`–`D3`, `D7` | `SOD-123` (`B.Cu`) | — | `D1 1N4148W` … `D7 1N4148W` | External cathode bar (`\|`) beyond cathode pad |
 | `D5`, `D6` | `SOD-123` (`B.Cu`) | — | `D5 B5819W`, `D6 B5819W` | External cathode bar (`\|`) (`D5`: `+12V_PROT`; `D6`: `-12V_IN`) |
 | `D8`, `D9` | `SOT-23` (`B.Cu`) | — | `D8 BAT54S`, `D9 BAT54S` | Open `SOT-23` corners; pin-1 (`-12V`) mark if space allows |
-| `C1` | `0603` (`B.Cu`) | — | `C1 1uF` | Non-polarized |
-| `C2` | `0805` (`B.Cu`) | — | `C2 220nF` | Non-polarized |
-| `C3` | `CP_Elec_6.3x5.4` (`B.Cu`) | — | `C3 10uF 50V` | `+` outside anode (`+12V`) pad + chamfered base outline |
-| `C4` | `CP_Elec_6.3x5.4` (`B.Cu`) | — | `C4 10uF 50V` | `+` outside anode (**`GND`**) pad + chamfered base outline |
-| `C5`–`C9` | `0603` (`B.Cu`) | — | `C5 100nF` … `C9 100nF` | Non-polarized |
-| `C10`, `C11` | `0603` (`B.Cu`) | — | `C10 47pF`, `C11 47pF` | Non-polarized |
-| `R1` | `0603` (`B.Cu`) | — | `R1 1M` | Non-polarized |
-| `R2`–`R7`, `R17`, `R18` | `0603` (`B.Cu`) | — | `R2 10k` … `R18 10k` | Non-polarized |
-| `R8` | `0603` (`B.Cu`) | — | `R8 20k` | Non-polarized |
-| `R9`, `R11`, `R12`, `R25` | `0603` (`B.Cu`) | — | `R9 1k`, `R11 1k`, `R12 1k`, `R25 1k` | Non-polarized |
-| `R10` | `0603` (`B.Cu`) | — | `R10 47k` | Non-polarized |
-| `R13`–`R15`, `R24` | `0603` (`B.Cu`) | — | `R13 100k` … `R15 100k`, `R24 100k` | Non-polarized |
-| `R16`, `R19` | `1206` (`B.Cu`) | — | `R16 1k`, `R19 1k` | Non-polarized (`1/4 W` `1206` outline) |
-| `R21` | `0603` (`B.Cu`) | — | `R21 1.5k` | Non-polarized |
-| `R26`, `R27` | `1206` (`B.Cu`) | — | `R26 10R`, `R27 10R` | Non-polarized (`1/4 W` `1206` outline) |
+| `C1` | `0603` (`B.Cu`) | — | `1uF` *(`C1` on `B.Fab`)* | Non-polarized |
+| `C2` | `0805` (`B.Cu`) | — | `220nF` *(`C2` on `B.Fab`)* | Non-polarized |
+| `C3` | `CP_Elec_6.3x5.4` (`B.Cu`) | — | `10uF` *(`C3` on `B.Fab`, or `C3 10uF`)* | `+` outside anode (`+12V`) pad + chamfered base outline |
+| `C4` | `CP_Elec_6.3x5.4` (`B.Cu`) | — | `10uF` *(`C4` on `B.Fab`, or `C4 10uF`)* | `+` outside anode (**`GND`**) pad + chamfered base outline |
+| `C5`–`C9` | `0603` (`B.Cu`) | — | `100nF` *(`C5`–`C9` on `B.Fab`)* | Non-polarized |
+| `C10`, `C11` | `0603` (`B.Cu`) | — | `47pF` *(`C10`, `C11` on `B.Fab`)* | Non-polarized |
+| `R1` | `0603` (`B.Cu`) | — | `1M` *(`R1` on `B.Fab`)* | Non-polarized |
+| `R2`–`R7`, `R17`, `R18` | `0603` (`B.Cu`) | — | `10k` *(`R2`–`R7`, `R17`, `R18` on `B.Fab`)* | Non-polarized |
+| `R8` | `0603` (`B.Cu`) | — | `20k` *(`R8` on `B.Fab`)* | Non-polarized |
+| `R9`, `R11`, `R12`, `R25` | `0603` (`B.Cu`) | — | `1k` *(`R9`, `R11`, `R12`, `R25` on `B.Fab`)* | Non-polarized |
+| `R10` | `0603` (`B.Cu`) | — | `47k` *(`R10` on `B.Fab`)* | Non-polarized |
+| `R13`–`R15`, `R24` | `0603` (`B.Cu`) | — | `100k` *(`R13`–`R15`, `R24` on `B.Fab`)* | Non-polarized |
+| `R16`, `R19` | `1206` (`B.Cu`) | — | `1k` *(`R16`, `R19` on `B.Fab`)* | Non-polarized (`1/4 W` `1206` outline) |
+| `R21` | `0603` (`B.Cu`) | — | `1.5k` *(`R21` on `B.Fab`)* | Non-polarized |
+| `R26`, `R27` | `1206` (`B.Cu`) | — | `10R` *(`R26`, `R27` on `B.Fab`)* | Non-polarized (`1/4 W` `1206` outline) |
 | `J_PWR` | `IDC 2x5` (THT, `B.Cu`) | `J_PWR +/-12V` + `-12V` bar | `J_PWR +/-12V` + `-12V / RED STRIPE` | Pin-1 dot, keyway notch on `B.SilkS`, `-12V`/`GND`/`+12V` on **both** layers |
 | `J1`–`J3` | `WQP-PJ398SM` (THT, `F.Cu`) | `J1 IN`, `J2 OUT`, `J3 INV_OUT` | `J1 IN`, `J2 OUT`, `J3 INV_OUT` | Jack body outline on `F.SilkS` |
 | `RV1`–`RV4` | `9mm Pot` (THT, `F.Cu`) | `RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k` | `RV1 GAIN A100k`, `RV2 ATK A50k`, `RV3 REL A1M`, `RV4 OFFSET B10k` | Pin-1 (`1`) square pad / marker on **both** layers |

@@ -42,7 +42,7 @@ Always read the corresponding `docs/tutorial/stage-N-*.md` file at runtime to ex
   3. Step `3.3` (ONE subagent, 3 sequential turns via `send_message`):
      - `3.3a`: Test-point recommendations (must avoid raw `ENV_CAP`/`ENV_RAW` and virtual-ground `IN-` nodes).
      - `3.3b`: Add `TP1`–`TP8` (`RH-5001`, `DNP`) to `EnvelopeFollowerImproved.md` and `EnvelopeFollowerBOM.md` (live-verify `RH-5001` via LCSC/JLCPCB).
-     - `3.3c`: Create `SilkscreenInstructions.md` (Ref+Value via `fp_text user` with `fp.Value()` hidden on `.Fab`, `B.SilkS` mirroring, dual-sided TPs/THTs, external Pin-1/cathode/`+` marks, `5 × 5 mm` QR square, `B.Fab` fab notes).
+     - `3.3c`: Create `SilkscreenInstructions.md` (concise value-only labels on `R*/C*` passives and `Ref+Value` on ICs/diodes/THTs/TPs via `fp_text user` with `fp.Value()` hidden on `.Fab` and passive `fp.Reference()` on `.Fab`, `B.SilkS` mirroring, dual-sided TPs/THTs, external Pin-1/cathode/`+` marks, `5 × 5 mm` QR square, `B.Fab` fab notes).
 - **Gate checks:** Zero `PENDING_VERIFY` strings in `EnvelopeFollowerBOM.md` before starting Stage 4; `15pF`/`47pF`/`100pF` queried via short tokens (`"15pF"`, `"47pF"`, `"100pF"`) if multi-word `"NP0 0603"` returns wrong capacitance.
 
 ---
@@ -75,12 +75,12 @@ Always read the corresponding `docs/tutorial/stage-N-*.md` file at runtime to ex
   2. Verify:
      - `/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli pcb drc --refill-zones --exit-code-violations --format json --output /tmp/stage5_drc.json stages/stage-5/EnvelopeFollower.kicad_pcb`
      - `python3 stages/stage-5/.agents/skills/kicad/scripts/analyze_pcb.py stages/stage-5/EnvelopeFollower.kicad_pcb --full --analysis-dir stages/stage-5/analysis/`
-     - `python3 stages/stage-5/.agents/skills/kicad-silkscreen-markup/scripts/silk_annotator.py --inspect stages/stage-5/EnvelopeFollower.kicad_pcb`
+     - `python3 stages/stage-5/.agents/skills/kicad-silkscreen-markup/scripts/silk_annotator.py --inspect stages/stage-5/EnvelopeFollower.kicad_pcb` (must exit `0` with `RESULT: PASS`: `100%` labeled non-fiducial footprints, `0` tether drift hits, and `0` split pairs)
      - Top/bottom `kicad-cli pcb render` checks.
   3. Step `5.2` (ONE fresh subagent for Audit → conditional Fix via `send_message`):
      - Audit `generate_kicad_pcb.py` and `EnvelopeFollower.kicad_pcb` against `SilkscreenInstructions.md` and `envelope_follower.net`.
      - If discrepancies exist, send the Fix prompt to the same subagent and re-run DRC + `analyze_pcb.py` + `silk_annotator.py --inspect` + 3D renders.
-- **Watch-outs:** Seed `SilkGrid` with SMD `.Fab` body bounding boxes (`SOIC-14` `U1`/`U2` label placement); confirm `DNP` flags (`exclude_from_pos_files`, `exclude_from_bom`) on `TP1`–`TP8`; confirm `F.Cu` panel controls (`RV1`–`RV4`, `J1`–`J3`, `D4`) and `B.Cu` SMT + `J_PWR` + `TP1`–`TP8`.
+- **Watch-outs:** Seed `SilkGrid` with SMD `.Fab` body bounding boxes (`SOIC-14` `U1`/`U2` label placement); maintain `>= 1.5–2.0 mm` label corridors between `B.Cu` passive rows so local labels stay within `<= 3.5 mm` tether limits; confirm `DNP` flags (`exclude_from_pos_files`, `exclude_from_bom`) on `TP1`–`TP8`; confirm `F.Cu` panel controls (`RV1`–`RV4`, `J1`–`J3`, `D4`) and `B.Cu` SMT + `J_PWR` + `TP1`–`TP8`.
 
 ---
 
