@@ -1,4 +1,6 @@
 __pycache__/
 site/
 .venv/
+_tmp_*
+capability_mode.json
 
