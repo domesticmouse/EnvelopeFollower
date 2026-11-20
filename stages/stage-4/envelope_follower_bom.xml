@@ -2,7 +2,7 @@
 <export version="D">
   <design>
     <source>/Users/brett/Documents/GitHub/EnvelopeFollower/stages/stage-4/envelope_follower.py</source>
-    <date>11/20/2026 10:12 PM</date>
+    <date>11/20/2026 10:13 PM</date>
     <tool>SKiDL (3.0.0)</tool>
   </design>
   <components>
@@ -15,7 +15,7 @@
         (field (name "Manufacturer") "Texas Instruments")
         (field (name "JLCPCB_Class") "Extended")
         (field (name "Silkscreen") "U1 TL074H")
-        (field (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses <3-5mm from V+/V-")
+        (field (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses within 3-5mm of V+/V-")
       </fields>
       <libsource lib="Amplifier_Operational" part=""TL074""/>
     </comp>
@@ -28,7 +28,7 @@
         (field (name "Manufacturer") "Texas Instruments")
         (field (name "JLCPCB_Class") "Extended")
         (field (name "Silkscreen") "U2 TL074H")
-        (field (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses <3-5mm from V+/V-")
+        (field (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses within 3-5mm of V+/V-")
       </fields>
       <libsource lib="Amplifier_Operational" part=""TL074""/>
     </comp>
@@ -41,7 +41,7 @@
         (field (name "Manufacturer") "Changjing Elec")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Silkscreen") "D_PWR_P B5819W")
-        (field (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> +12V_PROT); Alt SOD-323: 1N5819WS (C191023)")
+        (field (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to +12V_PROT); Alt SOD-323: 1N5819WS (C191023)")
       </fields>
       <libsource lib="Device" part=""D_Schottky""/>
     </comp>
@@ -54,7 +54,7 @@
         (field (name "Manufacturer") "Changjing Elec")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Silkscreen") "D_PWR_N B5819W")
-        (field (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> -12V_IN, reversed vs D_PWR_P); Alt SOD-323: C191023")
+        (field (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to -12V_IN, reversed vs D_PWR_P); Alt SOD-323: C191023")
       </fields>
       <libsource lib="Device" part=""D_Schottky""/>
     </comp>
@@ -80,7 +80,7 @@
         (field (name "Manufacturer") "Changjing Elec")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Silkscreen") "D3 1N4148WS")
-        (field (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> ATK_IN); Alt SOD-123: 1N4148W (C81598)")
+        (field (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to ATK_IN); Alt SOD-123: 1N4148W (C81598)")
       </fields>
       <libsource lib="Diode" part=""1N4148WS""/>
     </comp>
@@ -93,7 +93,7 @@
         (field (name "Manufacturer") "Changjing Elec")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Silkscreen") "D_LED_CLAMP 1N4148WS")
-        (field (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> U2B_OUT, anti-parallel across D4); Alt SOD-123: C81598")
+        (field (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to U2B_OUT, anti-parallel across D4); Alt SOD-123: C81598")
       </fields>
       <libsource lib="Diode" part=""1N4148WS""/>
     </comp>
@@ -535,7 +535,7 @@
         (field (name "Manufacturer") "YAGEO")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Silkscreen") "100nF")
-        (field (name "Notes") "F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins")
+        (field (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
       </fields>
       <libsource lib="Device" part=""C""/>
     </comp>
@@ -548,7 +548,7 @@
         (field (name "Manufacturer") "YAGEO")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Silkscreen") "100nF")
-        (field (name "Notes") "F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins")
+        (field (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
       </fields>
       <libsource lib="Device" part=""C""/>
     </comp>
@@ -561,7 +561,7 @@
         (field (name "Manufacturer") "YAGEO")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Silkscreen") "100nF")
-        (field (name "Notes") "F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins")
+        (field (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
       </fields>
       <libsource lib="Device" part=""C""/>
     </comp>
@@ -574,7 +574,7 @@
         (field (name "Manufacturer") "YAGEO")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Silkscreen") "100nF")
-        (field (name "Notes") "F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins")
+        (field (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
       </fields>
       <libsource lib="Device" part=""C""/>
     </comp>
@@ -703,7 +703,7 @@
         (field (name "Manufacturer") "QingPu")
         (field (name "JLCPCB_Class") "Consigned THT")
         (field (name "Silkscreen") "J1 IN")
-        (field (name "Notes") "F.Cu panel THT; J1.TN -> GND (mandatory); dual-sided silkscreen; Alt LCSC: C56407602")
+        (field (name "Notes") "F.Cu panel THT; J1.TN to GND (mandatory); dual-sided silkscreen; Alt LCSC: C56407602")
       </fields>
       <libsource lib="Connector_Audio" part=""AudioJack2_SwitchT""/>
     </comp>
@@ -963,7 +963,6 @@
       <node ref="U1" pin="5"/>
       <node ref="C2" pin="2"/>
       <node ref="J2" pin="S"/>
-      <node ref="U1" pin="3"/>
       <node ref="TP1" pin="1"/>
       <node ref="C_DEC4" pin="2"/>
       <node ref="R_LED" pin="2"/>
@@ -975,6 +974,7 @@
       <node ref="C4" pin="1"/>
       <node ref="U2" pin="3"/>
       <node ref="J4" pin="5"/>
+      <node ref="U1" pin="3"/>
       <node ref="RV3" pin="2"/>
       <node ref="U1" pin="10"/>
       <node ref="J4" pin="6"/>
@@ -1069,8 +1069,8 @@
       <node ref="D3" pin="2"/>
     </net>
     <net code="23" name="ATK_IN">
-      <node ref="U2" pin="9"/>
       <node ref="D3" pin="1"/>
+      <node ref="U2" pin="9"/>
       <node ref="R_ATK_MIN" pin="1"/>
     </net>
     <net code="24" name="ATK_POT_1">
@@ -1120,8 +1120,8 @@
       <node ref="R15" pin="2"/>
       <node ref="R16B" pin="1"/>
       <node ref="R17" pin="1"/>
-      <node ref="D_OUT" pin="3"/>
       <node ref="TP7" pin="1"/>
+      <node ref="D_OUT" pin="3"/>
       <node ref="R16A" pin="2"/>
     </net>
     <net code="34" name="OUT_TIP">

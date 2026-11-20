@@ -283,7 +283,7 @@ def build_circuit() -> None:
         manufacturer="Texas Instruments",
         jlc_class="Extended",
         silkscreen="U1 TL074H",
-        notes="F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses <3-5mm from V+/V-",
+        notes="F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses within 3-5mm of V+/V-",
     )
 
     u2 = Part(
@@ -301,7 +301,7 @@ def build_circuit() -> None:
         manufacturer="Texas Instruments",
         jlc_class="Extended",
         silkscreen="U2 TL074H",
-        notes="F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses <3-5mm from V+/V-",
+        notes="F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses within 3-5mm of V+/V-",
     )
 
     # --- SMT Diodes (8) ---
@@ -321,7 +321,7 @@ def build_circuit() -> None:
         manufacturer="Changjing Elec",
         jlc_class="Basic",
         silkscreen="D_PWR_P B5819W",
-        notes="F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> +12V_PROT); Alt SOD-323: 1N5819WS (C191023)",
+        notes="F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to +12V_PROT); Alt SOD-323: 1N5819WS (C191023)",
     )
 
     d_pwr_n = Part(
@@ -339,7 +339,7 @@ def build_circuit() -> None:
         manufacturer="Changjing Elec",
         jlc_class="Basic",
         silkscreen="D_PWR_N B5819W",
-        notes="F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> -12V_IN, reversed vs D_PWR_P); Alt SOD-323: C191023",
+        notes="F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to -12V_IN, reversed vs D_PWR_P); Alt SOD-323: C191023",
     )
 
     # BAT54S SOT-23: Pin 1 = A1, Pin 2 = K2, Pin 3 = COM (K1/A2)
@@ -376,7 +376,7 @@ def build_circuit() -> None:
         manufacturer="Changjing Elec",
         jlc_class="Basic",
         silkscreen="D3 1N4148WS",
-        notes="F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> ATK_IN); Alt SOD-123: 1N4148W (C81598)",
+        notes="F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to ATK_IN); Alt SOD-123: 1N4148W (C81598)",
     )
 
     d_led_clamp = Part(
@@ -394,7 +394,7 @@ def build_circuit() -> None:
         manufacturer="Changjing Elec",
         jlc_class="Basic",
         silkscreen="D_LED_CLAMP 1N4148WS",
-        notes="F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> U2B_OUT, anti-parallel across D4); Alt SOD-123: C81598",
+        notes="F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to U2B_OUT, anti-parallel across D4); Alt SOD-123: C81598",
     )
 
     # KiCad Diode:BAV99 physical SOT-23 pinout: Pin 1 = A1, Pin 2 = K2, Pin 3 = COM
@@ -545,7 +545,7 @@ def build_circuit() -> None:
             manufacturer="YAGEO",
             jlc_class="Basic",
             silkscreen="100nF",
-            notes="F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins",
+            notes="F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins",
         )
         c_decs.append(cap)
     c_dec1, c_dec2, c_dec3, c_dec4 = c_decs
@@ -700,7 +700,7 @@ def build_circuit() -> None:
         manufacturer="QingPu",
         jlc_class="Consigned THT",
         silkscreen="J1 IN",
-        notes="F.Cu panel THT; J1.TN -> GND (mandatory); dual-sided silkscreen; Alt LCSC: C56407602",
+        notes="F.Cu panel THT; J1.TN to GND (mandatory); dual-sided silkscreen; Alt LCSC: C56407602",
     )
 
     j2 = jack_t(ref="J2", value="WQP-PJ398SM", tag="j2")

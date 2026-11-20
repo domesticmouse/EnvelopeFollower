@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "envelope_follower.py")
-    (date "11/20/2026 10:12 PM")
+    (date "11/20/2026 10:13 PM")
     (tool "SKiDL (3.0.0)")
     (sheet
       (number 1)
@@ -203,7 +203,7 @@
         (field
           (name "Silkscreen") "100nF")
         (field
-          (name "Notes") "F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins")
+          (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -239,7 +239,7 @@
         (field
           (name "Silkscreen") "100nF")
         (field
-          (name "Notes") "F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins")
+          (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -275,7 +275,7 @@
         (field
           (name "Silkscreen") "100nF")
         (field
-          (name "Notes") "F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins")
+          (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -311,7 +311,7 @@
         (field
           (name "Silkscreen") "100nF")
         (field
-          (name "Notes") "F.Cu SMT; local V+/V- decoupling <3-5mm from U1/U2 supply pins")
+          (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -491,7 +491,7 @@
         (field
           (name "Silkscreen") "D3 1N4148WS")
         (field
-          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> ATK_IN); Alt SOD-123: 1N4148W (C81598)")
+          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to ATK_IN); Alt SOD-123: 1N4148W (C81598)")
         (field
           (name "Description") "75V 0.15A Fast switching Diode, SOD-323")
         (field
@@ -635,7 +635,7 @@
         (field
           (name "Silkscreen") "D_LED_CLAMP 1N4148WS")
         (field
-          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> U2B_OUT, anti-parallel across D4); Alt SOD-123: C81598")
+          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to U2B_OUT, anti-parallel across D4); Alt SOD-123: C81598")
         (field
           (name "Description") "75V 0.15A Fast switching Diode, SOD-323")
         (field
@@ -707,7 +707,7 @@
         (field
           (name "Silkscreen") "D_PWR_N B5819W")
         (field
-          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> -12V_IN, reversed vs D_PWR_P); Alt SOD-323: C191023")
+          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to -12V_IN, reversed vs D_PWR_P); Alt SOD-323: C191023")
         (field
           (name "Description") "Schottky diode")
         (field
@@ -743,7 +743,7 @@
         (field
           (name "Silkscreen") "D_PWR_P B5819W")
         (field
-          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K -> +12V_PROT); Alt SOD-323: 1N5819WS (C191023)")
+          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to +12V_PROT); Alt SOD-323: 1N5819WS (C191023)")
         (field
           (name "Description") "Schottky diode")
         (field
@@ -873,7 +873,7 @@
         (field
           (name "Silkscreen") "J1 IN")
         (field
-          (name "Notes") "F.Cu panel THT; J1.TN -> GND (mandatory); dual-sided silkscreen; Alt LCSC: C56407602")
+          (name "Notes") "F.Cu panel THT; J1.TN to GND (mandatory); dual-sided silkscreen; Alt LCSC: C56407602")
         (field
           (name "Description") "Audio Jack, 2 Poles (Mono / TS), Switched T Pole (Normalling)")
         (field
@@ -2549,7 +2549,7 @@
         (field
           (name "Silkscreen") "U1 TL074H")
         (field
-          (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses <3-5mm from V+/V-")
+          (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses within 3-5mm of V+/V-")
         (field
           (name "Description") "Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14")
         (field
@@ -2585,7 +2585,7 @@
         (field
           (name "Silkscreen") "U2 TL074H")
         (field
-          (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses <3-5mm from V+/V-")
+          (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses within 3-5mm of V+/V-")
         (field
           (name "Description") "Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14")
         (field
