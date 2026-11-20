@@ -47,7 +47,6 @@ from silk_annotator import (
     add_silk_rect,
     add_silk_seg,
     add_silk_text,
-    add_standard_fab_notes,
     box_edge_distance,
     footprint_bbox,
     inspect_board_silk,
@@ -60,7 +59,7 @@ BOARD_H = 108.00
 POWER_NETS = {"+12V", "-12V", "+12V_IN", "-12V_IN", "+12V_PROT", "-12V_PROT"}
 
 
-QR_RECT = (12.50, 8.20, 17.50, 13.20)
+QR_RECT = (12.50, 7.80, 17.50, 12.80)
 
 
 def build_placements() -> dict[str, tuple[float, float, float, bool]]:
@@ -83,20 +82,20 @@ def build_placements() -> dict[str, tuple[float, float, float, bool]]:
         # --- 11 Rear THT on B.Cu ---
         "J4": (
             13.73,
-            100.20,
+            99.30,
             0.0,
             True,
         ),  # vertical 2x5 shrouded IDC, centered at X=15.00
         "C1": (3.50, 54.50, 0.0, True),
         "C2": (13.60, 52.50, 270.0, True),
         "TP1": (27.30, 105.20, 0.0, True),  # GND
-        "TP2": (13.40, 35.20, 0.0, True),  # +12V
-        "TP3": (12.10, 31.90, 0.0, True),  # -12V
+        "TP2": (12.90, 35.20, 0.0, True),  # +12V
+        "TP3": (12.60, 31.90, 0.0, True),  # -12V
         "TP4": (27.60, 6.20, 0.0, True),  # IN_BUF
         "TP5": (15.00, 4.20, 0.0, True),  # PREAMP_OUT
         "TP6": (27.60, 33.80, 0.0, True),  # RECT_OUT
-        "TP7": (12.20, 75.80, 0.0, True),  # OUT_CLAMP
-        "TP8": (15.00, 82.65, 0.0, True),  # INV_OUT_CLAMP
+        "TP7": (12.20, 75.50, 0.0, True),  # OUT_CLAMP
+        "TP8": (15.00, 80.80, 0.0, True),  # INV_OUT_CLAMP
         # --- 49 SMT parts strictly on B.Cu ---
         # Corridor A (Y = 0.45..7.50)
         "R_GAIN_MIN": (6.80, 2.10, 0.0, True),
@@ -137,14 +136,14 @@ def build_placements() -> dict[str, tuple[float, float, float, bool]]:
         "R_IN_BUF": (10.60, 69.20, 0.0, True),
         "R_IN_PROT": (3.40, 68.50, 90.0, True),
         "R_LED": (27.30, 71.20, 90.0, True),
-        "D_LED_CLAMP": (14.60, 71.60, 90.0, True),
-        "D_OUT": (22.20, 71.00, 90.0, True),
+        "D_LED_CLAMP": (14.60, 71.25, 90.0, True),
+        "D_OUT": (22.20, 70.85, 90.0, True),
         "R16A": (3.00, 75.20, 0.0, True),
         "R16B": (7.80, 75.20, 0.0, True),
-        "R19A": (17.20, 75.40, 0.0, True),
-        "R19B": (22.20, 75.60, 0.0, True),
+        "R19A": (17.20, 75.15, 0.0, True),
+        "R19B": (22.20, 75.15, 0.0, True),
         # Lower Board Power Block & Output Clamp (Y = 78.50..107.00)
-        "D_INV_OUT": (15.80, 79.00, 0.0, True),
+        "D_INV_OUT": (10.80, 79.30, 0.0, True),
         "R_PWR_N": (3.20, 84.00, 90.0, True),
         "D_PWR_N": (2.40, 89.60, 90.0, True),
         "C4": (4.40, 99.80, 270.0, True),
@@ -231,18 +230,112 @@ def check_geometry(fps: dict[str, pcbnew.FOOTPRINT]) -> None:
                 )
 
 
-def _reserve_circle(grid: SilkGrid, side: int, cx: float, cy: float, r: float) -> None:
-    pad = r + 0.20
-    grid.keepout[side].append((cx - pad, cy - pad, cx + pad, cy + pad))
-
-
-def _reserve_seg(
-    grid: SilkGrid, side: int, x0: float, y0: float, x1: float, y1: float, w: float
-) -> None:
-    pad = w * 0.5 + 0.20
-    grid.keepout[side].append(
-        (min(x0, x1) - pad, min(y0, y1) - pad, max(x0, x1) + pad, max(y0, y1) + pad)
+def _place_silk_dot_checked(
+    grid: SilkGrid,
+    board: pcbnew.BOARD,
+    side: int,
+    candidates: list[tuple[float, float]],
+    *,
+    radius: float = 0.22,
+    width: float = 0.15,
+) -> tuple[float, float]:
+    """Place a filled silkscreen dot at the first clear candidate and reserve keepout."""
+    layer_id = pcbnew.B_SilkS if side == 1 else pcbnew.F_SilkS
+    r_eff = radius + width * 0.5
+    for cx, cy in candidates:
+        box = (cx - r_eff, cy - r_eff, cx + r_eff, cy + r_eff)
+        if grid.box_ok(side, *box):
+            add_silk_dot(board, layer_id, cx, cy, radius=radius)
+            grid.keepout[side].append(
+                (box[0] - 0.20, box[1] - 0.20, box[2] + 0.20, box[3] + 0.20)
+            )
+            grid.reserve(side, *box)
+            return (cx, cy)
+    raise RuntimeError(
+        f"Failed to place silkscreen dot on side={side} among {candidates}"
     )
+
+
+def _place_silk_seg_checked(
+    grid: SilkGrid,
+    board: pcbnew.BOARD,
+    side: int,
+    candidates: list[tuple[float, float, float, float]],
+    *,
+    width: float = 0.25,
+) -> tuple[float, float, float, float]:
+    """Place a silkscreen segment at the first clear candidate and reserve keepout."""
+    layer_id = pcbnew.B_SilkS if side == 1 else pcbnew.F_SilkS
+    hw = width * 0.5
+    for x0, y0, x1, y1 in candidates:
+        box = (
+            min(x0, x1) - hw,
+            min(y0, y1) - hw,
+            max(x0, x1) + hw,
+            max(y0, y1) + hw,
+        )
+        if grid.box_ok(side, *box):
+            add_silk_seg(board, layer_id, x0, y0, x1, y1, width=width)
+            grid.keepout[side].append(
+                (box[0] - 0.20, box[1] - 0.20, box[2] + 0.20, box[3] + 0.20)
+            )
+            grid.reserve(side, *box)
+            return (x0, y0, x1, y1)
+    raise RuntimeError(
+        f"Failed to place silkscreen segment on side={side} among {candidates}"
+    )
+
+
+def _block_tht_fab_bodies(
+    grid: SilkGrid,
+    fps: dict[str, pcbnew.FOOTPRINT],
+    refs: tuple[str, ...],
+    margin: float = 0.08,
+) -> None:
+    """Reserve THT component .Fab body outlines so labels stay visible outside housings."""
+    for ref in refs:
+        fp = fps[ref]
+        side = 1 if fp.IsFlipped() else 0
+        fab_layer = pcbnew.B_Fab if side == 1 else pcbnew.F_Fab
+        xs, ys = [], []
+        for gi in fp.GraphicalItems():
+            if not hasattr(gi, "GetText") and gi.GetLayer() == fab_layer:
+                bb = gi.GetBoundingBox()
+                xs.extend((pcbnew.ToMM(bb.GetLeft()), pcbnew.ToMM(bb.GetRight())))
+                ys.extend((pcbnew.ToMM(bb.GetTop()), pcbnew.ToMM(bb.GetBottom())))
+        if xs and ys:
+            grid.keepout[side].append(
+                (
+                    min(xs) - margin,
+                    min(ys) - margin,
+                    max(xs) + margin,
+                    max(ys) + margin,
+                )
+            )
+
+
+def _add_bounded_fab_notes(board: pcbnew.BOARD, cx: float, y_start: float) -> None:
+    """Place complete B.Fab notes wrapped strictly inside the 30.0 mm board width."""
+    lines = [
+        "FAB: 2L FR4 | THICKNESS: 1.6mm",
+        "1oz CU | FINISH: ENIG / HASL-LF",
+        "IPC-6012 CLASS 2 | NO EDGE CUT",
+        "SOLDER MASK: BLACK | SILK: WHITE",
+        "MIN TR/SP: 0.127mm",
+        "DRILL TOL: +/-0.08mm",
+    ]
+    for idx, line in enumerate(lines):
+        add_silk_text(
+            board,
+            pcbnew.B_Fab,
+            line,
+            cx,
+            y_start + idx * 1.9,
+            0.0,
+            0.70,
+            0.12,
+            True,
+        )
 
 
 def _place_single_silk_text(
@@ -301,12 +394,20 @@ def apply_silkscreen_and_fab(
 ) -> None:
     """Apply all SilkscreenInstructions.md labels, dual-sided echoes, polarity marks, QR & fab notes."""
     for fp in fps.values():
+        fab_lyr = pcbnew.B_Fab if fp.IsFlipped() else pcbnew.F_Fab
+        fp.Reference().SetLayer(fab_lyr)
         fp.Reference().SetVisible(False)
+        fp.Value().SetLayer(fab_lyr)
         fp.Value().SetVisible(False)
 
     grid = SilkGrid(board, fps, board_bounds=(0.0, 0.0, BOARD_W, BOARD_H))
 
-    # 1. Reserve 5.0 x 5.0 mm JLCPCB QR code placeholder on B.SilkS (via-free & pad-free region)
+    # Reserve THT housing .Fab bodies so component labels remain legible after assembly
+    _block_tht_fab_bodies(
+        grid, fps, ("RV1", "RV2", "RV3", "RV4", "J1", "J2", "J3", "D4", "J4")
+    )
+
+    # 1. Reserve 5.0 x 5.0 mm JLCPCB QR code placeholder on B.SilkS (via-free & >=0.25mm mask-clear)
     qr_x0, qr_y0, qr_x1, qr_y1 = QR_RECT
     add_silk_rect(
         board, pcbnew.B_SilkS, qr_x0, qr_y0, qr_x1, qr_y1, filled=True, width=0.15
@@ -317,26 +418,24 @@ def apply_silkscreen_and_fab(
     for ic_ref in ("U1", "U2"):
         fp = fps[ic_ref]
         ic_side = 1 if fp.IsFlipped() else 0
-        ic_silk = pcbnew.B_SilkS if ic_side == 1 else pcbnew.F_SilkS
         p1 = next(p for p in fp.Pads() if p.GetNumber() == "1").GetPosition()
         p2 = next(p for p in fp.Pads() if p.GetNumber() == "2").GetPosition()
         fpos = fp.GetPosition()
         px, py = pcbnew.ToMM(p1.x), pcbnew.ToMM(p1.y)
         fx, fy = pcbnew.ToMM(fpos.x), pcbnew.ToMM(fpos.y)
         if abs(pcbnew.ToMM(p1.y) - pcbnew.ToMM(p2.y)) < 0.1:
-            dx = 0.75 if px > fx else -0.75
-            dy = 1.55 if py > fy else -1.55
+            sx = 1.0 if px > fx else -1.0
+            sy = 1.0 if py > fy else -1.0
+            cands = [(px + sx * 0.75, py + sy * 1.55), (px + sx * 1.45, py + sy * 1.45)]
         else:
-            dx = 1.65 if px > fx else -1.65
-            dy = 0.50 if py > fy else -0.50
-        dot_x, dot_y = px + dx, py + dy
-        add_silk_dot(board, ic_silk, dot_x, dot_y, radius=0.25)
-        _reserve_circle(grid, ic_side, dot_x, dot_y, 0.25)
+            sx = 1.0 if px > fx else -1.0
+            sy = 1.0 if py > fy else -1.0
+            cands = [(px + sx * 1.65, py + sy * 0.50), (px + sx * 1.55, py + sy * 1.25)]
+        _place_silk_dot_checked(grid, board, ic_side, cands, radius=0.25)
 
     for d_ref in ("D_PWR_P", "D_PWR_N", "D3", "D_LED_CLAMP"):
         fp = fps[d_ref]
         d_side = 1 if fp.IsFlipped() else 0
-        d_silk = pcbnew.B_SilkS if d_side == 1 else pcbnew.F_SilkS
         p1 = next(p for p in fp.Pads() if p.GetNumber() == "1").GetPosition()
         p2 = next(p for p in fp.Pads() if p.GetNumber() == "2").GetPosition()
         x1, y1 = pcbnew.ToMM(p1.x), pcbnew.ToMM(p1.y)
@@ -345,39 +444,80 @@ def apply_silkscreen_and_fab(
         vlen = math.hypot(vx, vy) or 1.0
         ux, uy = vx / vlen, vy / vlen
         nx, ny = -uy, ux
-        offset = 1.20 if "SOD-123" in components[d_ref]["footprint"] else 1.05
+        base_off = 1.20 if "SOD-123" in components[d_ref]["footprint"] else 1.05
         half_len = 0.85 if "SOD-123" in components[d_ref]["footprint"] else 0.60
-        bx, by = x1 + ux * offset, y1 + uy * offset
-        sx0, sy0 = bx - nx * half_len, by - ny * half_len
-        sx1, sy1 = bx + nx * half_len, by + ny * half_len
-        add_silk_seg(board, d_silk, sx0, sy0, sx1, sy1, width=0.25)
-        _reserve_seg(grid, d_side, sx0, sy0, sx1, sy1, 0.25)
+        cands = []
+        for off in (base_off, base_off + 0.15, base_off + 0.30):
+            bx, by = x1 + ux * off, y1 + uy * off
+            cands.append(
+                (
+                    bx - nx * half_len,
+                    by - ny * half_len,
+                    bx + nx * half_len,
+                    by + ny * half_len,
+                )
+            )
+        _place_silk_seg_checked(grid, board, d_side, cands, width=0.25)
 
     for s_ref in ("D1_D2", "D_IN", "D_OUT", "D_INV_OUT"):
         fp = fps[s_ref]
         s_side = 1 if fp.IsFlipped() else 0
-        s_silk = pcbnew.B_SilkS if s_side == 1 else pcbnew.F_SilkS
         p1 = next(p for p in fp.Pads() if p.GetNumber() == "1").GetPosition()
+        p2 = next(p for p in fp.Pads() if p.GetNumber() == "2").GetPosition()
         p3 = next(p for p in fp.Pads() if p.GetNumber() == "3").GetPosition()
         x1, y1 = pcbnew.ToMM(p1.x), pcbnew.ToMM(p1.y)
+        x2, y2 = pcbnew.ToMM(p2.x), pcbnew.ToMM(p2.y)
         x3, y3 = pcbnew.ToMM(p3.x), pcbnew.ToMM(p3.y)
+        # Outward unit vectors: u = away from Pad 3 (pin side), v = away from Pad 2 (edge side)
         ux, uy = x1 - x3, y1 - y3
         ul = math.hypot(ux, uy) or 1.0
+        ux, uy = ux / ul, uy / ul
+        vx, vy = x1 - x2, y1 - y2
+        vl = math.hypot(vx, vy) or 1.0
+        vx, vy = vx / vl, vy / vl
         if abs(ux) > abs(uy):
-            dot_x = x1 + (-1.22 if ux < 0 else 1.22)
-            dot_y = y1 + (-0.23 if y1 > y3 else 0.23)
+            sx = -1.0 if ux < 0 else 1.0
+            sy = -1.0 if vy < 0 else 1.0
+            cands = [
+                (x1 + sx * 1.38, y1),
+                (x1 + sx * 1.45, y1 + sy * 0.25),
+                (x1 + sx * 1.45, y1 - sy * 0.20),
+                (x1 + sx * 1.30, y1 + sy * 0.50),
+                (x1, y1 + sy * 1.25),
+                (x1 - sx * 0.25, y1 + sy * 1.25),
+            ]
         else:
-            dot_x, dot_y = x1 + (ux / ul) * 1.35, y1 + (uy / ul) * 1.35
-        add_silk_dot(board, s_silk, dot_x, dot_y, radius=0.22)
-        _reserve_circle(grid, s_side, dot_x, dot_y, 0.22)
+            sx = -1.0 if vx < 0 else 1.0
+            sy = -1.0 if uy < 0 else 1.0
+            cands = [
+                (x1, y1 + sy * 1.38),
+                (x1 + sx * 0.25, y1 + sy * 1.45),
+                (x1 - sx * 0.20, y1 + sy * 1.45),
+                (x1 + sx * 0.50, y1 + sy * 1.30),
+                (x1 + sx * 1.25, y1),
+                (x1 + sx * 1.25, y1 - sy * 0.25),
+            ]
+        _place_silk_dot_checked(grid, board, s_side, cands, radius=0.22)
 
-    j4_p1 = next(p for p in fps["J4"].Pads() if p.GetNumber() == "1").GetPosition()
+    # J4 horizontal RED STRIPE / -12V bar along Pins 1-2 bottom edge (0.85 mm wide, clear of Pin-1 triangle & shroud)
+    j4_fp = fps["J4"]
+    j4_p1 = next(p for p in j4_fp.Pads() if p.GetNumber() == "1").GetPosition()
     p1x, p1y = pcbnew.ToMM(j4_p1.x), pcbnew.ToMM(j4_p1.y)
-    bar_x0, bar_y0, bar_x1, bar_y1 = 8.30, 97.20, 8.75, 103.20
+    j4_fab_xs, j4_fab_ys = [], []
+    for gi in j4_fp.GraphicalItems():
+        if not hasattr(gi, "GetText") and gi.GetLayer() == pcbnew.B_Fab:
+            bb = gi.GetBoundingBox()
+            j4_fab_xs.extend((pcbnew.ToMM(bb.GetLeft()), pcbnew.ToMM(bb.GetRight())))
+            j4_fab_ys.extend((pcbnew.ToMM(bb.GetTop()), pcbnew.ToMM(bb.GetBottom())))
+    bar_x0 = min(j4_fab_xs)
+    bar_x1 = max(j4_fab_xs)
+    bar_y0 = max(j4_fab_ys) + 0.35  # 0.23+ mm clear of J4 bottom B.SilkS edge
+    bar_y1 = bar_y0 + 0.85
     add_silk_rect(
         board, pcbnew.B_SilkS, bar_x0, bar_y0, bar_x1, bar_y1, filled=True, width=0.15
     )
-    grid.keepout[1].append((bar_x0 - 0.25, bar_y0 - 0.25, bar_x1 + 0.25, bar_y1 + 0.25))
+    grid.keepout[1].append((bar_x0 - 0.20, bar_y0 - 0.20, bar_x1 + 0.20, bar_y1 + 0.20))
+    grid.reserve(1, bar_x0 - 0.08, bar_y0 - 0.08, bar_x1 + 0.08, bar_y1 + 0.08)
 
     # Reserve C1/C2 3D capacitor body areas on B.SilkS so their '1uF' values sit cleanly outside the body
     for film_ref in ("C1", "C2"):
@@ -387,18 +527,58 @@ def apply_silkscreen_and_fab(
                 (fb[0] - 0.15, fb[1] - 0.15, fb[2] + 0.15, fb[3] + 0.15)
             )
 
-    # 3. Board ID & J4 rail callouts first so fixed corridors stay legible, then components
+    # 3. Board ID (B.SilkS + open F.SilkS corner) & J4 rail callouts
+    j4_mid_y = p1y - 5.08
+    j4_top_y = p1y - 10.16
     for side, text, anchor, lim in (
-        (1, "ENVELOPE FOLLOWER", (15.0, 18.2), 6.0),
-        (1, "6HP +/-12V REV1.0", (15.0, 20.0), 6.0),
-        (1, "RED -12V", (15.0, 106.6), 5.0),
-        (1, "GND", (21.0, 94.8), 6.0),
-        (1, "+12V", (21.4, 87.5), 5.0),
-        (0, "-12V", (p1x - 1.5, p1y), 6.0),
+        # B.SilkS board title block
+        (1, "ENVELOPE FOLLOWER", (15.0, 18.55), 6.0),
+        (1, "6HP ±12V EURORACK", (15.0, 20.30), 6.0),
+        (1, "REV 1.0", (23.0, 11.2), 6.0),
+        # F.SilkS open top-left corner title echo
+        (0, "ENVELOPE FOLLOWER", (7.2, 2.0), 4.0),
+        (0, "6HP ±12V EURORACK", (7.2, 3.8), 4.0),
+        (0, "REV 1.0", (7.2, 5.6), 4.0),
+        # J4 rail polarity & callouts
+        (1, "RED STRIPE / -12V", (15.0, bar_y1 + 0.95), 4.0),
+        (1, "GND", (21.2, j4_mid_y), 6.0),
+        (1, "+12V", (21.4, j4_top_y), 5.0),
+        (0, "-12V Pin 1", (p1x - 3.5, p1y), 6.0),
     ):
-        res = _place_single_silk_text(grid, board, side, text, anchor, max_tether=lim)
+        res = _place_single_silk_text(
+            grid, board, side, text, anchor, max_tether=lim, step=0.15
+        )
         if res is None:
             raise RuntimeError(f"Board text {text!r} failed on side={side}")
+
+    # Place RV1-RV4 Pin "1" markers tightly beside Pad 1 BEFORE dense passive labels fill corridors
+    for rv_ref in ("RV1", "RV2", "RV3", "RV4"):
+        fp = fps[rv_ref]
+        pads = {p.GetNumber(): p.GetPosition() for p in fp.Pads()}
+        p1x_rv, p1y_rv = pcbnew.ToMM(pads["1"].x), pcbnew.ToMM(pads["1"].y)
+        p2x_rv, p2y_rv = pcbnew.ToMM(pads["2"].x), pcbnew.ToMM(pads["2"].y)
+        p1_box = (p1x_rv - 0.90, p1y_rv - 0.90, p1x_rv + 0.90, p1y_rv + 0.90)
+        for side in (0, 1):
+            res = _place_single_silk_text(
+                grid,
+                fp,
+                side,
+                "1",
+                (p1x_rv, p1y_rv),
+                p1_box,
+                max_tether=1.10,
+                step=0.10,
+            )
+            if res is None:
+                raise RuntimeError(f"Failed Pin '1' mark on {rv_ref} side={side}")
+            rx, ry, _ = res
+            d1 = math.hypot(rx - p1x_rv, ry - p1y_rv)
+            d2 = math.hypot(rx - p2x_rv, ry - p2y_rv)
+            if d1 > 2.0 or d1 >= d2:
+                raise RuntimeError(
+                    f"{rv_ref} side={side} '1'@({rx:.2f},{ry:.2f}) too far from Pad 1 "
+                    f"(d1={d1:.2f}, d2={d2:.2f})"
+                )
 
     # Primary silkscreen labels: priority actives/interfaces -> panel THT echoes -> SMDs -> film caps
     priority = [
@@ -407,8 +587,11 @@ def apply_silkscreen_and_fab(
         "D_PWR_N",
         "D_PWR_P",
         "D_LED_CLAMP",
-        "D_INV_OUT",
         "D_OUT",
+        "TP8",
+        "R19B",
+        "R19A",
+        "D_INV_OUT",
         "D_IN",
         "D1_D2",
         "D3",
@@ -420,7 +603,6 @@ def apply_silkscreen_and_fab(
         "TP5",
         "TP6",
         "TP7",
-        "TP8",
         "D4",
         "J1",
         "J2",
@@ -463,12 +645,37 @@ def apply_silkscreen_and_fab(
                 )
             if ref.startswith("TP"):
                 pos = fp.GetPosition()
+                tx_tp, ty_tp = pcbnew.ToMM(pos.x), pcbnew.ToMM(pos.y)
+                # Keep TP1 ${REFERENCE} inside Edge.Cuts and add "DNP" on B.Fab for all TP1-TP8
+                for gi in fp.GraphicalItems():
+                    if (
+                        hasattr(gi, "GetText")
+                        and gi.GetText() == "${REFERENCE}"
+                        and gi.GetLayer() == pcbnew.B_Fab
+                        and ref == "TP1"
+                    ):
+                        gi.SetPosition(
+                            pcbnew.VECTOR2I(
+                                pcbnew.FromMM(tx_tp), pcbnew.FromMM(ty_tp - 1.9)
+                            )
+                        )
+                add_silk_text(
+                    fp,
+                    pcbnew.B_Fab,
+                    "DNP",
+                    tx_tp,
+                    ty_tp + (1.7 if ref != "TP1" else 1.55),
+                    0.0,
+                    0.50,
+                    0.08,
+                    True,
+                )
                 echo_res = _place_single_silk_text(
                     grid,
                     fp,
                     0,
                     silk or comp["value"],
-                    (pcbnew.ToMM(pos.x), pcbnew.ToMM(pos.y)),
+                    (tx_tp, ty_tp),
                     footprint_bbox(fp),
                     max_tether=MAX_THT_TETHER_MM,
                 )
@@ -502,7 +709,7 @@ def apply_silkscreen_and_fab(
                 )
             done_echoes.add(ref)
 
-    # 4. Polarity symbols checked cleanly against SilkGrid
+    # 4. Electrolytic '+' and D4 '+'/'-' polarity symbols checked cleanly against SilkGrid
     for cap_ref in ("C3", "C4"):
         fp = fps[cap_ref]
         cap_side = 1 if fp.IsFlipped() else 0
@@ -524,35 +731,36 @@ def apply_silkscreen_and_fab(
         if res is None:
             raise RuntimeError(f"Failed '+' mark on {cap_ref}")
 
+    d4_fp = fps["D4"]
+    d4_p1 = next(p for p in d4_fp.Pads() if p.GetNumber() == "1").GetPosition()
+    d4_p2 = next(p for p in d4_fp.Pads() if p.GetNumber() == "2").GetPosition()
+    d4_p1x, d4_p1y = pcbnew.ToMM(d4_p1.x), pcbnew.ToMM(d4_p1.y)
+    d4_p2x, d4_p2y = pcbnew.ToMM(d4_p2.x), pcbnew.ToMM(d4_p2.y)
+    d4_k_box = (d4_p1x - 0.85, d4_p1y - 0.85, d4_p1x + 0.85, d4_p1y + 0.85)
+    d4_a_box = (d4_p2x - 0.85, d4_p2y - 0.85, d4_p2x + 0.85, d4_p2y + 0.85)
     for side in (0, 1):
-        fp = fps["D4"]
-        p1 = next(p for p in fp.Pads() if p.GetNumber() == "1").GetPosition()
-        p2 = next(p for p in fp.Pads() if p.GetNumber() == "2").GetPosition()
-        _place_single_silk_text(
+        res_k = _place_single_silk_text(
             grid,
-            fp,
+            d4_fp,
             side,
             "-",
-            (pcbnew.ToMM(p1.x), pcbnew.ToMM(p1.y) - 1.8),
-            footprint_bbox(fp),
+            (d4_p1x, d4_p1y + 1.8),
+            d4_k_box,
+            max_tether=1.8,
+            step=0.20,
         )
-        _place_single_silk_text(
+        res_a = _place_single_silk_text(
             grid,
-            fp,
+            d4_fp,
             side,
             "+",
-            (pcbnew.ToMM(p2.x), pcbnew.ToMM(p2.y) - 1.8),
-            footprint_bbox(fp),
+            (d4_p2x, d4_p2y + 1.8),
+            d4_a_box,
+            max_tether=1.8,
+            step=0.20,
         )
-
-    for rv_ref in ("RV1", "RV2", "RV3", "RV4"):
-        fp = fps[rv_ref]
-        p1 = next(p for p in fp.Pads() if p.GetNumber() == "1").GetPosition()
-        px, py = pcbnew.ToMM(p1.x), pcbnew.ToMM(p1.y)
-        for side in (0, 1):
-            _place_single_silk_text(
-                grid, fp, side, "1", (px - 1.4, py + 1.4), footprint_bbox(fp)
-            )
+        if res_k is None or res_a is None:
+            raise RuntimeError(f"Failed D4 +/- marks on side={side}")
 
     # 5. Dual-sided THT echoes (remaining front-panel pots first, then rear THT)
     for ref, fp in sorted(
@@ -567,18 +775,13 @@ def apply_silkscreen_and_fab(
         comp = components[ref]
         echo_text = comp["fields"].get("Silkscreen", "") or comp["value"]
         pos = fp.GetPosition()
-        anchor_pt = (
-            (26.2, 66.8)
-            if ref == "D4" and opp_side == 1
-            else (pcbnew.ToMM(pos.x), pcbnew.ToMM(pos.y))
-        )
         fp_box = footprint_bbox(fp)
         res = _place_single_silk_text(
             grid,
             fp,
             opp_side,
             echo_text,
-            anchor_pt,
+            (pcbnew.ToMM(pos.x), pcbnew.ToMM(pos.y)),
             fp_box,
             max_tether=MAX_THT_TETHER_MM,
         )
@@ -587,7 +790,7 @@ def apply_silkscreen_and_fab(
                 f"Dual-sided echo failed for {ref} ({echo_text}) on side={opp_side}"
             )
 
-    add_standard_fab_notes(board, 15.0, 27.0)
+    _add_bounded_fab_notes(board, 15.0, 27.0)
 
 
 class HVGridRouter(GridRouter):
@@ -724,7 +927,7 @@ class HVGridRouter(GridRouter):
             elif self.can_place_via(cx, cy, net_code) and (
                 vstate in targets or self.is_passable(nl, cx, cy, net_code)
             ):
-                silk_pen = 3.5 if self.silk_via_avoid[cy * self.nx + cx] else 0.0
+                silk_pen = 20.0 if self.silk_via_avoid[cy * self.nx + cx] else 0.0
                 ng = cg + 6.0 + silk_pen
                 if ng < best_g.get(vstate, 1e18):
                     best_g[vstate] = ng
@@ -811,20 +1014,19 @@ def route_board(
         router.mark_static_circle(lid, cx, cy, r + 0.35, block_via=True)
     router.mark_via_block_rect(*QR_RECT, margin=0.35)
 
-    # Mark all placed F.SilkS / B.SilkS text bboxes for via avoidance
+    # Mark all placed F.SilkS / B.SilkS texts and board polarity graphics for via avoidance
     silk_layers = (pcbnew.F_SilkS, pcbnew.B_SilkS)
     for dr in board.GetDrawings():
         if (
-            hasattr(dr, "GetText")
-            and (not hasattr(dr, "IsVisible") or dr.IsVisible())
-            and dr.GetLayer() in silk_layers
-        ):
+            not hasattr(dr, "IsVisible") or dr.IsVisible()
+        ) and dr.GetLayer() in silk_layers:
             bb = dr.GetBoundingBox()
             router.mark_silk_via_rect(
                 pcbnew.ToMM(bb.GetLeft()),
                 pcbnew.ToMM(bb.GetTop()),
                 pcbnew.ToMM(bb.GetRight()),
                 pcbnew.ToMM(bb.GetBottom()),
+                margin=0.45,
             )
     for fp in fps.values():
         for gi in (fp.Reference(), fp.Value(), *fp.GraphicalItems()):
@@ -948,7 +1150,7 @@ def route_board(
                         else (-0.2 if inward < 0 else 0.0)
                     )
                     silk_pen = (
-                        1.5 if router.silk_via_avoid[gy * router.nx + gx] else 0.0
+                        10.0 if router.silk_via_avoid[gy * router.nx + gx] else 0.0
                     )
                     cands.append((d + bias + silk_pen, gx, gy))
             cands.sort()
