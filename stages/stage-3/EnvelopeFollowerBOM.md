@@ -2,7 +2,7 @@
 
 Production and hand-assembly Bill of Materials for [`EnvelopeFollowerImproved.md`](./EnvelopeFollowerImproved.md), verified live against the JLCPCB SMT / LCSC component catalog (`selectSmtComponentList/v2` and `wmsc.lcsc.com`).
 
-> **Verification Status:** **100% live-verified.** All **19 SMT line items (`49` components)** and the LCSC-sourced THT components (`C1`–`C2`, `J4`, `D4`) are verified live with active stock, Basic/Extended feeder status, and unit pricing. Panel-mounted jacks (`J1`–`J3`) and potentiometers (`RV1`–`RV4`) have `0` JLCPCB SMT stock and are tracked separately as manual user-sourced/consigned THT parts for post-PCBA mechanical alignment.
+> **Verification Status:** **100% live-verified.** All **19 SMT line items (`49` components)**, the populated LCSC-sourced THT components (`C1`–`C2`, `J4`, `D4`), and the optional **DNP** test points (`TP1`–`TP8`, Ronghe `RH-5001` / `C5199801`) are verified live with active stock, Basic/Extended feeder status, and unit pricing. Panel-mounted jacks (`J1`–`J3`) and potentiometers (`RV1`–`RV4`) have `0` JLCPCB SMT stock and are tracked separately as manual user-sourced/consigned THT parts for post-PCBA mechanical alignment.
 
 ---
 
@@ -10,13 +10,15 @@ Production and hand-assembly Bill of Materials for [`EnvelopeFollowerImproved.md
 
 | Metric | Count / Value | Notes |
 |---|---:|---|
-| **Grand Total Physical Parts** | **60** | `49` SMT (`81.7%`) + `11` THT (`18.3%`) across `27` unique BOM lines |
+| **Populated Physical Parts** | **60** | `49` SMT (`81.7%`) + `11` populated THT (`18.3%`) across `27` active BOM lines |
+| **Optional / DNP Footprints** | **8** | `TP1`–`TP8` (`1` DNP BOM line: Ronghe `RH-5001`, `C5199801`) — **Total PCB footprints: `68` (`28` BOM lines)** |
 | **SMT Assembly Parts (JLCPCB Economic)** | **49** | `19` unique SMT BOM lines (`F.Cu` single-sided assembly) |
 | **Basic SMT Lines (`$0` feeder fee)** | **14 lines (`33` parts)** | `$0.1907` / board in Basic passives and diodes |
 | **Extended SMT Lines (`$3` feeder fee ea.)** | **5 lines (`16` parts)** | `TL074HIDR`, `BAT54S`, `10 kΩ ±0.1%`, `470 Ω 0.5 W`, `22 µF 50 V` (`$0.8587` / board + `$15.00` setup fee per order) |
-| **THT Parts Mounted Later** | **11 parts (`8` lines)** | `J1`–`J3` (`3`), `RV1`–`RV4` (`4`), `J4` (`1`), `D4` (`1`), plus `C1`–`C2` (`2` box film caps) |
+| **THT Parts Mounted Later (Populated)** | **11 parts (`8` lines)** | `J1`–`J3` (`3`), `RV1`–`RV4` (`4`), `J4` (`1`), `D4` (`1`), plus `C1`–`C2` (`2` box film caps) |
+| **DNP THT Hardware (Optional)** | **8 parts (`1` DNP line)** | `TP1`–`TP8` (`C5199801` `RH-5001`); omitted from PCBA/default build (bare `B.Cu` pads work unstuffed) |
 | **SMT Parts Subtotal (1 board)** | **`$1.0494`** | Parts cost only (excludes PCB fab, shipping, and `$15.00` Extended feeder fees) |
-| **LCSC-Verified THT Subtotal (1 board)** | **`$0.8259`** | `C1`–`C2` (`C125397`), `J4` (`C53207560`), `D4` (`C99771`) |
+| **LCSC-Verified THT Subtotal (1 board)** | **`$0.8259`** | Populated only: `C1`–`C2` (`C125397`), `J4` (`C53207560`), `D4` (`C99771`); DNP `TP1`–`TP8` = `$0.0000` default (`+$0.6664` @ 1+ or `+$0.6440` @ 5+ if installed) |
 
 ### Cost Optimization Notes
 1. **Rectifier consolidation (`7 × 10 kΩ ±0.1%`, `C95204`)**: Implementing `R4+R5` (`20.00 kΩ` feedforward) and `R8A+R8B` (`20.00 kΩ` feedback) from two `10 kΩ ±0.1%` resistors in series eliminates a separate `20 kΩ ±0.1%` Extended feeder line (saving **`$3.00`** per order for `$0.05` in parts) while ensuring single-reel thermal tracking across all 7 rectifier resistors.
@@ -53,9 +55,9 @@ All 19 line items below are placed on `F.Cu` and populated by JLCPCB SMT assembl
 
 ---
 
-## 3. THT / Manual Assembly BOM (Mounted Later)
+## 3. THT / Manual Assembly BOM (Mounted Later & Optional DNP)
 
-These **11 parts (`8` line items)** are omitted from the JLCPCB SMT assembly CSV so JLCPCB executes an **Economic single-sided SMT** build without Standard-assembly THT surcharges. Front-panel hardware (`J1`–`J3`, `RV1`–`RV4`, `D4`) is dry-fitted into the 3U front panel before soldering; `J4` and `C1`/`C2` mount on `B.Cu`.
+The **11 populated THT parts (`8` active line items)** plus the **8 optional DNP test points (`1` DNP line item: `TP1`–`TP8`)** are omitted from the JLCPCB SMT assembly CSV so JLCPCB executes an **Economic single-sided SMT** build without Standard-assembly THT surcharges. Front-panel hardware (`J1`–`J3`, `RV1`–`RV4`, `D4`) is dry-fitted into the 3U front panel before soldering; `J4`, `C1`/`C2`, and optional `TP1`–`TP8` pins mount on `B.Cu`.
 
 | Line | Designators | Qty | Value / Part | Package (`KiCad Footprint`) | MPN / Spec | Manufacturer / Source | LCSC Part # | Sourcing Status & Live Stock | Unit ($) | Notes |
 |---:|---|---:|---|---|---|---|---|---|---:|---|
@@ -67,6 +69,7 @@ These **11 parts (`8` line items)** are omitted from the JLCPCB SMT assembly CSV
 | **25** | `RV2` | 1 | `A50k` 9mm Pot | `9mm Vertical THT` (`Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical`) | `RV09AF-40-20K-A503` (`A50k`) | Alpha (Taiwan) / Tayda / Thonk | — | **Consigned / User-Sourced** (`RV09` `stock=0` on JLC) | ~$0.85 | `ATK` (`0.47 ms` to `50.5 ms`); audio taper |
 | **26** | `RV3` | 1 | `A1M` 9mm Pot | `9mm Vertical THT` (`Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical`) | `RV09AF-40-20K-A105` (`A1M`) | Alpha (Taiwan) / Tayda / Thonk | — | **Consigned / User-Sourced** (`RV09` `stock=0` on JLC) | ~$0.85 | `Release` (`10 ms` to `1.01 s`); audio taper |
 | **27** | `RV4` | 1 | `B10k` 9mm Pot | `9mm Vertical THT` (`Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical`) | `RV09AF-40-20K-B103` (`B10k`, opt. center detent) | Alpha (Taiwan) / Tayda / Thonk | — | **Consigned / User-Sourced** (`RV09` `stock=0` on JLC) | ~$0.85 | `OFFSET` (`±5.09 V`); linear taper |
+| **28** | `TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8` | 8 *(DNP)* | `RH-5001` (`2.5mm` Pin, **DNP**) | `Through-Board Pin` (`TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm` / `TestPoint_Keystone_5000-5004_Miniature`) | `RH-5001` | Ronghe (via LCSC) | `C5199801` | **DNP — Verified Live** (Extended, LCSC Stock: `106,585`, JLC Stock: `102,504`) | $0.0833 | **DNP** (Do Not Populate by default; `$0.0805` @ 5+, `$0.0656` @ 50+ LCSC, `$0.0836` JLC). Optional `B.Cu` pins on `GND`, `+12V`, `-12V`, `IN_BUF`, `PREAMP_OUT`, `RECT_OUT`, `OUT_CLAMP`, `INV_OUT_CLAMP`; verify drill dia. in `C5199801` datasheet |
 
 *(Cross-reference: LCSC carries `HYCW-PJ301M-197B` (`C56407602`, stock `27`, `$0.2534`) as a `PJ301M`-footprint alternative if sourcing jacks from LCSC, though `WQP-PJ398SM` from modular synth suppliers is standard for KiCad's `WQP-PJ398SM` footprint.)*
 
@@ -74,7 +77,7 @@ These **11 parts (`8` line items)** are omitted from the JLCPCB SMT assembly CSV
 
 ## 4. Ready-to-Upload JLCPCB SMT BOM CSV
 
-Matches JLCPCB's required 4-column upload schema (`Comment,Designator,Footprint,LCSC Part #`) for the 19 Economic SMT lines:
+Matches JLCPCB's required 4-column upload schema (`Comment,Designator,Footprint,LCSC Part #`) for the 19 Economic SMT lines (excludes manual THT parts and **DNP** test points `TP1`–`TP8`; in KiCad/SKiDL, set `dnp=True` / `exclude_from_bom=True` on `TP1`–`TP8` and filter the CPL with `--bom` before JLCPCB upload):
 
 ```csv
 Comment,Designator,Footprint,LCSC Part #
@@ -109,7 +112,8 @@ BAV99,"D_IN,D_OUT,D_INV_OUT",SOT-23,C2500
 | **JLCPCB Extended Feeder Fees (`5 × $3`)** | $15.00 | $3.00 | `C2878713`, `C47546`, `C95204`, `C333193`, `C2836438` |
 | **LCSC THT Parts (`C1/C2`, `J4`, `D4`)** | $4.13 | $0.83 | Live pricing (`C125397` ×2, `C53207560` ×1, `C99771` ×1) |
 | **User-Sourced Panel Hardware (`J1`–`J3`, `RV1`–`RV4`)** | ~$23.75 | ~$4.75 | Est. ~$0.45/jack (`3×`), ~$0.85/pot (`4×`) |
-| **Subtotal (Components + Feeder Fees, excl. PCB/PCBA/Shipping)** | **~$48.13** | **~$9.63** | Add JLCPCB 2-layer PCB fab + Economic PCBA + shipping at checkout |
+| **Default Populated Subtotal (excl. PCB/PCBA/Shipping & DNP `TP1`–`TP8`)** | **~$48.13** | **~$9.63** | Add JLCPCB 2-layer PCB fab + Economic PCBA + shipping at checkout |
+| *Optional DNP Test Points (`TP1`–`TP8`, `40 pcs` `C5199801` @ `$0.0805`)* | *$3.22* | *$0.64* | *Excluded by default (`DNP`); 50+ LCSC tier is `$3.28` (`$0.0656`/ea, 10 spares) → `~$51.35` (`~$10.27`/bd) if installed* |
 
 ---
 
