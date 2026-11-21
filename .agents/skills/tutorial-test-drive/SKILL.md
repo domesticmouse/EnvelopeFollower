@@ -58,6 +58,7 @@ Before each stage `N` (`1`–`7`), the orchestrator runs `python3 .agents/skills
 - Reuse an existing subagent via `send_message` **only** for:
   1. Multi-turn conversational sequences inside the same step (Step `3.3a` → `3.3b` → `3.3c`, Step `5.2` Audit → Fix, or Stage 6 QR fix if needed).
   2. One filename-normalization nudge when a verbatim prompt lacked an output filename and the subagent picked a different name.
+  3. Resuming a subagent left waiting after a sandbox-escape approval timeout once the user checks in (do **not** kill the subagent or spawn a replacement; see Section 5).
 - Always wait reactively after `invoke_subagent` or `send_message`—never poll in a loop.
 
 ---
@@ -86,7 +87,7 @@ Stop the roll-forward immediately and emit the audit report up to the failure po
 - **Clean-room breach:** Any subagent reads `docs/`, `prompts/`, root `README.md`, or `mkdocs.yml`.
 - **Stage 1 integrity failure:** Missing skills (`<9`), broken/external symlinks inside `stages/stage-1/`, or missing scripts/reference docs.
 - **Corrupt reference image:** `stages/stage-2/EnvelopeFollower.webp` fails image validation (e.g., HTML wrapper page).
-- **Repeated command/network failure (`2×`):** A required network command (`npx`, `curl`, `jlcpcb_search.py`, `search_lcsc.py`, `uv pip install`), KiCad CLI export, or Python script fails twice, or SMT parts remain `PENDING_VERIFY` entering Stage 4.
+- **Repeated command/network failure (`2×`):** A required network command (`npx`, `curl`, `jlcpcb_search.py`, `search_lcsc.py`, `uv pip install`), KiCad CLI export, or Python script fails twice (excluding sandbox-escape approval timeouts handled via the async wait policy in Section 5), or SMT parts remain `PENDING_VERIFY` entering Stage 4.
 - **Electrical / fabrication failure:** Unrecoverable polarity error (`C4`, diodes, `BAV99` pin numbers, `J_PWR`), Stage 4 `ERC()` non-zero errors/warnings or `NO_LIB > 0`, or Stage 5/6 DRC violations / fatal Gerber errors persisting after one fix pass.
 
 ### Soft Friction (Log & Continue)
@@ -101,6 +102,7 @@ Record in the audit report and continue rolling forward when:
 ## 5. Sandbox & Tooling Watch-Outs
 
 - **Sandbox rule:** Always try commands with `BypassSandbox: false` first; retry only the single command needing network (`npx`, `curl`, `uv pip install`, `jlcpcb_search.py`, `search_lcsc.py`) or external reads with `BypassSandbox: true` and the identical `toolSummary`.
+- **Async sandbox-escape approval timeouts:** Expect the user to monitor long test-drive runs asynchronously. If a subagent fails or stalls due to a sandbox-escape (`BypassSandbox: true`) approval timeout, **do not kill the subagent, spawn a replacement, or immediately abort the run**. Leave that subagent alive in a waiting state, post a short comment in the main conversation noting the stage/step, subagent role and `conversationId`, and the command that timed out, and pause for the user to check in and poke/resume the subagent via `send_message`.
 - **Batch JLCPCB lookups:** Consolidate pending parts into a single `jlcpcb_search.py` invocation so the user sees at most one permission prompt per lookup step.
 - **Class I pF capacitor queries:** Query short tokens (`"15pF"`, `"47pF"`, `"100pF"`) rather than `"15pF NP0 0603"` (which can return `1 nF` false matches on JLCPCB's endpoint).
 - **SKiDL working directory:** Ensure `os.chdir(Path(__file__).resolve().parent)` executes **before** `from skidl import ...` so `.erc` and `.log` files never leak to the repository root.
