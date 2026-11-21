@@ -13,37 +13,38 @@ Run `generate_eurorack_panel.py --inspect` against the main PCB:
 ```bash
 python3 .agents/skills/eurorack-panel/scripts/generate_eurorack_panel.py \
     --main-pcb EnvelopeFollower.kicad_pcb \
+    --label RV4=OFFSET \
     --label D4=ENV \
     --inspect
 ```
 
-Observed coordinate alignment between the 8 front-panel THT controls (`RV1`–`RV4`, `J1`–`J3`, `D4`) and the 3U front panel:
+Observed coordinate alignment between the 8 front-panel THT controls (`RV1`–`RV4`, `J1`–`J3`, `D4`) and the `2 × 4` 3U front panel:
 
 ```text
 === Eurorack Panel Mechanical Report for EnvelopeFollower.kicad_pcb ===
-Main PCB Outline   : 29.60 x 107.00 mm (X: 100.20..129.80, Y: 20.75..127.75)
-Target Front Panel : 6HP x 3U (30.00 x 128.50 mm), Vertical rail overhang = 10.75 mm top/bottom
-Panel Origin (0,0) : Global (100.00, 10.00) mm -> (130.00, 138.50) mm
+Main PCB Outline   : 30.00 x 108.00 mm (X: 0.00..30.00, Y: 0.00..108.00)
+Target Front Panel : 6HP x 3U (30.00 x 128.50 mm), Vertical rail overhang = 10.25 mm top/bottom
+Panel Origin (0,0) : Global (0.00, -10.25) mm -> (30.00, 118.25) mm
 
-Ref       Value       Label      FP Origin (X, Y)     Bushing Global (X, Y)   Panel-Local (X, Y)   Drill
---------------------------------------------------------------------------------------------------------
-RV1       A100k       GAIN       (112.50,  36.50)     (115.00,  29.00)        ( 15.00,  19.00)     7.2 mm
-RV2       A50k        ATK        (112.50,  53.00)     (115.00,  45.50)        ( 15.00,  35.50)     7.2 mm
-RV3       A1M         REL        (112.50,  69.50)     (115.00,  62.00)        ( 15.00,  52.00)     7.2 mm
-RV4       B10k        OFFSET     (112.50,  86.00)     (115.00,  78.50)        ( 15.00,  68.50)     7.2 mm
-J1        IN          IN         (108.00,  91.52)     (108.00,  98.00)        (  8.00,  88.00)     6.2 mm
-D4        LED_3mm     ENV        (120.73,  98.00)     (122.00,  98.00)        ( 22.00,  88.00)     3.2 mm
-J2        OUT         OUT        (108.00, 109.52)     (108.00, 116.00)        (  8.00, 106.00)     6.2 mm
-J3        INV_OUT     INV OUT    (122.00, 109.52)     (122.00, 116.00)        ( 22.00, 106.00)     6.2 mm
+Ref   Value      Label      FP Origin (X, Y)     Bushing Global (X, Y)   Panel-Local (X, Y)   Drill
+---------------------------------------------------------------------------------------------------
+RV1   A100k      GAIN       (  5.00,  22.50)     (  7.50,  15.00)        (  7.50,  25.25)     7.2 mm
+RV2   A50k       ATK        ( 20.00,  22.50)     ( 22.50,  15.00)        ( 22.50,  25.25)     7.2 mm
+RV3   A1M        REL        (  5.00,  50.00)     (  7.50,  42.50)        (  7.50,  52.75)     7.2 mm
+RV4   B10k       OFFSET     ( 20.00,  50.00)     ( 22.50,  42.50)        ( 22.50,  52.75)     7.2 mm
+J1    WQP-PJ398SM IN         (  7.50,  60.52)     (  7.50,  67.00)        (  7.50,  77.25)     6.2 mm
+D4    3mm Red LED ENV        ( 21.23,  67.00)     ( 22.50,  67.00)        ( 22.50,  77.25)     3.2 mm
+J2    WQP-PJ398SM OUT        (  7.50,  80.32)     (  7.50,  86.80)        (  7.50,  97.05)     6.2 mm
+J3    WQP-PJ398SM INV OUT    ( 22.50,  80.32)     ( 22.50,  86.80)        ( 22.50,  97.05)     6.2 mm
 ```
 
-Whether your Stage 5 main PCB places the 8 controls in a single centered pot column + 2 jack rows (`29.60 × 107.00 mm`) or a `2 × 4` two-column grid (`30.00 × 108.00 mm`, `X = 8.00, 22.00 mm` at `Y = 26.00, 46.00, 66.00, 86.00 mm` as in trace `11-ff4fe23f`), `generate_eurorack_panel.py` extracts each footprint's rotated shaft/bushing `fp_circle` directly from `EnvelopeFollower.kicad_pcb` and keeps both boards in the same global KiCad coordinate space so every hole aligns 1:1.
+`generate_eurorack_panel.py` automatically detects each footprint's rotated shaft/bushing `fp_circle` directly from `EnvelopeFollower.kicad_pcb` (`Alps RK09K` pots, `WQP-PJ398SM` jacks, and `LED_D3.0mm`) and keeps both boards in the same global KiCad coordinate space so every hole aligns 1:1.
 
 !!! tip "Deriving Functional Panel Labels from `Silkscreen` & Avoiding the `INV OUT` Input-Box Trap"
-    Running `generate_eurorack_panel.py` on a Stage 5 PCB surfaced two edge cases in trace `11-ff4fe23f` that are fixed in the generator:
+    `generate_eurorack_panel.py` handles two subtle label rules cleanly:
 
-    1. **`Silkscreen`-Driven Panel Labels (`derive_panel_label`) & `--label REF=TEXT`**: Because Stage 4/5 footprints store electrical values in `Value` (`A100k`, `A50k`, `A1M`, `B10k`, `LED_3mm`) and full assembly labels in `Silkscreen` (`"RV1 GAIN A100k"`, `"RV2 ATK A50k"`, `"RV3 REL A1M"`, `"RV4 OFFSET B10k"`, `"D4 LED"`), reading `Value` alone would print `"A100k"` instead of `"GAIN"`. `derive_panel_label()` extracts `(property "Silkscreen" "...")` and strips the leading `<REF>` token and trailing `<Value>` tokens to isolate `"GAIN"`, `"ATK"`, `"REL"`, and `"OFFSET"`, while `--label D4=ENV` overrides `"D4 LED"` to `"ENV"`.
-    2. **Token-Based Input Callout Box Detection (`INV OUT` vs. `IN`)**: A naive `startswith("IN")` check falsely classifies `"INV OUT"` as an input jack and draws an input box around it. Checking whole tokens (`tokens[0] in ("IN", "INPUT") and "OUT" not in tokens and "OUTPUT" not in tokens`) boxes `"IN"` (`J1`) while keeping `"INV OUT"` (`J3`) unboxed.
+    1. **`Silkscreen`-Driven Panel Labels (`derive_panel_label`) & `--label REF=TEXT`**: Because Stage 4/5 footprints store electrical values in `Value` (`A100k`, `A50k`, `A1M`, `B10k`, `3mm Red LED`, `WQP-PJ398SM`) and full assembly labels in `Silkscreen` (`"RV1 GAIN A100k"`, `"RV2 ATK A50k"`, `"RV3 REL A1M"`, `"RV4 OFF B10k"`, `"J1 IN"`, `"D4 LED"`, `"J2 OUT"`, `"J3 INV_OUT"`), `derive_panel_label()` strips the leading `<REF>` token and trailing `<Value>` tokens to isolate `"GAIN"`, `"ATK"`, `"REL"`, `"IN"`, `"OUT"`, and `"INV OUT"`, while `--label RV4=OFFSET --label D4=ENV` expands `"OFF"` to `"OFFSET"` and overrides `"LED"` to `"ENV"`.
+    2. **Token-Based Input Callout Box Detection (`INV OUT` vs. `IN`)**: Checking whole tokens (`tokens[0] in ("IN", "INPUT") and "OUT" not in tokens and "OUTPUT" not in tokens`) draws the input callout box strictly around `"IN"` (`J1`) while keeping `"INV OUT"` (`J3`) unboxed.
 
 ## Step 6.2: Generate the Panel PCB, Run DRC & Package Gerbers
 
@@ -53,6 +54,7 @@ python3 .agents/skills/eurorack-panel/scripts/generate_eurorack_panel.py \
     --output panel/EnvelopeFollower_Panel.kicad_pcb \
     --title "ENV FOLLOW" \
     --subtitle "6HP ANALOG" \
+    --label RV4=OFFSET \
     --label D4=ENV \
     --gerber-dir production/panel \
     --zip production/EnvelopeFollower_Panel.zip \
@@ -63,16 +65,18 @@ Output:
 
 ```text
 Generated panel/EnvelopeFollower_Panel.kicad_pcb (6HP / 30.0x128.5mm, 8 jack cutouts).
-DRC Summary: 0 violations, 0 unconnected items.
+DRC Summary: 0 non-library violations, 0 unconnected items.
 Exported Gerbers & Drills to production/panel
 Packaged fabrication archive at production/EnvelopeFollower_Panel.zip
 ```
 
+*(Note: Running raw `kicad-cli pcb drc` directly on embedded `Eurorack_Panel:*` footprints emits 10 expected `lib_footprint_issues` library-mismatch warnings and exits with code `5`; passing `--drc` to `generate_eurorack_panel.py` filters those expected embedded-footprint warnings and enforces `0` copper/silk/clearance/unconnected violations.)*
+
 ## Panel Engineering Highlights
 
-- **Doepfer A-100 3U Mounting Slots (`H1`, `H2`)**: Oval `5.5 x 3.2 mm` NPTH slots centered at panel-local `(7.50, 3.00)` and `(7.50, 125.50)` fit both fixed threaded rail strips and sliding M3 nuts.
-- **Blemish-Free Front Shielding (`(layers "*.Cu" "B.Mask")`)**: Pot (`7.2 mm`) and jack (`6.2 mm`) holes use plated through-hole pads connected solidly to the `F.Cu` and `B.Cu` `GND` shield zones. Leaving `F.Mask` tented over the front copper ring yields a clean exterior surface around the M6/M7 nuts, while exposing `B.Mask` on the rear automatically grounds the entire front panel shield to chassis `GND` when the hardware nuts tighten against the back face.
-- **Silkscreen Clarity & Input Callout Box**: Clear `F.SilkS` legends label `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, with a `5 × 5 mm` white square placed on `B.SilkS` that JLCPCB replaces with an order QR code during fabrication.
+- **Doepfer A-100 3U Mounting Slots (`H1`, `H2`)**: Oval `5.5 × 3.2 mm` NPTH slots centered at panel-local `(7.50, 3.00)` and `(7.50, 125.50)` fit both fixed threaded rail strips and sliding M3 nuts.
+- **Blemish-Free Front Shielding (`(layers "*.Cu" "B.Mask")`)**: Pot (`7.2 mm`) and jack (`6.2 mm`) holes use plated through-hole pads (`9.6 mm` / `8.6 mm`) connected solidly to the `F.Cu` and `B.Cu` `GND` shield zones. Leaving `F.Mask` tented over the front copper ring yields a clean exterior surface around the M6/M7 nuts, while exposing `B.Mask` on the rear automatically grounds the entire front panel shield to chassis `GND` when the hardware nuts tighten against the back face.
+- **Silkscreen Clarity & Input Callout Box**: Clear `F.SilkS` legends label `GAIN`, `ATK`, `REL`, `OFFSET`, boxed `IN`, `ENV`, `OUT`, and `INV OUT`, with `ENV FOLLOW 6HP` and a `5.0 × 5.0 mm` solid white square placed on `B.SilkS` at panel-local `(12.50, 60.50)` to `(17.50, 65.50)` (between `REL`/`OFFSET` and `IN`/`ENV`) that JLCPCB replaces with an order QR code during fabrication.
 
 | 3U Front Panel (`F.Cu` / `F.SilkS`) | 3U Front Panel Rear (`B.Cu` / Grounding Rings) |
 | :---: | :---: |
@@ -91,12 +95,12 @@ python3 .agents/skills/kicad/scripts/analyze_gerbers.py production/panel/ --full
 ```
 
 !!! warning "Catching Obsolete `JLCJLCJLCJLC` Markings via 3D Render Inspection"
-    Inspecting `/tmp/panel_back.png` in trace `11-ff4fe23f` caught the legacy `JLCJLCJLCJLC` order-number placeholder emitted by an older version of `eurorack-panel`. Because JLCPCB now uses a **`5 × 5 mm` solid silkscreen square** (`gr_rect` with `(fill yes)` on `B.SilkS`) for order QR code placement, you can fix an older template with this follow-up prompt:
+    Always inspect `/tmp/panel_back.png` to verify the rear silkscreen carries JLCPCB's modern **`5.0 × 5.0 mm` solid silkscreen square** (`gr_rect` with `(fill yes)` on `B.SilkS`) rather than the legacy `JLCJLCJLCJLC` text string. If an older generator template emitted `JLCJLCJLC`, replace it with:
 
     > *"Please remove the obsolete `JLCJLCJLC` marking from `panel/EnvelopeFollower_Panel.kicad_pcb`, add a `5 mm × 5 mm` filled square to `B.SilkS` for replacement with the JLCPCB QR code during ordering, and re-export `production/panel/` and `production/EnvelopeFollower_Panel.zip`."*
 
 Verified analyzer results on `panel/EnvelopeFollower_Panel.kicad_pcb` and `production/panel/`:
 
-- **PCB Analyzer**: `0` errors, `0` warnings, `10` footprints (`8` controls + `2` M3 slots), `2` filled copper zones (`F.Cu`, `B.Cu`), `30.0 x 128.5 mm` outline, `routing_complete: True`.
-- **Gerber Analyzer**: `0` findings across all severities; `9/9` Gerber layers complete (`B.Cu`, `B.Mask`, `B.Paste`, `B.SilkS`, `Edge.Cuts`, `F.Cu`, `F.Mask`, `F.Paste`, `F.SilkS`); `7` PTH component holes (`3 × 6.2 mm`, `4 × 7.2 mm`) and `3` NPTH mounting/LED holes (`3.2 mm` LED hole + `2` M3 oval slots).
-- **3D Renders (`kicad-cli pcb render`)**: Confirms clean front solder mask tenting, boxed `IN` vs. unboxed `INV OUT`, exposed rear `B.Mask` grounding rings, mirrored `ENV FOLLOW 6HP`, and the `5 × 5 mm` solid QR square on `B.SilkS`.
+- **PCB Analyzer (`analyze_pcb.py`)**: `0` errors, `0` warnings (`5` info items), `10` footprints (`8` controls + `2` M3 slots), `2` filled copper zones (`F.Cu`, `B.Cu`), `30.0 × 128.5 mm` outline, `routing_complete: True`.
+- **Gerber Analyzer (`analyze_gerbers.py`)**: `0` findings across all severities (`0` errors, `0` warnings, `0` info); `9/9` Gerber layers complete (`B.Cu`, `B.Mask`, `B.Paste`, `B.SilkS`, `Edge.Cuts`, `F.Cu`, `F.Mask`, `F.Paste`, `F.SilkS`, `alignment.aligned: True`); `7` PTH component holes (`3 × 6.2 mm`, `4 × 7.2 mm`) and `3` NPTH mounting/LED holes (`1 × 3.2 mm` LED hole + `2 × 5.5 × 3.2 mm` M3 oval slots), packaged cleanly into `14` files inside `production/EnvelopeFollower_Panel.zip`.
+- **3D Renders (`kicad-cli pcb render`)**: Confirms clean front solder mask tenting, boxed `IN` vs. unboxed `INV OUT`, exposed rear `B.Mask` grounding rings, mirrored `ENV FOLLOW 6HP`, and the `5.0 × 5.0 mm` solid QR square on `B.SilkS`.
