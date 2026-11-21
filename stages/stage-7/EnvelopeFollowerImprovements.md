@@ -1,277 +1,270 @@
-# Envelope Follower Circuit Review & Recommended Improvements
+# Envelope Follower — Circuit Review & Suggested Improvements
 
-Detailed engineering review of [`EnvelopeFollower.md`](./EnvelopeFollower.md) and [`EnvelopeFollower.webp`](./EnvelopeFollower.webp), identifying circuit design flaws, component/stability risks, Eurorack interoperability gaps, and calculation discrepancies in the documentation.
+Review of the circuit documented in [EnvelopeFollower.md](./EnvelopeFollower.md) (derived from [EnvelopeFollower.webp](./EnvelopeFollower.webp)).
 
----
-
-## Executive Summary
-
-The original 6-op-amp circuit is functionally sound as a basic DIY sketch, but a stage-by-stage analysis reveals **several significant analog design issues** and **two factual calculation/wiring errors in `EnvelopeFollower.md`**:
-
-1. **Severe output clipping & gain modulation (`U1D`, `RV4`)**: `U1D` amplifies `ENV_NODE` by `2.25×` to `2.52×`, clipping `OUT` at the `+12V` rail once `ENV_NODE` exceeds `~4.2–4.7 V`, while `RV4` (`OFFSET`) shifts envelope gain by `12%` across its rotation and exhibits a strongly S-curved taper.
-2. **Unbuffered peak diode (`D3`) & missing attack current limiter (`RV2`)**: `D3` sits outside any op-amp feedback loop (`~0.65 V` dead-zone and thermal drift), and dialing `ATK` (`RV2`) to `0 Ω` shorts `U1C` directly into `C2` (`1 µF`).
-3. **Release-dependent amplitude droop (`R9`)**: `R9` (`1 kΩ`) forms a resistive divider with `R10` (`10 kΩ`) + `RV3`, dropping `ENV_NODE` amplitude by `9.1%` (`-0.83 dB`) at minimum `Release`.
-4. **Low input impedance (`Z_in ≈ 9.9 kΩ`) & miscalculated $f_c$**: `R2` (`10 kΩ`) terminates at `U1A` virtual ground, pulling $Z_{\text{in}}$ down to `9.9 kΩ` (10× below the `100 kΩ` Eurorack standard) and raising the actual input high-pass cutoff from the documented `0.034 Hz` to **`3.42 Hz`**.
-5. **LED idle glow & low peak brightness (`U2B`, `D4`, `R21`–`R23`)**: The `-2.79 V` cathode bias leaves standard red/yellow/green LEDs glowing dimly at idle (`~23–32 µA`) while capping `+10 V` peak current at `~0.33–0.37 mA`.
-6. **Missing Eurorack hardware protections**: Lacks reverse-polarity protection on `J4`, local `100 nF` IC decoupling caps on `U1`/`U2`, preamp gain-floor / open-loop wiper protection on `RV1`, surge/ESD clamping and clash-rated resistors on `OUT`/`INV_OUT`, and explicit pin-level termination for unused op-amp sections (`§2`).
-7. **Reversed `OFFSET` pot rotation note**: `EnvelopeFollower.md` (Section 6.3) states `Pin 1 -> OFF_TOP, Pin 3 -> OFF_BOT` pushes `OUT` negative when turned clockwise, whereas it actually pushes `OUT` **positive**.
-
-> **Key Architectural Insight:** Switching the canonical IC BOM from `1 × TL074 + 1 × TL072` (`Option A`) to **`2 × TL074`** (`Option C`, already listed in `EnvelopeFollower.md`) unifies the IC BOM and frees **2 op-amp sections**—enough to add a true `100 kΩ` input buffer and an active precision peak detector (`D3` inside the op-amp loop) with minimal PCB area impact.
+All reference designators (`U1A`–`U1D`, `U2A`–`U2B`, `R1`–`R23`, `C1`–`C4`, `D1`–`D4`, `RV1`–`RV4`, `J1`–`J4`) and net names (`IN_TIP`, `IN_AC`, `IN_SUM`, `V_GAIN`, `RECT_MID`, `V_RECT`, `ENV_CAP`, `ENV_RAW`, `V_OUT_BUF`, `LED_BIAS`, etc.) follow [EnvelopeFollower.md](./EnvelopeFollower.md).
 
 ---
 
-## 1. Critical Circuit Flaws & Recommended Fixes
+## Executive Summary & Prioritized Improvements
 
-### 1.1 Output Stage Excess Gain, Clipping & `OFFSET`-Dependent Gain Modulation (`U1D`, `RV4`, `R11`–`R15`)
+The original circuit in [EnvelopeFollower.md](./EnvelopeFollower.md) is fundamentally sound—a classic AC-coupled inverting input stage, 2-op-amp precision full-wave rectifier, passive attack/release envelope detector, DC-offsetting output buffer with `-1×` inverse output, and negatively biased LED buffer. However, detailed analysis reveals several electrical interactions, headroom bottlenecks, pot-taper/usability issues, and hardware reliability gaps.
 
-**Current Behavior (`EnvelopeFollower.md` §4 Stage 5):**
-- `RV4` (`100 kΩ` `OFFSET` pot) sits between `R11` (`10 kΩ` to `+12V`) and `R12` (`10 kΩ` to `-12V`). Depending on wiper fraction $\alpha \in [0, 1]$, its Thévenin source resistance varies by more than 3×:
-  - Ends ($\alpha = 0, 1$): $R_{\text{th}} = 10\text{ k}\Omega \parallel 110\text{ k}\Omega = 9.17\text{ k}\Omega$
-  - Center ($\alpha = 0.5$): $R_{\text{th}} = 60\text{ k}\Omega \parallel 60\text{ k}\Omega = 30.00\text{ k}\Omega$
-- Because `OFF_WIPER` feeds `U1D-` through `R13` (`10 kΩ`) alongside `R14` (`10 kΩ` to `GND`) and `R15` (`10 kΩ` feedback), `U1D` exhibits three coupled problems:
-  1. **Premature rail clipping**: `U1D` amplifies `ENV_NODE` by $2.25\times$ (center) to $2.52\times$ (ends). Because `RECT_OUT` reaches `~+10.5 V` and `ENV_NODE` reaches `~+9.8 V`, `U1D` tries to swing to `+22 V` and **clips hard against the `+12V` rail (`~+10.5 V`) once `ENV_NODE` exceeds just `+4.17 V` to `+4.67 V`** (less than half of the detector's dynamic range). Positive `OFFSET` reduces available envelope headroom even further.
-  2. **Gain modulation with `OFFSET`**: Adjusting `OFFSET` shifts the envelope signal gain by **`12%`** (`2.25×` at center vs. `2.52×` at the extremes).
-  3. **Heavily compressed center taper**: Because $R_{\text{th}}$ triples at mid-travel, the DC shift at `OUT` is non-linear: at $\alpha = 0.25$ / $0.75$ (halfway from center to an end), `OUT` shifts by only **`±1.44 V`** (`27.5%` of its `±5.22 V` full-scale shift).
-
-**Recommended Improvements:**
-- **Option A — Zero extra op-amps (keep 6 op-amps, non-inverting `U1D`, linearize `RV4`)**:
-  - Keep `U1D` non-inverting (`U1D+` presents `~10¹² Ω` to `ENV_NODE` so `C2` release timing is undisturbed, leaving `U2B` dedicated to the LED driver in §3.2), and make three component changes:
-    1. **Remove `R14` (`10 kΩ` to `GND`)**: Eliminates the unnecessary `2×` base gain floor, reducing envelope gain to $1 + \frac{R_{15}}{R_{13} + R_{\text{th}}(\alpha)}$.
-    2. **Scale `RV4` down 10× (`RV4 = 10 kΩ`, `R11 = R12 = 1 kΩ`)**: Preserves the exact `±10.00 V` span while cutting wiper source resistance 10× to $R_{\text{th}} \in [0.92\text{ k}\Omega, 3.00\text{ k}\Omega]$.
-    3. **Set `R13 = 18 kΩ` (or `22 kΩ`) with `R15 = 10 kΩ`**:
-       - With `R13 = 18 kΩ`: `OFFSET` spans **`±5.29 V`** (`±2.44 V` at 25%/75% travel—nearly linear!), and envelope gain drops to **`1.48×` (center) to `1.53×` (ends)** (only **`3.5%`** variation instead of `12%`, raising the `OUT` clip threshold to `ENV_NODE ≈ +6.9 V`).
-       - With `R13 = 22 kΩ`: `OFFSET` spans **`±4.36 V`** (`±2.04 V` at 25%/75%), and envelope gain drops to **`1.40×` to `1.44×`** (**`2.6%`** variation, raising clip threshold to `ENV_NODE ≈ +7.3 V`).
-- **Option B — Using `2 × TL074` (8 op-amps total: buffered `ENV_NODE` + inverting summer)**:
-  - Use a unity-gain voltage follower (`U_ENV_BUF`) to buffer `ENV_NODE` without loading `C2`, then reconfigure `U1D` as an **inverting summing amplifier** driving `INV_OUT` (`R_env = 10 kΩ` from `U_ENV_BUF_OUT`, `R15 = 10 kΩ` feedback, **remove `R14`**, `RV4 = 10 kΩ` + `R11 = R12 = 1 kΩ` via `R13 = 20 kΩ` for `±4.78 V` offset), and invert `U1D_OUT` at `-1.0×` via `U2A` (`R17 = R18 = 10 kΩ`) to produce `OUT`.
-  - Because `U1D-` is a virtual ground, envelope gain is locked at **`+1.00×`** (`0` to `~+10 V` full-scale without clipping `U1D` early) with **0.0% gain modulation** across the entire `OFFSET` sweep. (Optionally add a dedicated follower on `RV4` wiper for 100% offset linearity.)
+| Priority | Area / Components | Issue Found | Recommended Fix |
+|---|---|---|---|
+| **High** | **Output Stage (`U1D`, `RV4`, `R11`–`R15`)** | Excessive `2.25×`–`2.52×` gain clips `OUT`/`INV_OUT` above `ENV_RAW ≈ 4.6 V`; `RV4` (`100 kΩ`) modulates gain by `+12%` and produces severe S-curve offset crowding (`72%` of sweep in outer `25%` of travel); CW rotation shifts `OUT` negative. | Reduce `U1D` gain toward `1×` (matching `0–10 V` detector range); scale `RV4` to `10 kΩ` feeding `100 kΩ` summing resistors (or buffer `RV4`) to eliminate gain coupling and nonlinearity; reverse `RV4` wiring polarity. |
+| **High** | **Peak Detector (`D3`, `U1C`, `C2`)** | Peak diode `D3` (`1N4148`) sits outside `U1C`'s feedback loop, creating a `~0.6 V` deadband, temperature drift (`~-2 mV/°C`), and current-dependent peak error. | Place `D3` inside an active precision peak-detector op-amp loop (with anti-saturation clamp diode) or use matched-diode `V_f` compensation. |
+| **High** | **Envelope Detector (`R9`, `RV2`, `R10`, `RV3`, `C2`)** | Tapping `ENV_RAW` after `R9` (`1 kΩ`) drops amplitude by `9.1%` at fast `Release`; `ATK` (`50 kΩ`) + `R9+R10` (`11 kΩ`) creates up to `82%` divider loss; linear `1 MΩ` `Release` pot cramps `11–100 ms` into `0–9%` rotation; `0 Ω` `ATK` slams `U1C` into `1 µF`. | Tap `U1D +` and `LED` directly at `C2` (`ENV_CAP`); add `100 Ω`–`220 Ω` series protection on `RV2`; switch `RV3` to an `A1M` audio/log taper (+ parallel safety resistor); specify film (`MKS`/`MKP`) rather than X7R ceramic for `C2`; optionally decouple Attack and Release actively. |
+| **High** | **LED Driver (`R20`–`R23`, `U2B`, `D4`)** | Effective `29.67 kΩ` impedance limits LED current to `~0.17 mA` at `+5 V` (`~0.34 mA` at `+10 V`); `-2.79 V` cathode bias causes `~32 µA` idle glow on red/amber/yellow LEDs (`V_f ≈ 1.8–2.1 V`). | Use either re-scaled bias resistors (`R21 = 1 kΩ`, `R22 = 2.2 kΩ`, `R23 = 15 kΩ` → `~3 mA` max, `0 mA` idle for all colors) or an op-amp constant-current sink driver (`0–5 mA` linear, `V_f`-independent). |
+| **Medium** | **Input Stage (`J1`, `C1`, `R1`, `R2`, `RV1`, `U1A`)** | Low `~9.9 kΩ` input impedance loads passive attenuators/pickups; linear `RV1` feedback rheostat gives poor gain taper, `0×` dead-zone / `0 Ω` feedback short (no gain floor), open-wiper rail-slam risk, and stray capacitance; floating `J1` tip invites hum. | Ground `J1` normalled switch pin (`TN`); add `R_floor` + `1 MΩ` open-wiper resistor + `22 pF` compensation cap—or better, use `47 kΩ + A50k` log input attenuator with `R_floor = 2.2 kΩ` (`Z_in ≈ 97 kΩ`, `C1 = 1 µF ≥ 50 V` film) into fixed `+21×` `U1A` (`0.47×–10.8×` gain, `BAT54S` input clamp). |
+| **High** | **Power & Decoupling (`J4`, `C3`–`C8`, `D_rev+`, `D_rev-`)** | No reverse-polarity protection on `J4` (cables plugged backward destroy `U1`/`U2`); no local `100 nF` IC decoupling drawn; small `4.7 µF` bulk caps. | Use shrouded keyed `2×5` Eurorack header (`J4`) + series `1N5819` reverse-polarity Schottky diodes upstream of `22–47 µF` (`35 V`) bulk caps `C3`/`C4`; place `100 nF` (`50 V` X7R) local decoupling caps `C5`–`C8` directly at `U1`/`U2` supply pins. |
+| **High** | **Output & Jack Protection (`J1`–`J3`, `R16`, `R19`, `BAT54S`)** | Cross-patching `OUT`/`INV_OUT` (`-10.5 V`) into `+12 V` dissipates `~0.51 W` in `1 kΩ` `R16`/`R19` (exceeding `0603`/`1/4 W` ratings); no ESD/overvoltage clamps on jacks; risk of miswiring output jack `TN` pins to `GND`. | Upgrade `R16`/`R19` (`1 kΩ`) to `0.5 W` (or `2 × 470 Ω` `1/4 W` series); add `BAT54S` rail clamps on circuit side of `R16`/`R19` and at `U1A +`; ground `J1.TN` only and leave `J2.TN`/`J3.TN` `NC`. |
+| **Medium** | **Unused Op-Amp Termination (`TL074` spares)** | Unaddressed in baseline review; leaving spare op-amps floating (e.g., if consolidating Path A onto `2 × TL074`) causes oscillation, rail saturation, and crosstalk. | Terminate every unused op-amp unit as a `GND`-referenced unity-gain voltage follower (`+` input tied to `GND`, `-` input tied to `OUT`; never leave floating or tie both inputs to `GND`). |
+| **Low** | **Precision Rectifier (`U1B`, `U1C`, `R3`–`R8`)** | `R8 = 22 kΩ` (`+1.1×`) clips `U1C` slightly before `U1A` (`~9.5 V`); `U1B` sinks `2 mA` through `D2`, clipping positive `V_GAIN` peaks slightly earlier than negative peaks. | Change `R8` to `20 kΩ` (`10 kΩ + 10 kΩ`, matching `R5 + R6` BOM) for exact `1.00×` gain; optionally scale `R3`–`R8` to `22 kΩ` / `44 kΩ` to halve `U1B` sink current and improve peak symmetry. |
 
 ---
 
-### 1.2 Unbuffered Peak Diode `D3` Deadband & Missing Attack Surge Resistor (`U1C`, `D3`, `RV2`, `C2`)
+## 1. Detailed Stage-by-Stage Improvements
 
-**Current Behavior (`EnvelopeFollower.md` §4 Stage 4):**
-- **~0.65 V Dead-Zone**: `D3` (`1N4148`) sits outside `U1C`'s feedback loop. `C2` (`ENV_CAP`) cannot charge until `RECT_OUT` exceeds `D3`'s forward voltage (`~0.55–0.70 V`, drifting `-2 mV/°C`). Quiet audio tails and low-level signals below `~0.5 V` vanish abruptly, and `C2` lags below the true peak voltage (`~0.7–0.85 V` error during fast surges).
-- **Op-Amp Output Current Surge at `ATK = 0 Ω`**: When `RV2` (`ATK`, `50 kΩ` rheostat) is dialed fully CCW (`0 Ω`), `U1C` drives `C2` (`1 µF` to `GND`) directly through `D3`. Fast transients slam `U1C` into short-circuit current limiting (`~20–40 mA`), injecting sharp current spikes into the `±12V` rails and `GND` and risking capacitive-load ringing.
+### 1.1 Output Stage: Excessive Gain, Gain–Offset Coupling & Nonlinear Pot Taper (`U1D`, `RV4`, `R11`–`R15`)
 
-**Recommended Improvements:**
-- **Always add a minimum attack series resistor (`R_atk_min = 220 Ω` to `470 Ω`)** in series with `RV2` (`ATK`), analogous to `R10` on `Release`. At `220 Ω` with `1 µF`, minimum attack time constant is `0.22 ms` (still perceptually instantaneous for audio transients) while capping peak op-amp charging current and damping ringing.
-- **Precision fix (recommended, using 1 spare op-amp in `2 × TL074`)**: Wrap `D3` (`1N4148`) inside a dedicated precision peak-detector op-amp (`U_PK+` = `RECT_OUT`, `U_PK_OUT` → `D3.A`, `D3.K` (`ATK_IN`) → `U_PK-`, then `ATK_IN` → `R_atk_min` + `RV2` → `ENV_CAP`).
-  - Why keep `1N4148` inside an op-amp loop rather than substituting a power Schottky diode? A power Schottky (`1N5819`) has up to `1 mA` reverse leakage at `25 °C` (`10 mA` hot), which would discharge `C2` faster than the `1 MΩ` `Release` pot. Even a small-signal Schottky (`BAT85`) has up to `2 µA` reverse leakage at `25 V` (comparable to the `10 µA` discharge current of `10 V / 1 MΩ`), whereas `1N4148` leaks `< 25 nA` and achieves `< 5 mV` dead-zone inside an op-amp loop.
-  - *(6-op-amp fallback)*: If strictly limited to 6 op-amps, swapping `D3` to a low-leakage small-signal Schottky (`BAT85` or `1N5711`, $V_f \approx 0.24\text{–}0.32\text{ V}$) halves the dead-zone at the cost of slight temperature-dependent leakage at maximum `1 MΩ` `Release`.
+#### Issues Observed
+1. **Premature Rail Clipping (`2.25×`–`2.52×` Output Gain):**
+   `U1A` and `U1C` (`TL074` on `±12 V`) operate up to `~±10.5 V`. After `D3` (`~0.6 V`), `ENV_CAP` / `ENV_RAW` can already swing cleanly from `0 V` to `~+9.9 V` (and the `LED` buffer `U2B` tracks all the way to `+9.9 V`). However, `U1D` amplifies `ENV_RAW` by `2.25×` at `OFFSET` center (and `2.52×` at the extremes):
+   - Any `ENV_RAW` above **`~4.6 V`** drives `V_OUT_BUF` past `+10.5 V` (`4.6 V × 2.25 = 10.35 V`), hard-clipping both `OUT` (`J2`) and `INV_OUT` (`J3`).
+   - Meanwhile, the indicator `LED` (`U2B`) keeps getting brighter between `4.6 V` and `9.9 V`, misleading the user into thinking the output is still tracking dynamics when `OUT` and `INV_OUT` are actually flat-topped at the rail.
+2. **Offset Control Modulates Envelope Gain (`+12%` Shift):**
+   Because `RV4` (`100 kΩ`) sits between `R11` (`10 kΩ` to `+12V`) and `R12` (`10 kΩ` to `-12V`), its Thevenin source resistance `R_pot,th` varies by more than `3×`: from **`30.0 kΩ`** at center (`50%`) down to **`9.17 kΩ`** at both extremes (`0%` and `100%`). Feeding this directly into `R13` (`10 kΩ`) makes `R_off = 10 kΩ + R_pot,th` vary from `40.0 kΩ` to `19.17 kΩ`, changing the non-inverting gain on `U1D` (`2 + 10k / R_off`) from **`2.25×` (center) to `2.52×` (extremes)**. Adjusting `OFFSET` unintentionally scales the envelope amplitude by `~12%`.
+3. **Severe S-Curve Offset Nonlinearity (`72%` of Travel in Outer `25%`):**
+   Using the exact equation in [EnvelopeFollower.md](./EnvelopeFollower.md) Section 4.5, at `75%` pot rotation (`V_th = +5 V`), `R_top = 35 kΩ` and `R_bot = 85 kΩ`, giving `R_pot,th = 24.79 kΩ` and `R_off = 34.79 kΩ`. Thus:
+   - From `50%` to `75%` rotation, `OUT` shifts by only `-5 V × (10k / 34.79k) = -1.44 V` (**`27.6%`** of the `-5.22 V` swing).
+   - Over the last `25%` (`75%` to `100%`), `OUT` jumps by **`-3.78 V` (`72.4%`** of the swing).
+   This makes zeroing or fine-tuning small DC offsets near the ends of the knob awkward and nonlinear.
+4. **Inverted `OFFSET` Rotation Polarity:**
+   Because `RV4` drives `U1D`'s inverting input (`-`), a standard wiring with `+12V` at the CW end shifts `OUT` **negative** as you turn clockwise.
 
----
-
-### 1.3 `R9` (`1 kΩ`) Causes a `9.1%` `Release`-Dependent Amplitude Droop (`ENV_CAP` / `ENV_NODE`)
-
-**Current Behavior (`EnvelopeFollower.md` §4 Stage 4):**
-- `R9` (`1 kΩ`) sits between `C2` (`ENV_CAP`) and `ENV_NODE`, where `R10` (`10 kΩ`) + `RV3` (`1 MΩ`) pull down to `GND`.
-- `R9` and `R10 + RV3` form a voltage divider:
-  - At `RV3 = 1 MΩ`: $V_{\text{ENV\_NODE}} / V_{\text{ENV\_CAP}} = \frac{1010}{1011} = 0.999$
-  - At `RV3 = 0 Ω`: $V_{\text{ENV\_NODE}} / V_{\text{ENV\_CAP}} = \frac{10}{11} = 0.909$ (`-0.83 dB`)
-- Turning `Release` down to minimum drops the module's output amplitude by **`9.1%`**, and `R9` provides no meaningful protection because `U1D+` and `U2B+` are internal nodes (not external jacks) and `U2B+` already has `R20` (`10 kΩ`).
-
-**Recommended Improvement:**
-- **Remove `R9` (`1 kΩ`)** by connecting `ENV_CAP` directly to `ENV_NODE` (and change `R10` to `11 kΩ` if keeping an `11 ms` minimum release, or keep `10 kΩ` for `10 ms`).
-- Add a **`10 kΩ` series protection resistor** directly in front of `U1D+` (matching `R20` on `U2B+`)—or buffer `ENV_NODE` once with a follower—so `C2` cannot dump current into `U1D`'s input pin if `+12V` collapses while `C2` is charged to `+10 V`.
-
----
-
-### 1.4 Low Input Impedance (`Z_in ≈ 9.9 kΩ`) & Mandatory Grounding of `J1` Normal Switch (`J1`, `C1`, `R1`, `R2`, `U1A`)
-
-**Current Behavior (`EnvelopeFollower.md` §4 Stage 1 & §6.5):**
-- `U1A` is an inverting amplifier with its `+` pin grounded, so `U1A_INV` is a virtual ground. Thus, above a few hertz, `J1` sees $Z_{\text{in}} = R_1 \parallel R_2 = 1\text{ M}\Omega \parallel 10\text{ k}\Omega = 9.90\text{ k}\Omega$.
-- Standard Eurorack inputs are **`100 kΩ`** (and instrument/piezo inputs are `≥ 470 kΩ–1 MΩ`). A `9.9 kΩ` input loads a typical `1 kΩ` Eurorack output down by `9.2%` (`-0.84 dB`) and severely attenuates/muffles passive instruments.
-- Leaving `J1` Tip-Normal unconnected (listed as optional in §6.5) leaves `C1.1` floating when unpatched, allowing `U1A` (at up to `10×` / `+20 dB` gain) to amplify ambient 50/60 Hz hum and falsely trigger the envelope/LED.
-
-**Recommended Improvements:**
-- **Raise `Z_in` to `100 kΩ` (or higher)**:
-  - **Preferred (`2 × TL074`)**: Place a unity-gain non-inverting input buffer (`U_IN`) after `C1`, with `R1 = 100 kΩ` bias to `GND` (keeping `R2 = 10 kΩ` and `RV1 = 100 kΩ` low-noise).
-  - **6-op-amp option A**: Place `RV1` (`100 kΩ` audio taper) *ahead* of `U1A` as an input attenuator feeding a fixed `+10×` (`+11×`) non-inverting amplifier (`U1A`). This gives a constant `100 kΩ` input impedance and avoids `1 MΩ` feedback noise/rolloff, though an unprotected `TL074` non-inverting input must be protected against `< -10 V` negative signals to prevent `TL07x` common-mode phase reversal.
-  - **6-op-amp option B**: Scale `R2 = 100 kΩ` and `RV1 = 1 MΩ` (with `47 pF` feedback cap; trade-off: higher resistor thermal noise and susceptibility to hum at the panel pot).
-- **Make grounding `J1` Tip-Normal mandatory** in the schematic/PCB so unpatched noise is shorted cleanly to `GND`.
-- **Add input ESD / overvoltage clamping**: Place dual clamping diodes (`1N4148` / `BAV99` or `BAT54S`) from `IN_AC` (or after a `1 kΩ` series protection resistor at `J1`) to `+12V` and `-12V` to clamp hot-plug transients and ESD spikes (see `§2.4` for matching output protection).
+#### Recommended Improvements
+- **Option A — Zero-Extra-Op-Amp Resistor Scaling (keeps 6 op-amps total):**
+  1. Remove `R14` (which forced `U1D` gain `≥ 2×`), increase `R13` to **`100 kΩ`**, and set `R15` to **`47 kΩ`** (or **`33 kΩ`**) so `U1D` gain drops from `2.25×` to **`1.46×`** (or **`1.33×`**), extending unclipped `ENV_CAP` headroom from `4.6 V` up to **`7.2 V`–`7.9 V`** without loading `C2` (`ENV_CAP` still sees only `U1D +`).
+  2. Replace `RV4` (`100 kΩ`) with a **`10 kΩ`** linear pot (`R_pot,th ≤ 3.0 kΩ`) and `R11 = R12 = 1 kΩ` (`V_th = ±10 V`, `R_pot,th = 0.92–3.00 kΩ`). With `R13 = 100 kΩ` and `R15 = 47 kΩ`:
+     - Output gain varies only from **`1.456×` to `1.466×`** (**`0.66%`** variation vs `12%`).
+     - Offset sweeps smoothly over **`±4.66 V`** with **`< 2%`** linearity error (vs `72%` crowding).
+  3. Wire `RV4` Pin `1` (`CCW`) to `R11` (`+12V`) and Pin `3` (`CW`) to `R12` (`-12V`)—and optionally use a **center-detent** pot—so turning `OFFSET` clockwise shifts `OUT` positive (`INV_OUT` negative).
+- **Option B — Buffered `1×` Difference Amplifier (ideal, used in `2 × TL074` revision in Section 2):**
+  Once `C2` (`ENV_CAP`) is buffered by a unity-gain op-amp, `U1D` can be wired as a **unity-gain (`~0.97–1.00×`) difference amplifier** (`100 kΩ` resistors on `+` and feedback inputs, `RV4 = 10 kΩ` with `R11 = R12 = 6.8 kΩ` giving `±5.08 V` unloaded / `±4.85 V` loaded offset, or a buffered `RV4`):
+  $$V_{\text{OUT\_BUF}} = V_{\text{ENV}} - V_{\text{OFFSET}}$$
+  This maps the full `0–10 V` envelope range onto `0–10 V` at `OUT` with **zero clipping below `10 V`**, **zero gain-offset interaction**, and linear offset control.
 
 ---
 
-## 2. Eurorack Hardware Protections
+### 1.2 Peak-Charging Diode `D3` Outside Op-Amp Feedback (`U1C`, `D3`)
 
-Eurorack patchbays expose modules to reversed IDC power cables, hot-plug rail transients, accidental output-to-output collisions (`±12 V` vs. `∓10.5 V`), cable ESD, and panel-pot fault conditions. Add the following five hardware protections across the circuit:
+#### Issues Observed
+In Stage 3, `D3` (`1N4148`) sits **outside** `U1C`'s feedback loop (`U1C OUT → D3 → RV2`). Consequently:
+1. **Deadband Threshold (`~0.6 V`):** Rectified peaks below `~0.6 V` (`|V_GAIN| < 0.55 V`) cannot forward-bias `D3`, producing `0 V` envelope output and truncating quiet musical tails.
+2. **Amplitude- & Rate-Dependent Error:** Because `V_f` of a `1N4148` varies logarithmically with current (`~0.45 V` at `10 µA` trickle vs `~0.75 V` at `10 mA` fast attack) and drifts at `~-2 mV/°C`, peak accuracy shifts with `ATK` setting and temperature. With `U1D`'s `2.25×` gain, a `0.6 V` diode drop translates into a `~1.35 V` error at `OUT`.
 
-### 2.1 Reverse-Polarity & Overcurrent Power Supply Protection (`J4`, `C3`, `C4`)
+*(Note: You cannot simply move `R8` across `D3` inside `U1C`'s feedback loop, because when `V_RECT` drops, `C2` would discharge through `RV2` and `R8` into `U1C`'s `0 V` virtual ground, destroying `Release` time.)*
 
-**Gap in Original Design (`EnvelopeFollower.md` §2.6, §4 Stage 0, §6.5):**
-- `J4` feeds `+12V` and `-12V` directly into `U1`, `U2`, `C3`, and `C4` with no reverse-polarity protection, no mechanical keying specification, and no current limiting.
-- `C3` and `C4` (`4.7 µF`) are modest for Eurorack bulk decoupling and `EnvelopeFollower.md` §3.2 lists `16 V` as an acceptable minimum voltage rating (`< 1.35×` margin on `12 V` rails).
-
-**Recommended Additions:**
-- **Keyed Eurorack IDC Header (`J4`)**: Use a **shrouded, keyed 10-pin (`2×5`, `2.54 mm`) Eurorack IDC power header** following the standard pinout (`Pins 1–2 = -12V_IN` with `RED STRIPE` / `-12V` PCB silkscreen, `Pins 3–8 = GND`, `Pins 9–10 = +12V_IN`).
-- **Reverse-Polarity Protection — Option A: Series Schottky Diodes (Recommended)**:
-  - Insert **`D_PWR_P` (`1N5819` THT or `SS14` SMD, `40 V / 1 A`)** on `+12V` and **`D_PWR_N` (`1N5819` / `SS14`)** on `-12V` upstream of `C3`/`C4`:
-    - `D_PWR_P`: **Anode** → `J4` Pins 9–10 (`+12V_IN`), **Cathode** → protected `+12V` rail (`C3.+`).
-    - `D_PWR_N`: **Cathode** → `J4` Pins 1–2 (`-12V_IN`), **Anode** → protected `-12V` rail (`C4.-`). *(Critical: reverse orientation relative to `+12V` because conventional current flows out of `-12V` into the supply.)*
-  - **Why preferred**: At typical module draw (`~15–25 mA`), Schottky drop is only `~0.30–0.35 V` (`±11.65 V` internal rails, preserving full `±10 V` Eurorack swing headroom), while completely blocking reversed cables, hot-plug polarity swaps, and row-shifted IDC headers with **zero fault current** and no tripped bus-board fuses.
-  - **Optional `10 Ω` RC rail damping**: Placing **`R_PWR_P = 10 Ω` (`1/4 W`)** and **`R_PWR_N = 10 Ω` (`1/4 W`)** *after* the Schottky diodes (before `C3`/`C4`) adds `~0.2 V` drop at `20 mA` while forming a `~723 Hz` low-pass supply filter with `22 µF` bulk caps and damping hot-plug inrush ringing.
-- **Reverse-Polarity Protection — Option B: PTC Polyfuses + Shunt Crowbar Diodes (Zero normal drop)**:
-  - If full `±12.0 V` rail headroom is required, place **`50–100 mA` PTC resettable polyfuses** (`F_PWR_P`, `F_PWR_N`) in series with `+12V_IN` and `-12V_IN`, followed by reverse-biased shunt diodes (`1N4001` or `1N5819` to `GND`: `D_SHUNT_P` Cathode → `+12V`, Anode → `GND`; `D_SHUNT_N` Anode → `-12V`, Cathode → `GND`).
-  - *Warning against `10 Ω` + shunt diode alone*: Under a reversed `-12 V` fault (`~11.3 V` across `10 Ω`), fault current reaches `1.13 A` (`12.8 W`), burning open a standard `1/4 W` `10 Ω` resistor; pair shunt crowbar diodes with PTC polyfuses rather than unprotected `1/4 W` resistors.
-- **Bulk Decoupling Upgrade (`C3`, `C4`)**: Increase `C3` and `C4` from `4.7 µF` to **`22 µF` (`10–47 µF`) electrolytic rated `≥ 25 V` (`35 V` recommended)** (`C3.+` → `+12V`, `C3.-` → `GND`; `C4.+` → `GND`, `C4.-` → `-12V`). Do **not** use `16 V` electrolytics on `±12 V` rails.
+#### Recommended Improvements
+- **Option A — Active Precision Peak Detector (used in `2 × TL074` revision):**
+  Insert a dedicated op-amp (`U_peak`) after `U1C`:
+  - `V_RECT` → `U_peak +`.
+  - `U_peak OUT` → `D3` (`A → K`) → `RV2` (`ATK`) → `C2` (`ENV_CAP`).
+  - `C2` (`ENV_CAP`) → unity-gain JFET buffer (`U_buf`) → `10 kΩ` → `U_peak -`.
+  - Add an anti-saturation clamp diode `D_clamp` (`1N4148`, `A` at `U_peak -`, `K` at `U_peak OUT`) so when `V_RECT < V(C2)`, `U_peak OUT` clamps at `V_RECT - 0.6 V` rather than slamming to `-10.5 V`.
+  - **Result:** `0 mV` diode deadband—signals down to a few millivolts track cleanly.
+  - **Tradeoff to note:** When `RV2 > 0`, `U_peak` drives `RV2` at full rail (`~+10.5 V`) until `V(C2) = V_RECT`, making attack a **constant-target slew** (faster for low-amplitude signals) rather than a true exponential RC curve toward `V_RECT`. Alternatively, keep a fast `0 Ω` peak-hold stage (`C_hold` + `Release`) followed by `U_buf` and a post-buffer `RV2` (`ATK`) low-pass RC filter (zero amplitude loss and zero diode deadband, with the natural constraint `τ_rel,eff ≥ τ_atk`).
+- **Option B — Matched-Diode `V_f` Pre-Bias (if keeping passive RC exponential attack):**
+  Place a matched `1N4148` in the feedback path of a pre-bias unity buffer before `D3` (with a small `~0.2–0.5 mA` pull-down bias resistor from its `-` input to `-12 V`) so its output rides at `V_RECT + V_f`, canceling `D3`'s `~0.6 V` drop to within `~30–50 mV` while preserving pure passive exponential `RC` charging.
 
 ---
 
-### 2.2 Local IC Decoupling Capacitors (`U1`, `U2`)
+### 1.3 Envelope Detector: `R9` Tap Error, Attack/Release Interaction, Taper & `C2` Dielectric (`D3`, `RV2`, `C2`, `R9`, `R10`, `RV3`)
 
-**Gap in Original Design (`EnvelopeFollower.md` §6.2):**
-- `EnvelopeFollower.md` omits local high-frequency ceramic bypass capacitors from the schematic/BOM, listing them only as an optional build note. Relying solely on distant bulk electrolytics (`C3`/`C4`) leaves `TL074`/`TL072` supply pins inductive at MHz frequencies (`TL07x` GBW `= 3 MHz`), risking high-frequency oscillation, inter-stage crosstalk, and rail bounce during `C2` (`1 µF`) peak-charging transients.
+#### Issues Observed
+1. **`R9` (`1 kΩ`) Causes a `9.1%` Amplitude Drop at Fast `Release`:**
+   In [EnvelopeFollower.md](./EnvelopeFollower.md), `U1D +` and `R20` (`LED`) tap the `ENV_RAW` node **after** `R9` (`1 kΩ`), while `C2` sits before `R9`. As `RV3` (`Release`) is turned down from `1 MΩ` to `0 Ω`, `R9` (`1 kΩ`) and `R10` (`10 kΩ`) form a voltage divider:
+   $$\frac{V_{\text{ENV\_RAW}}}{V_{\text{ENV\_CAP}}} = \frac{10\,\text{k}\Omega + R_{\text{REL}}}{1\,\text{k}\Omega + 10\,\text{k}\Omega + R_{\text{REL}}} \xrightarrow{R_{\text{REL}}=0} \frac{10\,\text{k}\Omega}{11\,\text{k}\Omega} = 0.909\;(-9.1\%)$$
+   Turning `Release` down changes the peak output level even when `C2` charges to the exact same voltage.
+2. **Severe Attack / Release Amplitude Interaction (`-14.9 dB` Loss):**
+   When `ATK` (`RV2`) is set high (`50 kΩ`) and `Release` (`RV3`) is near minimum (`0 Ω`, leaving `R9 + R10 = 11 kΩ`), `RV2` and `R9 + R10` form a voltage divider during charging:
+   $$\frac{11\,\text{k}\Omega}{50\,\text{k}\Omega + 11\,\text{k}\Omega} = 0.180\;(-14.9\text{ dB})$$
+   Up to **82%** of the envelope peak voltage is lost (further compounded by `R9` to `0.164`).
+3. **Zero Minimum Series Resistance on `ATK` (`RV2 = 0 Ω`):**
+   At `0%` `ATK`, `D3` connects directly to `C2` (`1 µF`). `U1C` sees a capacitive short on fast transients, driving `U1C` into output current limit (`~25 mA`) and risking ringing.
+4. **Linear `1 MΩ` `Release` Potentiometer (`RV3`) Cramps Fast Decays:**
+   With `R_min = 11 kΩ` and a linear `1 MΩ` pot (`C2 = 1 µF`):
+   - `0%` = `11 ms`, `9%` = `101 ms`, `50%` = `511 ms`, `100%` = `1011 ms`.
+   Over **`90%` of the knob travel** spans just `101 ms` to `1.01 s`, squeezing the entire percussive `11 ms–100 ms` range into the bottom `9%` of rotation. Also, if `RV3`'s wiper momentarily loses contact, `C2` has no discharge path to `GND` and holds voltage indefinitely.
+5. **`C2` (`1 µF`) Dielectric Choice:**
+   [EnvelopeFollower.md](./EnvelopeFollower.md) (Sections 3.4 and 6.1) lists "Film or C0G/X7R ceramic" as suitable for `C2`. **X7R ceramic** `1 µF` MLCCs exhibit severe DC bias derating (often losing `30–70%` capacitance by `+10 V`), piezoelectric microphonics (panel knocks inject false transients directly into `U1D`), and voltage-dependent distortion of the exponential release tail.
 
-**Recommended Additions:**
-- Add **`4 × 100 nF` (`0.1 µF`) `50 V` X7R ceramic capacitors** (`C_DEC1`–`C_DEC4`, two per IC package), one on `V+` to `GND` and one on `V-` to `GND` for every op-amp IC:
-  - **For `2 × TL074` (`Option C`, recommended)**:
-    - `U1`: `C_DEC1` (`100 nF`) from `U1.4` (`+12V`) to `GND`; `C_DEC2` (`100 nF`) from `U1.11` (`-12V`) to `GND`.
-    - `U2`: `C_DEC3` (`100 nF`) from `U2.4` (`+12V`) to `GND`; `C_DEC4` (`100 nF`) from `U2.11` (`-12V`) to `GND`.
-  - *(For `1 × TL074 + 1 × TL072` `Option A`)*: `U2` (`TL072`) decouples `U2.8` (`+12V`) → `GND` and `U2.4` (`-12V`) → `GND`.
-- **PCB Placement Rule**: Mount each `100 nF` ceramic cap physically within **`< 3–5 mm`** of the IC's `V+` and `V-` pins with direct, low-inductance vias to the `GND` plane (`50 V` rating gives `> 4×` voltage margin and avoids Class-2 DC-bias capacitance collapse).
-
----
-
-### 2.3 Gain Floor Limiting & Wiper Fail-Safe (`U1A`, `RV1`, and `U1D` Reference)
-
-**Gap in Original Design (`EnvelopeFollower.md` §1, §4 Stage 1):**
-- Unlike `RV3` (`Release`, protected by `R10 = 10 kΩ`) and `RV2` (`ATK`, protected by `R_atk_min` in `§1.2`), `RV1` (`100 kΩ` `GAIN` rheostat on `U1A`) has **no minimum feedback resistor**. Dialing `RV1` fully CCW reduces feedback resistance to `0 Ω` (`A_v = 0×`), shorting `U1A_OUT` (`pin 1`) straight to the inverting summing node (`U1A_INV`, `pin 2`) through panel-pot end-stop wiper contact resistance (`~10–100 Ω`) and wiring capacitance, creating a complete dead/mute zone at CCW while leaving `U1A` unprotected if a pot wire detaches.
-
-**Recommended Additions:**
-- **Minimum Gain-Floor Resistor (`R_gain_min`) in Series with `RV1`**:
-  - Insert **`R_gain_min = 1 kΩ`** (or `2.2 kΩ`) between `U1A_INV` (`pin 2`) and `RV1.1`:
-    - **Eurorack-balanced default (`1 kΩ`)**: Limits the minimum closed-loop gain floor to **`|A_v,min| = 0.10×` (`-20 dB`)** (max `10.1×`, `+20.1 dB`), eliminating `0 Ω` output-to-summing-node shorting and wiper end-stop contact-resistance nonlinearity while retaining **`10:1` attenuation** so hot `±10 V` Eurorack signals can be scaled to `±1 V` without saturating `U1A` or `U1C`. (`2.2 kΩ` yields a `-0.22×` / `-13.2 dB` floor.)
-    - **Unity-gain floor alternative (`10 kΩ`)**: For quiet line/instrument builds where attenuation below `1×` is unwanted, `R_gain_min = 10 kΩ` sets a **`1.00×` (`0 dB`)** gain floor (`1.0×` to `11.0×`, or pair with a `100 kΩ` pot / `11 kΩ` input for `1×–10×`), though `±10 V` modular signals will then leave zero attenuation headroom.
-- **Open-Wire / Wiper-Lift Fail-Safe (`R_gain_fail`)**:
-  - Keep `RV1.2` (wiper) and `RV1.3` tied together to `PREAMP_OUT` (so momentary wiper bounce keeps the loop closed at `100 kΩ`), **and** place a PCB-mounted **`R_gain_fail = 1 MΩ`** resistor directly from `U1A_INV` to `PREAMP_OUT` in parallel with `R_gain_min + RV1`.
-  - If a panel pot wire or connector detaches, `U1A` gain stays bounded at `-100×` rather than jumping to open-loop HF oscillation/rail slam; normal gain remains `-0.10×` (`1 kΩ || 1 MΩ`) to `-9.17×` (`101 kΩ || 1 MΩ`, `+19.25 dB`—or use `2.2 MΩ` for `-9.66×`).
-- **HF Roll-Off & Output Gain-Floor Coordination**:
-  - Place **`22–47 pF` (`C0G/NP0`)** across `U1A_INV`–`PREAMP_OUT` (`§3.4`) to limit ultrasonic noise gain from panel wiring capacitance.
-  - On the output stage `U1D`, removing `R14` (`§1.1`) likewise eliminates the unintended **`2×` base gain floor** that caused `OUT` to clip prematurely above `ENV_NODE ≈ +4.2 V`.
+#### Recommended Improvements
+1. **Tap `U1D +` and `LED` directly at `C2` (`ENV_CAP`),** removing `R9` (`1 kΩ`) from the `Release` series path (adjusting `R10` to `10 kΩ` or `11 kΩ` directly from `C2` to `RV3`). This immediately eliminates the `9.1%` release-dependent amplitude shift.
+2. **Add a `100 Ω`–`220 Ω` series safety resistor in series with `RV2` (`ATK`):** Protects `U1C` from capacitive current spikes and ringing while keeping minimum attack `≤ 0.22 ms`.
+3. **Use an audio/logarithmic taper (`A1M`) for `RV3` (`Release`),** spreading fast `10–150 ms` releases across the first half of the knob and `150 ms–1 s` tails across the upper half. Add a **`4.7 MΩ` safety resistor** in parallel with `RV3` (effective max `τ_rel ≈ 835 ms`, or use `A2M || 2.2 MΩ` for `~1.05 s`) so an open wiper never latches the envelope high.
+4. **Specify a `1 µF` film capacitor (polyester/polypropylene, e.g., WIMA MKS2/MKP2, `≥ 50 V`) for `C2`**—do not use X7R ceramic or standard polarized electrolytics.
+5. **Decouple Attack and Release (optional upgrade):**
+   Either use a fast peak-hold stage (`C_hold` + `Release`) → unity buffer → `RV2` (`ATK`) + `C_atk` low-pass (zero amplitude loss, `τ_rel,eff ≥ τ_atk`), or a classic 2-op-amp diode-steering active slew limiter (`D_atk`/`D_rel` separating charge and discharge currents completely).
 
 ---
 
-### 2.4 Output Protection: Short-Circuit, Rail-Clash & ESD Clamping (`J2`, `J3`, `R16`, `R19`)
+### 1.4 LED Indicator: Dim Output, Idle Glow on Red/Yellow LEDs & Bias Loss (`R20`–`R23`, `U2B`, `D4`)
 
-**Gap in Original Design (`EnvelopeFollower.md` §2.2, §4 Stage 5, §6.5):**
-- Single `1 kΩ` series resistors (`R16` on `OUT`, `R19` on `INV_OUT`) limit continuous shorts to `GND` (`~10.5 mA`, `0.11 W`), **but**:
-  1. Under an accidental Eurorack **output-to-output mispatch** against another module driving `∓12 V` (`22.5 V` across `1 kΩ`), dissipation reaches **`0.51 W`**, exceeding standard `0.125 W` (`0805`) and `0.25 W` (`1/4 W`) resistor ratings.
-  2. There are **no ESD or overvoltage clamping diodes** on `J2`/`J3`, leaving `U1D_OUT`, `U2A_OUT` (and `U1D-`/`U2A-` if using `§3.5`'s in-loop feedback) exposed to high-voltage transients.
+#### Issues Observed
+1. **Very Low LED Current (`~0.17 mA` at `+5 V`, `~0.34 mA` at `+10 V`):**
+   From [EnvelopeFollower.md](./EnvelopeFollower.md) Section 4.6, `V_bias = -2.79 V` (`R22 = 10 kΩ`, `R23 = 33 kΩ`) has a Thevenin source resistance `R_th = 7.67 kΩ`, giving `29.67 kΩ` total series resistance with `R21 = 22 kΩ`. For a `2.8 V` green/blue LED, `I_LED` is only **`0.17 mA` at `+5 V`** and **`0.34 mA` at `+10 V`**—far dimmer than standard `2–5 mA` studio panel indicators unless narrow-angle ultra-bright LEDs are fitted.
+2. **Idle Glow on Red, Amber, Orange, and Yellow LEDs:**
+   Because the cathode rests at `-2.79 V` while `U2B OUT` rests at `0 V`, `2.79 V` appears across `D4` at idle. Any red/orange/yellow LED (`V_f ≈ 1.8–2.1 V`) conducts **`~30 µA`** continuously at `0 V` and never turns completely dark (worsening to hundreds of microamps if `R21` is simply lowered to increase brightness).
+3. **Continuous Negative-Rail Drain:**
+   `R22 + R23` (`43 kΩ`) draws `0.28 mA` from `-12V` continuously, and `R20` (`10 kΩ`) on `U2B +` provides no practical benefit for an internal node.
 
-**Recommended Additions:**
-- **Split Series Isolation & Clash-Rated Resistors (`R16A/B`, `R19A/B`)**:
-  - Replace `R16` (`1 kΩ`) with two **`470 Ω` `0.5 W` (`1/2 W`) resistors in series** (`R16A` op-amp-side + `R16B` jack-side = `940 Ω` total) for `OUT`, and similarly **`R19A` + `R19B` (`470 Ω + 470 Ω`, `0.5 W`)** for `INV_OUT`.
-  - Under a worst-case `22.5 V` opposite-rail output clash (`23.9 mA`), each `470 Ω` resistor dissipates `0.269 W` (safely inside `0.5 W` with `~1.86×` continuous margin), while maintaining capacitive-load isolation (`940 Ω` keeps `100 kΩ` load drop `< 1%`, or `0.00%` DC error with `§3.5`).
-- **Midpoint ESD & Overvoltage Rail-Clamping Diodes**:
-  - At the junction between `R16A`/`R16B` (and `R19A`/`R19B`), connect dual rail-clamping diodes (**`BAV99` SMD** or **`2 × 1N4148` THT**, `< 25 nA` leakage; or `BAT54S`):
-    - Upper diode: **Anode** → midpoint (`OUT_CLAMP` / `INV_OUT_CLAMP`), **Cathode** → `+12V`.
-    - Lower diode: **Anode** → `-12V`, **Cathode** → midpoint.
-  - Because `R16B`/`R19B` (`470 Ω`) sit on the **jack side** of the clamps, external ESD strikes and `> ±12 V` hot-plug transients are current-limited before shunting cleanly into the locally decoupled `±12V` rails (`§2.2`), clamping the op-amp side safely within `[-12.65 V, +12.65 V]` (well inside `TL07x` `±18 V` absolute max ratings) while remaining completely reverse-biased during normal `±10.5 V` swings.
-- **Output Jack Switch Rule**: Leave `J2` (`OUT`) and `J3` (`INV_OUT`) Tip-Normal switch pins **unconnected (`NC`)**; never tie output normals to `GND`.
-
----
-
-### 2.5 Unused Op-Amp Termination (`U2C`, `U2D` / Any Spare Sections)
-
-**Gap in Original Design (`EnvelopeFollower.md` §2.1):**
-- Leaving unused sections of a `TL074` (`Option C`, 2 unused in a 6-op-amp build, or 1 unused if adding only one spare-op-amp upgrade) with floating inputs allows `10¹² Ω` JFET pins to pick up stray fields, oscillate at HF, and inject noise onto shared `±12V` rails. Conversely, tying both `+` and `-` inputs to `GND` in open loop causes input offset voltage ($V_{\text{OS}}$) to rail the output continuously (`±10.5 V`), and tying an input to `-12V` violates `TL07x` negative common-mode limits (`V- + 4 V`), triggering phase reversal.
-
-**Recommended Addition:**
-- Terminate every unused op-amp section as a **unity-gain voltage follower referenced to `GND`**, with `V+` (`+12V`) and `V-` (`-12V`) powered and locally decoupled (`§2.2`):
-  - **Unused `U2C` (`TL074`)**: `U2.10` (`+`) → **`GND`**; `U2.9` (`-`) → `U2.8` (`OUT`).
-  - **Unused `U2D` (`TL074`)**: `U2.12` (`+`) → **`GND`**; `U2.13` (`-`) → `U2.14` (`OUT`).
-  - *(Unused `TL072` section `B`, if applicable)*: `pin 5` (`+`) → **`GND`**; `pin 6` (`-`) → `pin 7` (`OUT`).
-- **Why this works**: `TL07x` is unity-gain stable, `0 V` (`GND`) sits near the center of its `-8 V` to `+12 V` common-mode input range, and the output rests quietly at `0 V` with zero static load current.
+#### Recommended Improvements
+- **Option A — Re-Scaled Passive Bias (zero extra components, zero load on `C2`):**
+  Change `R21 = 1 kΩ`, `R22 = 2.2 kΩ` (to `GND`), and `R23 = 15 kΩ` (to `-12V`), removing `R20` (`0 Ω` jumper):
+  - `V_bias = -12 V × (2.2k / 17.2k) = -1.53 V` (`< 1.8 V`, so **completely OFF `0 mA` at `0 V` for red, yellow, green, blue, and white LEDs**).
+  - Total effective impedance drops from `29.67 kΩ` to `R21 + (2.2k || 15k) = 2.92 kΩ`, increasing LED current nearly `10×` to **`~1.3–1.6 mA` at `+5 V`** and **`~3.0–3.3 mA` at `+10 V`**.
+- **Option B — Precision Op-Amp Constant-Current Sink Driver (ideal when fed from buffered `C2` in `2 × TL074` revision):**
+  *(Important: do not place a resistive divider directly on unbuffered `C2` (`ENV_CAP`), as it would discharge `C2` and shorten `Release`!)*
+  Drive `U2B +` (or `U2D +`) from the buffered envelope via a `10 kΩ / 10 kΩ` divider (`0 V` to `+5 V` for `0–10 V` envelope), place `D4` (`LED`) from op-amp output (`A`) to `-` input (`K`), add a `1 kΩ` sense resistor from `-` input (`D4.K`) to `GND`, and place an antiparallel `1N4148` clamp across `D4` (`A` to `-`, `K` to output):
+  - $$I_{\text{LED}} = \frac{0.5 \cdot V_{\text{ENV}}}{1\,\text{k}\Omega} = 0.5\,\text{mA/V} \cdot V_{\text{ENV}} \quad (0\text{ mA at }0\text{ V},\; 5.0\text{ mA at }+10\text{ V})$$
+  - Exact **`0 mA` off state** at `0 V`, turns on at `< 20 mV`, linear brightness **completely independent of LED color or `V_f`**, and eliminates `R22`/`R23` `-12V` static drain.
 
 ---
 
-### 2.6 Eurorack Protection Summary Table
+### 1.5 Input Stage: Impedance, `GAIN` Taper/Stability, Gain Floor Limiting & Jack Normalization (`J1`, `C1`, `R1`, `R2`, `RV1`, `U1A`)
 
-| Protection | Target Stage / Pins | Recommended Addition / Upgrade |
-|---|---|---|
-| **Reverse-Polarity Power** | `J4`, `+12V`, `-12V`, `C3`, `C4` | Shrouded keyed `2×5` IDC header; `1N5819`/`SS14` series Schottkys (`D_PWR_P` A→`J4`, `D_PWR_N` K→`J4`) + optional `10 Ω` RC filter (or `50–100 mA` PTC + shunt diodes); upgrade `C3`/`C4` to `22 µF ≥ 25 V` (`35 V` pref.) |
-| **Local IC Decoupling** | `U1`, `U2` (`V+`, `V-` to `GND`) | `4 × 100 nF` `50 V` X7R ceramic caps (`V+`→`GND` and `V-`→`GND` per IC), placed `< 3–5 mm` from IC supply pins |
-| **Gain Floor Limiting** | `U1A`, `RV1` (`GAIN`) | `R_gain_min = 1 kΩ` (or `2.2 kΩ`) in series with `RV1` (`-0.10×` / `-0.22×` floor, preventing `0 Ω` short/mute; `10 kΩ` for `1×` floor) + `1 MΩ` PCB fail-safe across `RV1` + `22–47 pF` HF cap (`§3.4`); remove `R14` on `U1D` (`§1.1`) |
-| **Output Protection** | `J2` (`OUT`), `J3` (`INV_OUT`) | Split `R16`/`R19` into `470 Ω + 470 Ω` (`0.5 W` rated) + midpoint `BAV99` (`2 × 1N4148`) or `BAT54S` clamps to `±12V`; leave Tip-Normal pins `NC` |
-| **Unused Op-Amp Termination** | `U2C`, `U2D` (or any spare section) | Unity-gain follower to `GND` (`+` → `GND`, `-` → `OUT`: `U2.10`→`GND`, `U2.9`↔`U2.8`; `U2.12`→`GND`, `U2.13`↔`U2.14`) |
+#### Issues Observed
+1. **Low Input Impedance (`~9.9 kΩ` vs `100 kΩ` Eurorack Standard):**
+   `R2` (`10 kΩ`) terminates into `U1A`'s virtual ground, giving `Z_in = 1 MΩ || 10 kΩ ≈ 9.90 kΩ`. Standard Eurorack inputs are `100 kΩ` (or `1 MΩ` for instruments). A `~9.9 kΩ` load drops signal level noticeably when patched from passive attenuators (`10k–50k` pots), vintage synths, or guitar pickups.
+2. **`GAIN` Potentiometer (`RV1`) Used as Feedback Rheostat:**
+   - **Poor control taper:** Linear `0–100 kΩ` gives `|A_v| = R_GAIN / 10 kΩ`. Unity gain (`1×`) occurs at `10%` rotation (`10 kΩ`), while the entire top `50%` of knob travel covers only `+14 dB` to `+20 dB` (`5×` to `10×`). Typical Eurorack signals (`5–10 Vpp`) cluster below `20%` rotation.
+   - **Open-wiper failure mode:** If `RV1` wiper momentarily lifts, `U1A` loses feedback (`A_OL > 10⁵`) and slams to `±10.5 V`, creating a loud false envelope spike.
+   - **Summing-node capacitance:** Wiring panel pot `RV1` directly to `U1A -` (`IN_SUM`) adds stray capacitance at the inverting node, reducing phase margin at high gain.
+3. **Zero Minimum Gain Floor / `0 Ω` Feedback Short:**
+   - In the baseline inverting topology, turning `RV1` (`GAIN`) all the way down (`0 Ω`) shorts `U1A` output directly to `U1A -` (`IN_SUM`) through the panel pot wiper and drops gain to **`0×` (`-∞ dB`)**, creating an unresponsive dead zone across the lower end of the knob (compounded by `D3`'s `~0.6 V` threshold).
+   - Likewise, in a grounded `47 kΩ + A50k` input attenuator, turning `RV1` fully CCW shorts `U1A +` directly to `GND` (`0×` gain). Unless full mute at `0%` is specifically desired, a Eurorack envelope follower benefits from a deterministic non-zero **minimum gain floor** (while also protecting `TL07x` against common-mode floor phase reversal).
+4. **Floating Input Jack & Unprotected Input (`J1`, `C1`):**
+   Leaving a switched jack's normalled pin (`TN`) floating allows `C1` (`4.7 µF`) to pick up ambient `50/60 Hz` hum/noise when no cable is inserted, amplified up to `10×` by `U1A`. Additionally, `C1` lacks a specified `≥ 50 V` DC-blocking rating and `U1A` has no ESD/overvoltage rail clamping against external patch faults.
 
----
-
-## 3. Signal Integrity, Component Selection & Usability Improvements
-
-### 3.1 Precision Rectifier Matching, Headroom & Symmetry (`U1B`, `U1C`, `R3`–`R8`, `D1`, `D2`)
-
-- **High tolerance sensitivity (`2× − 1×` cancellation)**: During positive `PREAMP_OUT`, `U1C` sums $+\frac{V}{R_4+R_5}$ (`1/20 kΩ`) against $-\frac{V}{R_7}\frac{R_6}{R_3}$ (`1/10 kΩ`). Because it subtracts `1/20k` from `1/10k` to leave `1/20k`, **resistor errors are amplified roughly 3×**:
-  - With `5%` resistors, worst-case half-cycle gain asymmetry reaches **`44.3%`**.
-  - Even with standard `1%` resistors, worst-case half-cycle asymmetry reaches **`8.16%`**, leaking fundamental-frequency ripple (`50/100 Hz`) into the envelope detector.
-  - **Fix**: Specify **`0.1%` (or hand-matched `1%`) metal-film resistors** for `R3`–`R7` (dropping worst-case asymmetry to `0.80%`). Replace `R4 + R5` (`10 kΩ + 10 kΩ`) with a single `0.1%` `20 kΩ` resistor if convenient, and change `R8` from `22 kΩ` (`1.1×` gain) to **`20 kΩ`** for exact **`1.0×`** unity gain (preventing `U1C` from hitting `+10.5 V` rail saturation before `U1A`).
-- **`U1B` negative swing margin**: At `PREAMP_OUT = +10 V`, `RECT_HW = -10 V`, forcing `U1B_OUT` down to `-10 V - V_f(D2) ≈ -10.65 V` while sinking `2 mA` (`R6 || R7 = 5 kΩ`). On `±12 V` rails, `TL074` clips near `-10 V` to `-10.5 V`, causing asymmetric clipping at extreme peaks. Using small-signal Schottky diodes (`BAT85`) for `D1`/`D2` saves `~0.35 V` of headroom and halves zero-crossing deadband (note: `D1`/`D2` operate inside low-impedance op-amp nodes, so `BAT85`'s `~µA` leakage causes no timing error here, unlike `D3`).
-
-### 3.2 LED Driver Idle Glow & Low Peak Current (`U2B`, `D4`, `R21`–`R23`)
-
-**Current Behavior:**
-- `R22` (`10 kΩ` to `GND`) and `R23` (`33 kΩ` to `-12V`) set a `-2.79 V` Thévenin bias (`R_th = 7.67 kΩ`) on `D4` cathode, with `R21 = 22 kΩ` (`29.67 kΩ` total loop impedance):
-  - **Red LED ($V_f \approx 1.85\text{ V}$)**: Draws **`31.7 µA` at `0 V` idle** (visibly glowing in dim rooms) and only **`0.369 mA` at `+10 V` peak**.
-  - **Yellow/Green LED ($V_f \approx 2.1\text{ V}$)**: Draws **`23.3 µA` at `0 V` idle** and **`0.360 mA` at `+10 V`**.
-  - **Blue/White LED ($V_f \approx 3.0\text{ V}$)**: Stays off at idle, peaking at **`0.330 mA`**.
-
-**Recommended Improvement (In-Loop Precision LED Current Sink):**
-- Delete `R22` (`10 kΩ`) and `R23` (`33 kΩ`), and place LED `D4` **inside `U2B`'s feedback loop**:
-  - `U2B_OUT` → `D4.A`; `D4.K` → `U2B-` and **`R_led` (`2.2 kΩ` to `4.7 kΩ`) to `GND`**.
-  - **Crucial safeguard**: Add a **`1N4148` anti-parallel clamp diode across `D4`** (Anode at `D4.K` / `U2B-`, Cathode at `D4.A` / `U2B_OUT`). If offset/noise ever pulls `U2B+` slightly negative, this clamps `U2B_OUT` at `-0.65 V` so the LED is never subjected to `-12 V` reverse breakdown (typical LED $V_{R,\max} \approx 5\text{ V}$).
-- **Benefits**: Guaranteed **`0.00 mA` idle current** for **any LED color/forward voltage**, linear brightness proportional to envelope voltage (`0–4.5 mA` with `2.2 kΩ`), and independence from `-12V` supply drift. *(Note: In a 6-op-amp build, `U2B` gently saturates above `ENV_NODE ≈ +8.5 V` without affecting `ENV_NODE`; in an 8-op-amp build with a dedicated `ENV_CAP` buffer, dividing `U2B_OUT` by 2 into `U2D` with `R_led = 1 kΩ` keeps the LED linear all the way to `+10 V` even for a `3.2 V` blue LED.)*
-
-### 3.3 Capacitor Dielectrics & Physical Sizing (`C1`, `C2`)
-
-- **Do not use Class-2 MLCCs (X7R/X5R/Y5V) for `C2` (`1 µF`)**: `EnvelopeFollower.md` §3.2 mentions `MLCC` as an option for `C2`. Class-2 MLCCs suffer from **piezoelectric microphonics** (tapping panel pots creates CV spikes) and **DC-bias capacitance loss** (losing 30–60% of nominal capacitance at `+10 V`, causing Attack and Release times to shrink dramatically on loud signals). Specify a **polyester/polypropylene film capacitor** (`1 µF`, e.g., 5 mm box film).
-- **Shrink `C1` (`4.7 µF`) once `Z_in` is raised to `100 kΩ`**: A `4.7 µF` non-polarized film capacitor is physically large and costly. At `Z_in = 100 kΩ`, a compact **`1 µF` film** (`f_c = 1.59 Hz`) or **`470 nF` film** (`f_c = 3.39 Hz`) preserves the same low-frequency response in a standard 5 mm footprint without using bipolar electrolytics.
-
-### 3.4 Preamp HF Compensation & Potentiometer Taper Selection (`RV1`, `RV2`, `RV3`)
-
-- **Add `22 pF–47 pF` (`C0G/NP0`) feedback compensation across `RV1` (paired with `§2.3` gain-floor limiting)**: Panel wiring to `RV1` adds stray capacitance at `U1A_INV` (`pin 2`). At `100 kΩ` gain, a small parallel feedback capacitor rolls off ultrasonic gain above `~34–72 kHz`, preventing peaking, RF pickup, and oscillation. Pair with `R_gain_min` (`1 kΩ` / `2.2 kΩ`) and `R_gain_fail` (`1 MΩ`) per `§2.3`.
-- **Potentiometer tapers (`A` vs. `B`)**:
-  - **`RV1` (`GAIN`)**: Use a **`100 kΩ` audio/logarithmic (`A` taper)** pot. With a linear `100 kΩ` pot, unity gain (`1×`, `10 kΩ`) occurs at just **10% rotation**, crowding all normal Eurorack attenuation/unity levels into the bottom sliver while 90% of travel drives `±5 V` audio into hard rail clipping.
-  - **`RV2` (`ATK`) & `RV3` (`Release`)**: Use **audio/log (`A` taper)** pots (especially for `RV3 = 1 MΩ`), giving fine control in the musical `10–200 ms` range.
-- **Attack/Release interaction**: In any single-capacitor diode-RC detector driven by unsmoothed rectified AC, `RV2` (`ATK`) and `R10 + RV3` (`Release`) act as a voltage divider whenever $\tau_{\text{atk}} \gtrsim \tau_{\text{rel}}$. At `ATK = 50 kΩ` and `Release = 0 Ω` (`10 kΩ`), peak output drops to **`10k / (50k + 10k) = 16.7%` (`-15.6 dB`)**. Either increase `R10` (`22 kΩ–47 kΩ` if `22–47 ms` min release is acceptable), use `A`-taper pots to keep `RV3` away from low resistance in normal use, or split into a fast peak-hold (`Release`) stage followed by a buffered `ATK` slew stage if full-amplitude slow-attack + ultra-fast-release is required.
-
-### 3.5 Output Load Accuracy (`R16`, `R19`)
-
-- `R16` and `R19` (`1 kΩ`, or split `470 Ω + 470 Ω` per `§2.4`) sit outside the op-amp feedback loops, which protects against output shorts, rail clashes, and cable capacitance, but causes a **`~1%` voltage drop into `100 kΩ`** and a **`~8.6–9.1%` drop into `10 kΩ`** (e.g., if patched into a second unit of this exact circuit!).
-- **Optional precision CV enhancement**: Put the op-amp-side resistor (`R16A = 470 Ω`, `R19A = 470 Ω`) **inside the DC feedback loop**—taking a `10 kΩ` DC feedback resistor from the midpoint clamp node (after `R16A`/`R19A`, behind jack-side `R16B`/`R19B = 470 Ω` per `§2.4`) back to the op-amp `-` pin, plus a `100 pF` local HF compensation cap directly from the op-amp output pin to `-`. Note: only `R16B` (`470 Ω`) remains outside the DC loop (`< 0.47%` into `100 kΩ`), or place the `10 kΩ` DC feedback tap at `J2.Tip`/`J3.Tip` for `0.00%` DC drop while the midpoint `BAV99`/`1N4148` clamps (`§2.4`) protect both the op-amp output and its `-` pin.
-
-### 3.6 Optimal Allocation of `2 × TL074` (`Option C`, 8 Op-Amps)
-
-Migrating from `1 × TL074 + 1 × TL072` (`Option A`, 6 op-amps) to `2 × TL074` (`Option C`, 8 op-amps) unifies the IC BOM and gives **2 spare op-amps** that can be assigned in either of two clean configurations:
-
-1. **Allocation 1 (Inverting Input Preamp Preserved)**:
-   - Spare #1: **`100 kΩ` unity-gain input buffer** before `R2` (`10 kΩ`) (eliminates `9.9 kΩ` loading without increasing preamp resistor noise or phase-reversal risk).
-   - Spare #2: **Active precision peak detector** (`D3` inside loop) feeding `R_atk_min` + `RV2` → `C2`.
-   - Combine with §1.1 Option A (`R14` removed, `RV4 = 10 kΩ`, `R13 = 18–22 kΩ`, `< 3.5%` gain variation) and §3.2 (in-loop LED driver on `U2B`).
-2. **Allocation 2 (Exact `1.0×` Output Gain & `0%` Offset Interaction)**:
-   - Use §1.4 6-op-amp option A (`RV1` as `100 kΩ` input attenuator into clamped non-inverting `+11×` `U1A`, `Z_in = 100 kΩ`).
-   - Spare #1: **Active precision peak detector** (`D3` inside loop).
-   - Spare #2: **`ENV_NODE` unity buffer** feeding `U1D` as an inverting `1.0×` summer (§1.1 Option B) while `U2B` remains dedicated to the in-loop LED driver (§3.2).
-
-Any op-amp section still left unused in a build must be terminated as a unity-gain follower (`+` to `GND`, `-` to `OUT`) per `§2.5`, never left with floating inputs.
+#### Recommended Improvements
+- **Minimal Fix (keeps inverting `U1A`):**
+  1. Connect `J1`'s normalled switch pin (`TN`) to `GND` so an unplugged jack shorts the input cleanly to ground.
+  2. **Gain floor & ceiling limiting:** Insert a **`4.7 kΩ` gain-floor resistor (`R_floor`)** in series with `RV1` (`U1A -` ↔ `R_floor` ↔ `RV1` ↔ `U1A OUT`), setting a minimum gain floor of **`0.47×` (`-6.6 dB`)** and maximum **`10.47×`**—preventing a `0 Ω` feedback short and keeping standard `±5 V`–`±10 V` Eurorack signals active without clipping `U1A` at `±10 V` peaks (use `10 kΩ` if a `1.0×` unity floor is preferred for `±5 V` line/audio signals). Place a **`1 MΩ` safety resistor** (open-wiper gain ceiling) and **`22 pF` compensation capacitor** (HF rolloff) in parallel across `R_floor + RV1`.
+  3. Optionally switch `RV1` to an audio/log taper (`A100k`) so low gains occupy more knob travel.
+- **Better Fix (`Z_in ≈ 97 kΩ`, Log Taper, Gain Floor Limiting, No Extra Op-Amp):**
+  Replace the inverting input stage with an **input attenuator with gain-floor limiting into a fixed `+21×` non-inverting amplifier**:
+  - `J1.Tip` → `C1` (`1 µF` film, `≥ 50 V` / `63 V`, giving `f_c ≈ 1.65 Hz`—smaller and cheaper than `4.7 µF`) → `R_in1` (`47 kΩ`) → `RV1` (`A50k` log pot) → **`R_floor` (`2.2 kΩ`)** → `GND` (connected to `RV1` Pin `1` `CCW`).
+  - `RV1` wiper → `U1A +`, with a **`1 MΩ` pull-down to `GND`** (open-wiper ceiling safety) and **`BAT54S` rail-clamp diode array** (`Pin 1 A` → `-12V_PROT`, `Pin 2 K` → `+12V_PROT`, `Pin 3 COM` → `U1A +`; `R_in1 = 47 kΩ` limits even `±24 V` transient fault current to `< 0.26 mA`).
+  - `U1A` set to fixed non-inverting gain `1 + 200 kΩ / 10 kΩ = +21×` (with `22 pF` across `200 kΩ` for HF gain limiting).
+  - **Gain Floor & Headroom Performance:**
+    - **Minimum Gain Floor (`0%` CCW):** `R_floor = 2.2 kΩ` sets `|A_v,min| = (2.2k || 1M) / (47k + 50k + 2.2k) × 21 =` **`+0.465×`** (`-6.65 dB`), ensuring even hot `±10 V` (`20 Vpp`) Eurorack signals stay safely below `U1A` clipping (`±4.65 V`) while eliminating the silent dead zone at minimum `GAIN`. *(For a `~1.0×` unity floor, use `R_floor = 4.7 kΩ` → `+0.97×` to `+11.0×`, or `4.7 kΩ` with `180 kΩ / 10 kΩ` = `+19×` for `+0.87×` to `+9.97×`; only omit `R_floor` if full `0×` mute at CCW is explicitly desired.)*
+    - **Maximum Gain (`100%` CW):** **`+10.78×`** (`+20.65 dB`) with nearly constant `Z_in ≈ 96.6 kΩ`.
+    - **Common-Mode Floor Safety for `TL074`:** At `±12 V` peak input and full CW gain, `U1A +` reaches at most `±6.16 V`—safely above `TL07x`'s `-8 V` negative common-mode floor so **`TL074` cannot undergo phase reversal** (the rectifier takes `|V_GAIN|`, so removing `U1A`'s sign inversion does not alter circuit polarity).
+- **Optional Enhancement:** Add an `AC / DC` bypass switch across `C1` if sub-3 Hz CV tracking is desired.
 
 ---
 
-## 4. Discrepancies & Corrections Found in `EnvelopeFollower.md`
+### 1.6 Precision Full-Wave Rectifier: Gain Scaling & Saturation Symmetry (`U1B`, `U1C`, `R3`–`R8`)
 
-| Section / Line | Stated in `EnvelopeFollower.md` | Actual Circuit Behavior / Correction |
-|---|---|---|
-| **§1 Table (L15) & §4 Stage 1 (L137)** | Input AC-coupling high-pass cutoff $f_c \approx 0.034\text{ Hz}$ (calculated from `C1 = 4.7 µF` and `R1 = 1 MΩ`). | Because `R2` (`10 kΩ`) connects to `U1A`'s inverting virtual ground (`0 V`), `C1` sees $R_1 \parallel R_2 = 9.90\text{ k}\Omega$. The actual cutoff is **$f_c = \frac{1}{2\pi \cdot 4.7\,\mu\text{F} \cdot 9.90\,\text{k}\Omega} \approx 3.42\text{ Hz}$** (100× higher). |
-| **§6.3 Pot Rotation (L221)** | *"RV4 (OFFSET): Pin 1 -> OFF_TOP, Pin 3 -> OFF_BOT makes clockwise push OUT more negative (or swap Pin 1/Pin 3 if you want clockwise to push OUT more positive)."* | **Sign reversed.** `OFF_TOP` is `+10 V` and `OFF_BOT` is `-10 V`. Turning CW moves wiper Pin 2 toward Pin 3 (`-10 V`), and because `U1D` **inverts** `OFF_WIPER`, turning CW pushes `OUT` **more positive (`+5.22 V`)**. The current netlist already yields intuitive `CW = +OUT` behavior; swapping Pins 1 and 3 would invert it. |
-| **§4 Stage 4 (L152)** | Notes $\tau_{\text{rel,min}} = 11\text{ ms}$ from `(1 kΩ + 10 kΩ) · 1 µF`. | Omits that `R9` (`1 kΩ`) + `R10` (`10 kΩ`) attenuate `ENV_NODE` by `10/11` (`-9.1%`) relative to `ENV_CAP` when `Release` is at minimum. |
-| **§3.2 Cap Voltage (L103–104)** | Lists `(minimum 16 V)` for `C3`/`C4` on `±12 V` rails. | Tighten minimum rating to **`≥ 25 V`** (`35 V` recommended) to provide standard ≥2× voltage derating margin. |
+#### Issues Observed
+1. **Unnecessary `+1.1×` Gain (`R8 = 22 kΩ`):**
+   `V_RECT = +1.1 · |V_GAIN|` causes `U1C` to clip against `+10.5 V` when `|V_GAIN|` reaches `~9.55 V`, slightly before `U1A` clips, and introduces a non-integer `1.1×` factor while adding `22 kΩ` to the BOM.
+2. **Asymmetric Load Current on `U1B`:**
+   When `V_GAIN > 0`, `U1B OUT` sits at `-V_GAIN - V_f(D2)` (`~-10.65 V` at `V_GAIN = +10 V`) while sinking `I(R4) + I(R7) = V_GAIN / 5 kΩ` (`2.0 mA`). Because `TL07x` output swing droops under heavier load, positive `V_GAIN` peaks clip ~`0.5–1 V` earlier than negative `V_GAIN` peaks (`U1B` stays at `+0.6 V` during `V_GAIN < 0`).
+
+#### Recommended Improvements
+1. Change `R8` from `22 kΩ` to **`20 kΩ`** (or two **`10 kΩ` `1%` resistors in series**, matching `R5 + R6` and reusing the existing `10 kΩ` BOM line!) for exact **`1.00×`** rectifier gain and symmetric headroom.
+2. Optionally scale `R3, R4, R6–R8` up from `10 kΩ / 20 kΩ` to **`22 kΩ / 44 kΩ`** (e.g., `22 kΩ` for `R3`, `R4`, `R5`, `R6`, `R7`, and `R8` as `22 kΩ + 22 kΩ`), halving `U1B` peak sink current to `~0.9 mA` for cleaner saturation symmetry while preserving `1%` matching.
 
 ---
 
-## 5. Optional Eurorack Feature Enhancements (Scope Extensions)
+### 1.7 Eurorack Circuit Protections: Power Supply, IC Decoupling, Output Protection & Unused Op-Amp Termination (`J1`–`J4`, `C3`–`C8`, `D_rev+`, `D_rev-`, `BAT54S`, `R16`, `R19`, `U1`, `U2`)
 
-If expanding the module beyond a strict 1:1 fix of the original schematic:
-1. **Gate / Trigger Extractor Output**: Compare `ENV_NODE` against an adjustable threshold pot (e.g., `0–8 V`) with slight positive hysteresis (`~100–200 mV`) to generate a clean `0/+10 V` Gate/Trigger output for triggering ADSRs or clock dividers from audio transients.
-2. **AC / DC Input Coupling Switch**: A front-panel toggle (or jumper) bypassing `C1` allows the module to follow sub-3 Hz CVs and slow LFOs accurately while keeping AC-coupling available for DC-biased audio.
-3. **Input Pad / Gain Range Switch**: A `1×` / `10×` range switch or pad prevents `±10 V` modular signals from saturating `U1A` while preserving `+20 dB` (or `+26 dB`) gain for quiet guitar/line inputs.
-4. **Center-Detent `OFFSET` Pot & Bi-Color `OUT` LED**: A center-detent `10 kΩ` (`B`-taper) pot makes zero-offset easy to find by touch; a bi-color LED on `OUT` (or keeping single LED on `ENV_NODE`) visualizes bipolar offset shifts.
+While [EnvelopeFollower.md](./EnvelopeFollower.md) (Sections 3.1 and 6.1) mentions local `100 nF` decoupling, reverse-polarity protection, and terminating unused units in Option C as high-level Build Notes, a production-ready Eurorack module requires concrete component-level protections across power entry, IC supply rails, external I/O jacks, and spare op-amp units.
+
+#### 1.7.1 Power Supply Reverse-Polarity Protection & Bulk Filtering (`J4`, `D_rev+`, `D_rev-`, `C3`, `C4`)
+- **Issues Observed:**
+  - The baseline schematic shows bare `+12V in`, `GND`, and `-12V in` ports with no reverse-polarity protection—inserting an unkeyed ribbon cable backward destroys `U1`, `U2`, and reverse-biases `C3`/`C4` immediately.
+  - `4.7 µF` bulk capacitors (`C3`, `C4`) are light for noisy Eurorack bus boards shared with digital modules.
+- **Recommended Implementation:**
+  1. **Shrouded Keyed Eurorack Header (`J4`):** Use a **shrouded, keyed `2×5` (10-pin) IDC header** following the Doepfer A-100 pinout: Pins `1–2` = `-12V` (red stripe), Pins `3–8` = `GND` (all 6 pins tied solidly to the PCB ground plane), Pins `9–10` = `+12V`.
+  2. **Series Schottky Reverse-Polarity Diodes (`D_rev+`, `D_rev-`):** Place **`1N5819`** (THT, or `SS14` / `B5819W` SMD) series diodes upstream of `C3` and `C4`:
+     - **`+12V` rail (`D_rev+`):** Anode (`A`) to `J4` pins `9–10` (`+12V in`); Cathode (`K`) to protected `+12V_PROT` rail.
+     - **`-12V` rail (`D_rev-`):** Cathode (`K`) to `J4` pins `1–2` (`-12V in`); Anode (`A`) to protected `-12V_PROT` rail. *(Observe opposite orientation on the negative rail so normal `-12 V` conducts cleanly while reversed `+12 V` blocks.)*
+     - **Voltage Drop & Headroom:** At `~10–15 mA` module draw, `1N5819` drops `~0.25–0.32 V` (`V_rail ≈ ±11.7 V`), leaving `~±10.2–10.5 V` `TL07x` output swing and keeping Path A/B offset (`±4.54 V` / `±4.73 V`) and Path A LED bias (`-1.50 V`) within spec, with **zero standby fault dissipation** if plugged in backward indefinitely. *(Optionally add `10 Ω` `1/4 W` / `0805` series resistors or ferrite beads after `D_rev+`/`D_rev-` into `C3`/`C4` to damp hot-plug ringing and switching-PSU ripple; `10 Ω` adds `0.15 V` drop at `15 mA`, leaving `±11.55 V`. Avoid `10 Ω` fusible + `1N4004` shunt clamps unless zero steady-state drop is essential, as reversed cables force `~1.2 A` / `14.4 W` through the `10 Ω` resistor until it opens.)*
+  3. **Protected Bulk Capacitors (`C3`, `C4`):** Place **`22 µF` or `47 µF` (`≥ 35 V`, low-ESR aluminum electrolytic)** **downstream** of `D_rev+`/`D_rev-` so they are also reverse-polarity protected (`C3 +` to `+12V_PROT`, `C3 -` to `GND`; `C4 +` to `GND`, `C4 -` to `-12V_PROT`).
+
+#### 1.7.2 Local IC Decoupling Capacitors (`C5`–`C8`)
+- **Issue Observed:** No local high-frequency ceramic bypass capacitors are present on the baseline schematic; long bus traces to `U1` and `U2` invite op-amp HF oscillation and supply rail bounce during `C2` peak-charging transients and LED current steps.
+- **Recommended Implementation:**
+  Place **`100 nF` (`0.1 µF`, `50 V` X7R ceramic**, `0603`/`0805` SMD or radial THT) directly across the supply pins of **every op-amp package** (`< 5 mm` trace length, short return to `GND`):
+  - **`U1` (`TL074`, DIP-14 / SOIC-14):** `C5` from Pin `4` (`+12V_PROT`) to `GND`; `C6` from Pin `11` (`-12V_PROT`) to `GND`.
+  - **`U2` (`TL072` in Path A, DIP-8 / SOIC-8):** `C7` from Pin `8` (`+12V_PROT`) to `GND`; `C8` from Pin `4` (`-12V_PROT`) to `GND`.
+  - **`U2` (`TL074` in Path B or BOM-consolidated Path A):** `C7` from Pin `4` (`+12V_PROT`) to `GND`; `C8` from Pin `11` (`-12V_PROT`) to `GND`.
+
+#### 1.7.3 Output & Input Jack Protection (`J1`–`J3`, `R16`, `R19`, `BAT54S`)
+- **Issues Observed:**
+  1. **Output Resistor Overload Under Cross-Patching (`R16`, `R19`):** `1 kΩ` series resistors protect `U1D`/`U2A`/`U2C` on short to `GND` (`10.5² / 1000 = 0.11 W`), but patching `OUT` at `-10.5 V` directly into another module's `+10.5 V` or `+12 V` output (`21–22.5 V` difference) dissipates **`0.44–0.51 W`** continuously, scorching `0603`/`0805` SMD or `1/4 W` resistors.
+  2. **No ESD / Overvoltage Clamping:** External `8 kV` ESD strikes or hot-patched voltages beyond `±12 V` hit op-amp pins directly.
+  3. **Output Jack Switch Miswiring Risk:** Grounding a switched jack's normalled pin (`TN`) is required on `J1` (`IN`), but mistakenly grounding `J2.TN` or `J3.TN` shorts `OUT` / `INV_OUT` to `GND` through `1 kΩ` whenever unplugged.
+- **Recommended Implementation:**
+  1. **Fault-Rated `1 kΩ` Output Build-Out Resistors (`R16`, `R19`):** Keep `1 kΩ` series output resistance (which also isolates `100–300 pF` Eurorack patch cable capacitance from the op-amp output to prevent oscillation), but specify **`0.5 W` (`1/2 W`) metal-film THT**, **`1206`/`2512` surge-rated SMD**, or **`2 × 470 Ω` (`1/4 W` / `0805`) in series (`940 Ω`)**.
+  2. **ESD & Overvoltage Rail Clamps (`BAT54S`, SOT-23):** Use dual series Schottky arrays (`BAT54S`: Pin `1` `A` → `-12V_PROT`, Pin `2` `K` → `+12V_PROT`, Pin `3` `COM` → protected signal node):
+     - **On `OUT` (`J2`) and `INV_OUT` (`J3`):** Place `BAT54S` **behind current-limiting resistance**—specifically on the **op-amp side (`V_OUT_BUF` / `V_INV_BUF`)** of `R16`/`R19` (or at the midpoint of a split `820 Ω` op-amp-side + `180 Ω` jack-side network). *Why:* Because `D_rev+` blocks reverse flow back into the Eurorack PSU bus, placing `BAT54S` directly on raw `J2.Tip` without series impedance allows an external `>+15 V` DC fault to burn `BAT54S` and lift `+12V_PROT`. With `1 kΩ` `R16`/`R19` ahead of `BAT54S`, `+15 V` injects only `3 mA` (safely sunk by the module's `~10–15 mA` quiescent current) and `+24 V` injects `12 mA`. *(Optionally add `15 V` Zener / TVS rail clamps across `+12V_PROT`–`GND` and `GND`–`-12V_PROT` if sustaining `>20 V` external faults.)*
+     - **On `IN` (`J1`):** Place `BAT54S` (`Pin 3 COM`) at `U1A +` downstream of `C1` (`1 µF ≥ 50 V` film) and `R_in1` (`47 kΩ`); `R_in1` limits even `±24 V` transient faults to `0.25 mA`.
+  3. **Jack Switch Normalization:** Ground `J1.TN → GND` (unplugged input quieted to `0 V`), and leave **`J2.TN` and `J3.TN` unconnected (`NC`)**.
+
+#### 1.7.4 Unused Op-Amp Termination (`TL074` Spare Units)
+- **When Applicable:** Any build using `2 × TL074` with the 6-op-amp circuit (such as Path A consolidated onto a single IC BOM, baseline Option C in [EnvelopeFollower.md](./EnvelopeFollower.md), or single-output variants omitting `INV_OUT` or `LED`). *(Path B uses all `8` op-amps across `2 × TL074`, leaving `0` unused units.)*
+- **Recommended Implementation (Dual `±12 V` Supply):**
+  Configure every unused unit as a **unity-gain voltage follower referenced to `GND`** (`0 V` mid-supply, well inside `TL07x`'s `[-8 V, +12 V]` common-mode range):
+  - Tie the **non-inverting input (`+`) directly to `GND`**.
+  - Tie the **inverting input (`-`) directly to that unit's output (`OUT`)**.
+  - **Exact `TL074` Pin Mapping for Path A on `2 × TL074` (`U2C` & `U2D` unused):**
+    - **`U2C`:** Pin `10` (`+`) → `GND`; Pin `9` (`-`) ↔ Pin `8` (`OUT`).
+    - **`U2D`:** Pin `12` (`+`) → `GND`; Pin `13` (`-`) ↔ Pin `14` (`OUT`).
+  - **What to Avoid:** Never leave unused `TL07x` pins floating (parasitic oscillation and rail chatter inject noise through shared supply/substrate), never tie both `+` and `-` directly to `GND` without feedback (input offset `V_OS` saturates the output to `±10.5 V`), and never tie `+` to `-12V` (violates `TL07x` negative common-mode limit and triggers phase reversal).
+
+---
+
+## 2. Two Concrete Implementation Paths
+
+Depending on whether you want to keep the 6-op-amp topology (`1 × TL074 + 1 × TL072`, or `2 × TL074` with 2 terminated spares) or use `2 × TL074` (`8` op-amps, **same 2-IC count**) to unlock full active precision, here are the two recommended upgrade paths:
+
+### Path A: Minimal Revision (6 Active Op-Amps: `1 × TL074 + 1 × TL072`, or `2 × TL074` BOM-Consolidated)
+Fixes the biggest usability, gain-clipping, LED, impedance, and Eurorack protection flaws with **zero extra active stages**:
+1. **Input & Gain Floor (`U1A`):** Ground `J1.TN`; `C1 = 1 µF` film (`≥ 50 V`) → `47 kΩ` → `RV1` (`A50k` log pot) → **`R_floor = 2.2 kΩ` to `GND`** (`RV1` Pin `1` `CCW`); `RV1` wiper → `U1A +` (`1 MΩ` pull-down to `GND` + `BAT54S` clamp to `±12V_PROT`); `U1A` fixed `+21×` non-inverting (`200 kΩ || 22 pF` fb, `10 kΩ` to `GND`). (`Z_in ≈ 96.6 kΩ`, **`+0.47×` gain floor to `+10.8×` max**, no `TL07x` phase reversal).
+2. **Rectifier (`U1B`, `U1C`):** Change `R8` to `20 kΩ` (`10k + 10k` `1%`) for `1.00×` gain.
+3. **Envelope (`RV2`, `C2`, `RV3`):** Add `150 Ω` in series with `RV2` (`ATK`); remove `R9` from the `Release` branch and connect `U1D +` and `U2B +` directly to `C2` (`1 µF` film, not X7R); use `A1M` log pot (`|| 4.7 MΩ` safety resistor) for `RV3` (`Release`).
+4. **Output & Output Protection (`U1D`, `RV4`, `J2`, `J3`):** Omit `R14`; use `RV4 = 10 kΩ` linear (`R11 = R12 = 1 kΩ`, wired CW=`-12V_PROT` / CCW=`+12V_PROT` so CW = positive `OUT`), `R13 = 100 kΩ`, `R15 = 47 kΩ` (`1.46×` gain, `< 0.7%` gain-offset coupling, `±4.54 V` smooth linear offset at `±11.7 V` rails). Rate `R16`/`R19` (`1 kΩ`) at **`0.5 W`** (or `2 × 470 Ω` `1/4 W` series), add **`BAT54S`** clamps at `V_OUT_BUF` / `V_INV_BUF`, and leave `J2.TN` / `J3.TN` **`NC`**.
+5. **LED (`U2B`, `D4`):** Jumper `R20 = 0 Ω`; set `R21 = 1 kΩ`, `R22 = 2.2 kΩ`, `R23 = 15 kΩ` (`-1.50 V` bias, `0 mA` idle for all LED colors, `~3 mA` at `+10 V`).
+6. **Power & Local Decoupling (`J4`, `C3`–`C8`):** Shrouded keyed `2×5` IDC header `J4` (`1–2: -12V`, `3–8: GND`, `9–10: +12V`), series `1N5819` reverse-polarity diodes (`D_rev+` `A→K`, `D_rev-` `K→A`), downstream `22–47 µF` (`35 V`) bulk caps `C3`/`C4`, and **`4 × 100 nF` (`50 V` X7R) local decoupling caps `C5`–`C8`** directly at `U1` (`4`/`11`) and `U2` (`8`/`4` for `TL072`, or `4`/`11` for `TL074`).
+7. **Unused Op-Amp Termination (if built with `2 × TL074`):** Wire `U2C` (`Pin 10 → GND`, `9 ↔ 8`) and `U2D` (`Pin 12 → GND`, `13 ↔ 14`) as unity-gain followers.
+
+### Path B: Full Precision Revision (`2 × TL074` = 8 Op-Amps, Same 2-IC Count)
+Uses all `8` op-amp units (`0` spare units) to eliminate `D3`'s diode deadband and completely isolate `C2`, `OFFSET`, and `LED`, with full Eurorack protections built in:
+- `U1A`: High-Z input gain stage (`Z_in ≈ 96.6 kΩ`, `C1 = 1 µF ≥ 50 V` film, `J1.TN → GND`, `47 kΩ` + `A50k` log attenuator + **`R_floor = 2.2 kΩ`** + `1 MΩ` pull-down + `BAT54S` clamp + fixed `+21×` gain → **`+0.47×`–`+10.8×`**).
+- `U1B`, `U1C`: `1.00×` precision full-wave rectifier (`R8 = 20 kΩ`).
+- `U1D`: **Active precision peak detector** (`D3` inside feedback loop + `1N4148` anti-saturation clamp, `0 V` diode deadband, `150 Ω` min attack resistor).
+- `U2A`: **Dedicated unity-gain `C2` buffer** (`ENV_CAP` unloaded by anything except `R10 + RV3`).
+- `U2B`: **Near-unity (`~0.97×`) difference/offset stage** (`100 kΩ` summing resistors and `RV4 = 10 kΩ`, `R11 = R12 = 6.8 kΩ` for `±4.73 V` loaded linear offset at `±11.7 V` rails and `< 0.5%` gain shift—or `95.3 kΩ` inverting leg resistor for exact `1.00×` gain; `0–10 V` completely unclipped).
+- `U2C`: `-1.00×` inverted output (`INV_OUT`).
+- `U2D`: **Precision constant-current LED driver** (`10k/10k` divider on `U2D +` fed from `U2A`, `D4` in feedback with `1 kΩ` sense resistor to `GND` + antiparallel `1N4148` clamp → exact `0 mA` off at `0 V` and linear `0–5 mA` for any LED color).
+- **Outputs (`J2`, `J3`):** `R16`, `R19` = `1 kΩ` **`0.5 W`** (or `2 × 470 Ω` `1/4 W` series), **`BAT54S`** ESD/rail clamps on `V_OUT_BUF` (`U2B OUT`) and `V_INV_BUF` (`U2C OUT`), `J2.TN` / `J3.TN` left **`NC`**.
+- **Power & Decoupling (`J4`, `C3`–`C8`):** Shrouded `2×5` `J4`, series **`1N5819`** reverse-polarity diodes (`D_rev+`, `D_rev-`), `22–47 µF` (`35 V`) bulk caps `C3`/`C4` downstream, and **`4 × 100 nF` (`50 V` X7R)** decoupling caps `C5`–`C8` right at `U1` (`4`/`11`) and `U2` (`4`/`11`).
+- **Unused Op-Amp Note:** All `8` sections are active (`0` unused units); if building a stripped variant (e.g., omitting `INV_OUT` or `LED`), terminate any spare unit(s) as `GND`-referenced unity-gain followers (`+` → `GND`, `-` ↔ `OUT`).
+
+---
+
+## 3. Eurorack Protection Summary Checklist
+
+| Protection Area | Component(s) | Value / Rating | Placement & Connections |
+|---|---|---|---|
+| **Power Reverse Polarity** | `J4`, `D_rev+`, `D_rev-` | Shrouded `2×5` IDC; `2 × 1N5819` (or `SS14`) | `J4` (`1–2: -12V`, `3–8: GND`, `9–10: +12V`); `D_rev+` (`A` to `J4 +12V`, `K` to `+12V_PROT`); `D_rev-` (`K` to `J4 -12V`, `A` to `-12V_PROT`) |
+| **Bulk Rail Filtering** | `C3`, `C4` | `22–47 µF`, `≥ 35 V` low-ESR electrolytic | Downstream of `D_rev+`/`D_rev-` (`C3 +` to `+12V_PROT`, `C4 +` to `GND`, `C4 -` to `-12V_PROT`) |
+| **Local IC Decoupling** | `C5`–`C8` | `4 × 100 nF`, `50 V` X7R ceramic | `< 5 mm` from supply pins to `GND`: `U1` (`4`, `11`), `U2` (`8`/`4` for `TL072` or `4`/`11` for `TL074`) |
+| **Gain Floor & Input Clamp** | `R_floor`, `R_pd`, `C1`, `D_in` | `2.2 kΩ` (or `4.7 kΩ` inv.); `1 MΩ`; `1 µF ≥ 50 V` film; `BAT54S` | `R_floor` at `RV1` CCW-to-`GND` (`+0.47×` min floor; or series with `RV1` in inv. mode); `D_in` (`1:-12V_PROT`, `2:+12V_PROT`, `3:U1A+`); `J1.TN → GND` |
+| **Output Fault & ESD Clamp** | `R16`, `R19`, `D_out1`, `D_out2` | `1 kΩ`, `0.5 W` (or `2 × 470 Ω 1/4 W`); `2 × BAT54S` | `R16`/`R19` in series to `J2.Tip`/`J3.Tip`; `D_out1`/`D_out2` `Pin 3` at op-amp side (`V_OUT_BUF`, `V_INV_BUF`), `1:-12V_PROT`, `2:+12V_PROT`; `J2.TN`/`J3.TN = NC` |
+| **Unused Op-Amp Termination** | Spare `TL074` units (if any) | Direct traces (no extra parts) | Unity-gain follower: `+` input → `GND`, `-` input ↔ `OUT` (e.g., `U2C`: `10→GND`, `9↔8`; `U2D`: `12→GND`, `13↔14`) |

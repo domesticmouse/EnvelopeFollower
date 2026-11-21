@@ -1,299 +1,323 @@
-# Improved Envelope Follower Circuit Specification
+# Envelope Follower (Improved Eurorack Revision) — Circuit Description & Build Specification
 
-Updated engineering specification incorporating all circuit improvements and Eurorack hardware protections from [`EnvelopeFollowerImprovements.md`](./EnvelopeFollowerImprovements.md) applied to [`EnvelopeFollower.md`](./EnvelopeFollower.md), standardized on **2 × `TL074H` (SOIC-14)** with surface-mount construction for JLCPCB Economic PCBA and through-hole panel/power hardware mounted later.
+Improved production-oriented revision of [EnvelopeFollower.md](./EnvelopeFollower.md), incorporating the electrical fixes, usability upgrades, and Eurorack protections analyzed in [EnvelopeFollowerImprovements.md](./EnvelopeFollowerImprovements.md). Companion Bill of Materials and live JLCPCB/LCSC sourcing specification: [EnvelopeFollowerBOM.md](./EnvelopeFollowerBOM.md).
+
+> **Design Highlights:** Uses **2 × `TL074H` (`TL074HIDR`, `SOIC-14`)** quad op-amps (`8` active op-amp units, `0` unused spares) with **`U2C` and `U2D` implementing the active zero-deadzone peak detector and dedicated `C2` buffer**, updated potentiometer tapers/values (**`A100k`**, **`A50k`**, **`A1M`**, **`B10k`**), full Eurorack power/I/O protections, **`8` rear `B.Cu` `DNP` through-hole test points (`TP1`–`TP8`, Ronghe `RH-5001`)**, and a **single-sided `B.Cu` SMT assembly** layout compatible with **JLCPCB Economic PCBA** (`F.Cu` reserved strictly for panel-facing THT controls, `B.Cu` rear THT reserved for `J4`, `C1`/`C2` box film capacitors, and optional `TP1`–`TP8`, all hand-soldered later).
 
 ---
 
-## 1. Overview & Electrical Summary
+## 1. Overview & Improvements Applied
 
-This module is a **±12 V Eurorack analog envelope follower** built around **8 JFET/FET-input op-amp stages** (`2 × TL074HIDR`, `SOIC-14`). Relative to the original 6-op-amp sketch, this revision adds a buffered `100 kΩ` input stage (`U2D`), an active zero-deadzone precision peak detector (`U2C`), `0.1%`-matched `1.000×` full-wave rectification, linearized output offset summing, an in-loop zero-idle-glow LED current sink, and full Eurorack power/ESD/clash protections.
+This module converts a Eurorack audio or modulation signal (`IN`) into a smooth positive DC envelope (`OUT`), an inverted mirror (`INV_OUT`), and a linear, color-independent activity indicator (`LED`), powered from a standard Eurorack `±12 V` bus (`J4`).
 
-| Parameter | Original (`EnvelopeFollower.md`) | Improved Specification (`TL074H` / `2 × TL074`) |
+### Key Specifications & Baseline Comparison
+
+| Parameter | Original ([EnvelopeFollower.md](./EnvelopeFollower.md)) | Improved Revision (`EnvelopeFollowerImproved.md`) |
 |---|---|---|
-| **Power Supply** | Direct `±12 V`, `4.7 µF` (`≥16 V`), no protection | Shrouded keyed `2×5` IDC (`J4`); `B5819W` (`40 V / 1 A`) reverse-polarity Schottkys + `10 Ω` RC damping ($f_c = 723\text{ Hz}$) → **`±11.55 V` internal rails**; `22 µF / 50 V` SMD bulk caps + `4 × 100 nF / 50 V` X7R local bypasses |
-| **Op-Amps** | `1 × TL074 + 1 × TL072` (6 sections) | **`2 × TL074HIDR` (`SOIC-14`)** — all **8 sections used** (`U1A`–`U1D`, `U2A`–`U2D`), zero unused sections |
-| **Input (`IN`)** | $Z_{\text{in}} \approx 9.9\text{ k}\Omega$, actual $f_c \approx 3.42\text{ Hz}$, optional switch | **`U2D` unity buffer**: $Z_{\text{in}} = 101\text{ k}\Omega$, $f_c = 1.58\text{ Hz}$ (`1 µF` film), `1 kΩ` series protection + `BAV99` rail clamp + mandatory `J1.TN → GND` |
-| **Preamp (`GAIN`)** | `B100k` pot (`0` to `-10×`), `0 Ω` short at CCW | **`RV1` = `A100k` audio taper**; `1 kΩ` gain floor + `1 MΩ` fail-safe + `47 pF` `C0G` HF compensation ($A_v = -0.10\times\text{ to }-9.17\times$, $f_c \ge 36.9\text{ kHz}$) |
-| **Rectifier** | `1%`/`5%` resistors, `+1.1×`, `1N4148` | **`7 × 10 kΩ ±0.1%` (`25 ppm/°C`)** matched network + **`BAT54S`** Schottky pair; exact **`+1.000×`** gain ($V_{\text{RECT\_OUT}} = \|V_{\text{PREAMP\_OUT}}\|$), `≤ 0.80%` half-cycle error |
-| **Peak Detector** | Passive `D3` (`~0.65 V` deadband), no surge limit | **`U2C` active zero-deadzone peak detector** (`D3` `1N4148WS` inside op-amp loop, `< 5 mV` deadband) + `R_ATK_MIN = 470 Ω` surge limiter |
-| **Attack (`ATK`)** | `50 kΩ` (`0` to `50 ms`) | **`RV2` = `A50k` audio taper**; $\tau_{\text{atk}} \approx 0.47\text{ ms to }50.5\text{ ms}$ |
-| **Release (`Release`)** | `1 MΩ` (`11 ms`–`1.01 s`), `R9` causes `-9.1%` droop | **`RV3` = `A1M` audio taper** + `R10 = 10 kΩ`; **`R9` removed** (0% droop); $\tau_{\text{rel}} = 10\text{ ms to }1.01\text{ s}$; `10 kΩ` `R_ENV_PROT` on `U1D+` |
-| **Offset (`OFFSET`)** | `100 kΩ` pot (`2.25×`–`2.52×` gain, `12%` shift, clips at `+4.2 V`) | **`RV4` = `B10k` linear pot** between `1 kΩ` end resistors, `R13 = 18 kΩ`, **`R14` removed**; gain `1.476×–1.529×` (`3.5%` var), **`±5.09 V` linear shift** (`CW = +OUT`), linear up to `ENV_NODE ≈ +7.5 V` |
-| **Outputs** | Single `1 kΩ` outside loop, no ESD clamp | Split **`470 Ω + 470 Ω` (`0.5 W` `1210`)** clash-rated resistors + midpoint **`BAV99`** rail clamps + in-loop `10 kΩ` feedback (`100 pF` `C0G` HF cap) for `0.00%` `OUT`/`INV_OUT` tracking mismatch; `J2.TN`/`J3.TN = NC` |
-| **LED Indicator** | `-2.79 V` bias (`23–32 µA` idle glow, `0.36 mA` peak) | **`U2B` in-loop precision current sink** (`R_LED = 2.2 kΩ` + `1N4148WS` anti-parallel clamp; `R21`–`R23` removed); **`0.00 mA` idle**, `0–4.5 mA` linear drive for any 3 mm LED color |
+| **Op-Amps (`U1`, `U2`)** | `1 × TL074` + `1 × TL072` (`6` units) | **`2 × TL074H`** (`TL074HIDR`, `SOIC-14`, `8` active units, `0` spares) |
+| **Assembly Split** | Generic THT/SMD | **Single-sided `B.Cu` SMT** (JLCPCB Economic PCBA, `49` SMD parts) + **rear `B.Cu` THT** (`J4`, `C1`, `C2`, plus `8` `DNP` test points `TP1`–`TP8`) + **front `F.Cu` THT** controls (`J1`–`J3`, `RV1`–`RV4`, `D4`) |
+| **Input Stage (`J1`, `RV1`, `U1A`)** | Inverting `Z_in ≈ 9.9 kΩ`, `4.7 µF` cap, linear `100k` rheostat (`0×` deadzone), `J1.TN` floating | **High-Z non-inverting attenuator** (`Z_in ≈ 113 kΩ`, `f_c = 1.41 Hz`), `J1.TN → GND`, `R1 = 10 kΩ` + `BAT54S` (`D9`) clamp **ahead of `C1` (`1 µF 63 V` film)**, **`RV1 = A100k`** log pot + `4.7 kΩ` gain floor (`+0.45×` to `+10.04×`, `1 MΩ` open-wiper pull-down, `22 pF` HF comp) |
+| **Full-Wave Rectifier (`U1B`, `U1C`)** | `+1.1×` gain (`R8 = 22 kΩ`), premature clipping | **Exact `1.00×` gain** (`R8 = R10 = 20 kΩ`, `1%`), symmetric saturation headroom |
+| **Peak Detector & Buffer (`U2C`, `U2D`)** | Passive `1N4148` outside feedback (`~0.6 V` deadzone), `U1D +` tapped after `1 kΩ` `R9` (`-9.1%` release droop) | **`U2C` active zero-deadzone peak detector** (`D3` inside loop + `D5` anti-saturation clamp + `R11 = 200 kΩ` / `C10 = 100 pF` loop comp, `> 70°` phase margin) + **`U2D` dedicated unity-gain `C2` buffer** (`0 mV` diode deadzone, `0%` release tap droop) |
+| **Attack & Release (`RV2`, `RV3`, `C2`)** | Linear `50k` `ATK` (`0 Ω` short risk), linear `1M` `Release`, X7R allowed for `C2` | **`RV2 = A50k`** log pot + `150 Ω` min series protection (`0.15 ms`–`50.15 ms`); **`RV3 = A1M`** log pot + `4.7 MΩ` open-wiper safety (`10 ms`–`835 ms`); **`C2 = 1 µF 63 V` film** (`P=5mm`) |
+| **Output Gain & Offset (`U1D`, `RV4`, `U2A`)** | `2.25×`–`2.52×` gain (clips above `4.6 V`), `100k` `RV4` (`+12%` gain modulation, `72%` S-curve crowding, CW = negative `OUT`) | **Near-unity (`0.975×`) difference amplifier** (`0–10 V` unclipped tracking); **`RV4 = B10k`** linear pot (`R17 = R18 = 6.8 kΩ`) giving **`±4.69 V`** smooth linear offset (`< 1%` error, `±0.25%` gain flatness, **CW = positive `OUT`**) |
+| **LED Driver (`U2B`, `D4`)** | Passive `-2.79 V` bias (`0.17–0.34 mA` dim output, `30 µA` idle glow on red/amber) | **Precision constant-current sink** (`0.5 mA/V · V_ENV_BUF`, `0.00 mA` dark idle, `5.00 mA` at `+10 V`, `V_f`-independent for any 3 mm LED color, `D6` reverse clamp) |
+| **Eurorack Protections (`J4`, `D7`–`D11`, `R21`, `R24`)** | Unprotected bare power port, no decoupling caps, `1/4 W` `1 kΩ` output resistors | Shrouded keyed `2×5` `J4` + **`1N5819WS` (`D7`, `D8`)** reverse-polarity Schottkys + `10 Ω` RC rail filters (`R28`, `R29`) + **`47 µF 35 V`** bulk caps (`C3`, `C4`) + **`4 × 100 nF`** decoupling (`C5`–`C8`) + **`1 kΩ 1 W 2512`** fault-rated outputs (`R21`, `R24`) + **`BAT54S`** ESD/rail clamps (`D9`–`D11`) |
 
 ---
 
-## 2. IC Allocation & Component Inventory
+## 2. Signal Flow & Block Architecture Diagram
 
-### 2.1 Integrated Circuits (`2 × TL074HIDR`, `SOIC-14`)
+```text
+====================================================================================================
+ FRONT THT (F.Cu)             REAR THT (B.Cu)                 REAR SMT PCBA (B.Cu)
+====================================================================================================
 
-Both quad op-amps use **Texas Instruments `TL074HIDR`** (`SOIC-14`, `Package_SO:SOIC-14_3.9x8.7mm_P1.27mm`): `±2.25 V to ±20 V` supply, `20 V/µs` slew rate, `5.25 MHz` GBWP, `1 pA` input bias current, `1 mV` offset, `26 mA` output drive, `940 µA/ch` quiescent current, short-circuit protection, and internal EMI/RF suppression.
+  J1 (IN Jack)
+   ├─ TN ──▶ GND
+   └─ Tip ──▶ [R1: 10k]──┬──▶ [C1: 1uF 63V Film]──▶ RV1 (GAIN: A100k, F.Cu)
+                         │                            ├─ CW (3) ◀── C1
+                      [D9: BAT54S]                    ├─ CCW(1) ──▶ [R2: 4.7k]──▶ GND
+                      (±12V_PROT)                     └─ Wip(2) ──┬── [R3: 1M to GND]
+                                                                  ▼
+                                                         ( U1A: +11x Gain ) [R4=10k, R5=100k||C9=22pF]
+                                                                  │ V_GAIN ──▶ [TP4]
+                                            ┌─────────────────────┴──────────────────────┐
+                                            ▼                                            ▼
+                                  [R6: 10k]──( U1B: Half-Wave )                   [R8: 20k]
+                                             w/ D1, D2 (1N4148WS) & R7=10k               │
+                                            │                                            │
+                                            └─────────[R9: 10k]──────────────────────────┴──▶( U1C: 1.00x Summer, R10=20k )
+                                                                                                    │ V_RECT ──▶ [TP5]
+                                            ┌───────────────────────────────────────────────────────┘
+                                            ▼
+                                 ( U2C: Active Peak Detector ) ◀──[C10: 100pF]──┐
+                                  │     [D5: 1N4148WS clamp]                    │
+                                  ▼                                        [R11: 200k]
+                            [D3: 1N4148WS]──▶[R12: 150R]──▶ RV2 (ATK: A50k, F.Cu)│
+                                                                 │ ENV_CAP       │
+                                            ┌────────────────────┼───────────────┤
+                                            ▼                    ▼               │
+                                     [C2: 1uF 63V Film]   [R13: 10k]             │
+                                     (B.Cu Rear THT)             │               │
+                                                        RV3 (Release: A1M, F.Cu) │
+                                                           || [R14: 4.7M]        │
+                                                                 │               │
+                                                                GND              │
+                                                                                 │
+                              ENV_CAP ──▶( U2D: Unity Buffer +1x )───────────────┴── V_ENV_BUF ──▶ [TP6]
+                                                │
+                 ┌──────────────────────────────┴───────────────────────────────┐
+                 ▼                                                              ▼
+       [R15: 100k] / [R16: 100k to GND]                              [R25: 10k] / [R26: 10k to GND]
+                 │                                                              │
+                 ▼                                                              ▼
+       ( U1D: 0.975x Difference / OFFSET )                            ( U2B: LED Current Sink )
+          ▲  ▲                                                           │              ▲
+          │  └──[R20: 100k]── V_OUT_BUF                                  ▼              │
+          └─────[R19: 100k]── RV4 (OFFSET: B10k, F.Cu)             [D4: 3mm LED (F.Cu)] │
+                              (R17=6.8k +12V, R18=6.8k -12V)        || [D6: 1N4148WS]   │
+                 │                                                       │              │
+                 ├──────────────────────────┬──▶ [TP7]                   ├──▶───────────┘
+                 ▼                          ▼                            ▼
+          [D10: BAT54S]               [R22: 10k]                    [R27: 1k]──▶ GND
+                 │                          ▼
+          [R21: 1k 1W 2512]           ( U2A: Inv -1.00x, R23=10k )
+                 │                          │
+                 ▼                          ├──▶ [D11: BAT54S]   ──▶ [TP8] (V_INV_BUF)
+          J2 (OUT Jack, F.Cu)               ▼
+          (TN = NC)                   [R24: 1k 1W 2512]
+                                            │
+                                            ▼
+                                      J3 (INV_OUT Jack, F.Cu)
+                                      (TN = NC)
 
-| IC / Section | Pins (`+`, `-`, `Out`) | Circuit Role | Key Improvement |
-|---|---|---|---|
-| **`U1A`** | `3`, `2`, `1` | Inverting Gain Preamp (`GAIN` `RV1 = A100k`) | `1 kΩ` gain floor + `1 MΩ` wiper fail-safe + `47 pF` `C0G` HF roll-off |
-| **`U1B`** | `5`, `6`, `7` | Precision Half-Wave Rectifier | `BAT54S` (`D1_D2`) low-drop Schottky pair + `0.1%` resistors |
-| **`U1C`** | `10`, `9`, `8` | Precision Rectifier Summing Amp | `7 × 10 kΩ ±0.1%` matched network (`R8A+R8B = 20 kΩ` → exact `1.000×` gain) |
-| **`U1D`** | `12`, `13`, `14` | Output Non-Inverting Buffer + `OFFSET` Summer (`OUT`) | `R14` removed; `RV4 = B10k`, `R13 = 18 kΩ`; `10 kΩ` `R_ENV_PROT`; `§3.5` in-loop feedback |
-| **`U2A`** | `3`, `2`, `1` | Unity-Gain Inverting Buffer (`INV_OUT`) | `§3.5` in-loop feedback (`R18` from `INV_OUT_CLAMP` + `100 pF` `C0G`) |
-| **`U2B`** | `5`, `6`, `7` | Precision LED Current Sink (`D4`) | `D4` inside feedback loop (`R_LED = 2.2 kΩ` + `1N4148WS` reverse clamp) |
-| **`U2C`** | `10`, `9`, `8` | **Active Zero-Deadzone Peak Detector** | `D3` (`1N4148WS`) inside feedback loop (`< 5 mV` deadband) + `470 Ω` surge limit |
-| **`U2D`** | `12`, `13`, `14` | **`100 kΩ` Unity-Gain Input Buffer** | Isolates `R1 = 100 kΩ` from `U1A` virtual ground (`Z_in = 101 kΩ`, `f_c = 1.58 Hz`) |
-| **Power** | `V+ = 4`, `V- = 11` | `±11.55 V` Schottky-protected rails (`U1` and `U2`) | `4 × 100 nF` `50 V` X7R local decoupling `< 3–5 mm` from supply pins |
-
----
-
-### 2.2 Fixed Resistors (30 Total — All SMT)
-
-| Value & Spec | Package | Qty | Reference Designators | Circuit Locations |
-|---|---|---|---|---|
-| **10 Ω ±1% 250 mW** | `1206` | **2** | `R_PWR_P`, `R_PWR_N` | `+12V` and `-12V` rail RC damping/surge resistors after `D_PWR_P/N` |
-| **470 Ω ±1% 100 mW** | `0603` | **1** | `R_ATK_MIN` | Attack minimum current/ringing limiter (`ATK_IN` to `RV2.1`) |
-| **470 Ω ±1% 500 mW (0.5 W)** | `1210` | **4** | `R16A`, `R16B`, `R19A`, `R19B` | Split clash-rated output isolation resistors on `OUT` and `INV_OUT` |
-| **1 kΩ ±1% 100 mW** | `0603` | **5** | `R_IN_PROT`, `R_IN_BUF`, `R_GAIN_MIN`, `R11`, `R12` | `J1` tip protection; `U2D+` ESD input resistor; `U1A` gain floor; `RV4` end resistors |
-| **2.2 kΩ ±1% 100 mW** | `0603` | **1** | `R_LED` | Precision LED cathode current-setting resistor (`LED_K` to `GND`) |
-| **10 kΩ ±1% 100 mW** | `0603` | **7** | `R2`, `R10`, `R_ENV_PROT`, `R15`, `R17`, `R18`, `R20` | `U1A` input; `Release` min; `U1D+` protection; `U1D` fb; `U2A` in/fb; `U2B+` input |
-| **10 kΩ ±0.1% 25 ppm/°C** | `0603` | **7** | `R3`, `R4`, `R5`, `R6`, `R7`, `R8A`, `R8B` | Precision rectifier: `R3`/`R6`/`R7` (`10 kΩ`), `R4+R5` (`20 kΩ` FF), `R8A+R8B` (`20 kΩ` fb) |
-| **18 kΩ ±1% 100 mW** | `0603` | **1** | `R13` | `OFFSET` summing resistor (`OFF_WIPER` to `U1D_INV`) |
-| **100 kΩ ±1% 100 mW** | `0603` | **1** | `R1` | Input AC-coupling `GND` bias (`Z_in = 101 kΩ`) |
-| **1 MΩ ±1% 100 mW** | `0603` | **1** | `R_GAIN_FAIL` | `U1A` PCB open-wiper fail-safe across `RV1` |
-
-*(Deleted from original design: `R9` (`1 kΩ`), `R14` (`10 kΩ`), `R21` (`22 kΩ`), `R22` (`10 kΩ`), `R23` (`33 kΩ`); `R8` (`22 kΩ`) replaced by `R8A + R8B = 20 kΩ ±0.1%`.)*
-
----
-
-### 2.3 Potentiometers (4 Total — THT, Mounted Later)
-
-| Ref | Panel Label | Taper & Value | Wiring Style | Function & Range |
-|---|---|---|---|---|
-| **`RV1`** | `GAIN` | **`A100k`** (`100 kΩ` audio/log) | 2-terminal rheostat (`1` to `GAIN_POT_1`; `2+3` to `PREAMP_OUT`) | Input preamp gain: **`-0.10×` (`-20 dB`) to `-9.17×` (`+19.25 dB`)** |
-| **`RV2`** | `ATK` | **`A50k`** (`50 kΩ` audio/log) | 2-terminal rheostat (`1` to `ATK_POT_1`; `2+3` to `ENV_NODE`) | Attack slew/charge time: **`0.47 ms` to `50.5 ms`** |
-| **`RV3`** | `Release` | **`A1M`** (`1 MΩ` audio/log) | 2-terminal rheostat (`1` to `REL_POT_TOP`; `2+3` to `GND`) | Release decay time: **`10 ms` to `1.01 s`** |
-| **`RV4`** | `OFFSET` | **`B10k`** (`10 kΩ` linear) | 3-terminal divider (`1` to `OFF_TOP`, `2` wiper to `R13`, `3` to `OFF_BOT`) | Bipolar DC offset: **`±5.09 V`** (`CW` = more positive `OUT`) |
-
----
-
-### 2.4 Capacitors (11 Total — 9 SMT + 2 THT Box Film)
-
-| Ref | Value & Rating | Dielectric / Polarity | Package & Mount | Qty | Circuit Location |
-|---|---|---|---|---|---|
-| **`C1`, `C2`** | **`1 µF` `100 V` `±5%`** | Metallized Polyester (PET) Film, **Non-polarized** | `P=5mm` Box Film (**THT**, mounted later) | **2** | `C1`: Input AC-coupling (`f_c = 1.58 Hz`); `C2`: Envelope hold cap (`ENV_NODE` to `GND`, zero microphonics/droop) |
-| **`C3`, `C4`** | **`22 µF` `50 V` `±20%`** | Aluminum Electrolytic, **Polarized** | `SMD,D6.3xL5.4mm` (**SMT**) | **2** | `C3`: `+12V` bulk decoupling; `C4`: `-12V` bulk decoupling (`+` to `GND`) |
-| **`C_DEC1`–`C_DEC4`** | **`100 nF` `50 V` `±10%`** | `X7R` MLCC | `0603` (**SMT**) | **4** | Local `V+`/`V-` decoupling `< 3–5 mm` from `U1` and `U2` |
-| **`C_HF`** | **`47 pF` `50 V` `±5%`** | `C0G / NP0` MLCC (Class I) | `0603` (**SMT**) | **1** | `U1A` ultrasonic/RF feedback roll-off (`U1A_INV` to `PREAMP_OUT`) |
-| **`C_OUT1`, `C_OUT2`** | **`100 pF` `50 V` `±5%`** | `C0G / NP0` MLCC (Class I) | `0603` (**SMT**) | **2** | `U1D` & `U2A` local HF feedback caps (`§3.5` in-loop output compensation) |
-
-*(Note: Class-2 MLCCs (`X7R`/`X5R`) are excluded from `C1`/`C2` per `§3.3` due to piezoelectric microphonics and DC-bias capacitance collapse; JLCPCB carries `0` stock of `1 µF` SMD film (`ECWU1105KCV`), so `C1` and `C2` are specified as compact `P=5mm` THT film capacitors mounted alongside the other THT hardware.)*
-
----
-
-### 2.5 Diodes & LED (9 Physical Packages: 8 SMT + 1 THT LED)
-
-| Ref | Part | Package & Mount | Qty | Function |
-|---|---|---|---|---|
-| **`D_PWR_P`, `D_PWR_N`** | `B5819W` (`40 V / 1 A` Schottky) | `SOD-123` (**SMT**) | **2** | Eurorack `+12V` and `-12V` reverse-polarity power protection |
-| **`D1_D2`** | `BAT54S` (Dual Series Schottky) | `SOT-23` (**SMT**) | **1** | Combines rectifier diodes `D1` (`U1B_OUT → U1B_INV`) and `D2` (`RECT_HW → U1B_OUT`) |
-| **`D3`, `D_LED_CLAMP`** | `1N4148WS` (`100 V` low-leakage) | `SOD-323` (**SMT**) | **2** | `D3`: Active peak-detector diode (`< 25 nA` leakage); `D_LED_CLAMP`: Anti-parallel clamp across `D4` |
-| **`D_IN`, `D_OUT`, `D_INV_OUT`** | `BAV99` (Dual Series Switching) | `SOT-23` (**SMT**) | **3** | ESD and overvoltage rail clamps (`±12 V`) on `IN_AC`, `OUT_CLAMP`, `INV_OUT_CLAMP` |
-| **`D4`** | `3 mm` Indicator LED (Red / Any) | `3 mm` Round (**THT**, later) | **1** | Envelope level indicator inside `U2B` feedback loop |
-
----
-
-### 2.6 Jacks & Power Entry (4 Total — THT, Mounted Later)
-
-| Ref | Label | Type & Footprint | Connections |
-|---|---|---|---|
-| **`J1`** | `IN` | 3.5 mm mono switched jack (`WQP-PJ398SM`) | `Tip` → `R_IN_PROT`; `Sleeve` → `GND`; **`Tip-Normal (TN)` → `GND`** (mandatory) |
-| **`J2`** | `OUT` | 3.5 mm mono switched jack (`WQP-PJ398SM`) | `Tip` → `R16B`; `Sleeve` → `GND`; **`Tip-Normal (TN)` → `NC`** |
-| **`J3`** | `INV_OUT` | 3.5 mm mono switched jack (`WQP-PJ398SM`) | `Tip` → `R19B`; `Sleeve` → `GND`; **`Tip-Normal (TN)` → `NC`** |
-| **`J4`** | `PWR` | `2×5` (`10-pin`) `2.54 mm` shrouded keyed Eurorack IDC | Pins `1–2` = `-12V_IN` (`RED STRIPE`), Pins `3–8` = `GND`, Pins `9–10` = `+12V_IN` |
-
-### 2.7 Test Points (8 Total — THT, Optional / DNP)
-
-Tier 1 core bench test points (`TP1`–`TP8`) use **Ronghe `RH-5001`** (`2.5 mm` black pin-type through-board test points, LCSC **`C5199801`**) marked **DNP (Do Not Populate)** in the BOM. Bare plated through-hole pads on `B.Cu` allow immediate probe contact on unstuffed boards, with optional hand-soldering of `RH-5001` pins on `B.Cu` for clip-on oscilloscope/DMM grabbers. Every test point sits exclusively on a low-impedance power rail or buffered/closed-loop op-amp output node.
-
-*(KiCad footprint: `TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm` or `TestPoint:TestPoint_Keystone_5000-5004_Miniature` — verify exact drill diameter against the `C5199801` datasheet before PCB drill freeze.)*
-
-| Ref | Net Name | Stage | Expected Signal / Range | Bench & Troubleshooting Role |
-|---|---|---|---|---|
-| **`TP1`** | **`GND`** | Stage 0 | `0.000 V` reference | Dedicated clip-on return for oscilloscope ground leads and DMM black probe |
-| **`TP2`** | **`+12V`** | Stage 0 | `≈ +11.55 V` DC (`±1%`) | Verifies `D_PWR_P` orientation, `R_PWR_P`/`C3` RC drop, and `U1.4`/`U2.4` rail health |
-| **`TP3`** | **`-12V`** | Stage 0 | `≈ -11.55 V` DC (`±1%`) | Verifies reversed `D_PWR_N` orientation, `R_PWR_N`/`C4` RC drop, and `U1.11`/`U2.11` rail health |
-| **`TP4`** | **`IN_BUF`** | Stage 1A | `±V_in` AC (`0 V` DC) | Confirms `J1` tip/normalled ground, `C1` DC blocking (`f_c = 1.58 Hz`), `D_IN` clamp, and `U2D` buffer without loading `IN_AC` |
-| **`TP5`** | **`PREAMP_OUT`** | Stage 1B | `(-0.10× to -9.17×)·IN_BUF` | Verifies `RV1` (`GAIN`) range, audio taper, and `U1A` clipping headroom ahead of rectifier |
-| **`TP6`** | **`RECT_OUT`** | Stages 2–3 | `+1.000·\|PREAMP_OUT\|` | Verifies `U1B`/`D1_D2`/`U1C` full-wave rectification and `0.1%` half-cycle symmetry |
-| **`TP7`** | **`OUT_CLAMP`** | Stage 5 | `1.476×–1.529× ENV ± 5.09 V` | Measures closed-loop `U1D` output (`R16A` in-loop); with `RV4` centered (`0.000 V` idle), doubles as buffered `1.476× ENV_NODE` monitor |
-| **`TP8`** | **`INV_OUT_CLAMP`** | Stage 5 | `-1.000 × V(OUT_CLAMP)` | Verifies `U2A` inverter, `D_INV_OUT` clamp, and `0.00%` tracking symmetry vs. `TP7` |
-
-**Sensitive & Virtual-Ground Nodes Deliberately Omitted:**
-- **`IN_AC` & `U2D_IN` (Stage 1A)**: High-impedance `100 kΩ` / `1 µF` AC-coupling node; scope probe capacitance and unshielded test pins inject `50/60 Hz` hum that `U1A` amplifies up to `-9.17×` (probe **`TP4` `IN_BUF`** instead).
-- **`U1A_INV`, `U1B_INV`, `U1C_INV`, `U1D_INV`, `U2A_INV`, `LED_K` (`U2B-`)**: Op-amp inverting summing / virtual-ground / feedback pins; adding THT pad + probe capacitance (`~10–20 pF`) degrades phase margin (risking HF peaking/oscillation on `U1A` with `C_HF = 47 pF` or instability inside `U2B`'s nonlinear LED loop).
-- **`ENV_NODE`, `ATK_IN`, `REL_POT_TOP`, `U1D_IN`, `U2B_IN` (Stage 4)**: High-impedance peak-hold node (`C2 = 1 µF` discharging into up to `1.01 MΩ`); a `1 MΩ` (`1×`) or `10 MΩ` (`10×`) probe distorts `1 s` release decay, and residual solder flux on an unwashed THT pin creates leakage droop (center `RV4` and monitor buffered `ENV_NODE` at **`TP7` `OUT_CLAMP`**).
-
----
-
-## 3. Component Orientation, Pinout & Polarity Reference
-
-### 3.1 Diode & LED Pin Mapping (Verified Against KiCad Libraries & Datasheets)
-
-- **2-Pin SMD Diodes (`SOD-123`, `SOD-323`) & THT `LED_D3.0mm`**: KiCad pad/pin convention is **`Pin 1 = K` (Cathode, band / flat / short lead)**, **`Pin 2 = A` (Anode)**.
-- **3-Pin `SOT-23` Dual Series Diodes (`BAT54S`, `BAV99`)**: Physical SOT-23 pinout is **`Pin 1 = A1`**, **`Pin 2 = K2`**, **`Pin 3 = COM (K1 / A2)`**. *(Note: KiCad's `Diode:BAV99` symbol places Pin 1 at the left diode's anode and Pin 2 at the right diode's cathode, matching the physical SOT-23 package despite legacy hidden pin-name labels.)*
-
-| Ref | Part | Package | Anode (`A` / `Pin 1`) | Cathode (`K` / `Pin 2`) | Common (`COM` / `Pin 3`) | Critical Note |
-|---|---|---|---|---|---|---|
-| **`D_PWR_P`** | `B5819W` | `SOD-123` | `+12V_IN` (`J4.9–10`) | `+12V_PROT` | — | Blocks reversed `+12V` cable |
-| **`D_PWR_N`** | `B5819W` | `SOD-123` | `-12V_PROT` | `-12V_IN` (`J4.1–2`) | — | **Reversed vs. `+12V`**: Cathode faces `J4` (`-12V_IN`) |
-| **`D1_D2`** | `BAT54S` | `SOT-23` | `RECT_HW` (`Pin 1 = A1`, `D2.A`) | `U1B_INV` (`Pin 2 = K2`, `D1.K`) | `U1B_OUT` (`Pin 3 = K1/A2`) | `D2`: `RECT_HW → U1B_OUT`; `D1`: `U1B_OUT → U1B_INV` |
-| **`D3`** | `1N4148WS` | `SOD-323` | `U2C_OUT` (`U2.8`) | `ATK_IN` (`U2.9`, `R_ATK_MIN`) | — | Inside `U2C` feedback loop |
-| **`D_IN`** | `BAV99` | `SOT-23` | `-12V` (`Pin 1 = A1`) | `+12V` (`Pin 2 = K2`) | `IN_AC` (`Pin 3 = COM`) | Shunts `> +12V` or `< -12V` transients to rails |
-| **`D_OUT`** | `BAV99` | `SOT-23` | `-12V` (`Pin 1 = A1`) | `+12V` (`Pin 2 = K2`) | `OUT_CLAMP` (`Pin 3 = COM`) | Midpoint between `R16A` and `R16B` |
-| **`D_INV_OUT`** | `BAV99` | `SOT-23` | `-12V` (`Pin 1 = A1`) | `+12V` (`Pin 2 = K2`) | `INV_OUT_CLAMP` (`Pin 3 = COM`) | Midpoint between `R19A` and `R19B` |
-| **`D4`** | `3 mm LED` | `THT` | `U2B_OUT` (`U2.7`, long lead) | `LED_K` (`U2.6`, flat/short) | — | Inside `U2B` current-sink loop |
-| **`D_LED_CLAMP`** | `1N4148WS` | `SOD-323` | `LED_K` (`U2.6`) | `U2B_OUT` (`U2.7`) | — | **Anti-parallel** across `D4`; prevents LED `-12V` breakdown |
-
-### 3.2 Capacitor Polarity & Placement
-
-| Ref | Value | Polarity | `+` Terminal | `-` Terminal | Assembly Note |
-|---|---|---|---|---|---|
-| **`C1`, `C2`** | `1 µF` `100 V` | Non-polarized | N/A | N/A | `P=5mm` box film (`~11 mm` tall); mount on `B.Cu` if `F.Cu` panel standoff is `10.5 mm` |
-| **`C3`** | `22 µF` `50 V` | **Polarized** | **`+12V`** | **`GND`** | `5.4 mm` tall SMD elec (`4.2×` voltage derating) |
-| **`C4`** | `22 µF` `50 V` | **Polarized** | **`GND`** | **`-12V`** | **`GND` is positive relative to `-12V`** |
-| **`C_DEC1`, `C_DEC3`** | `100 nF` `50 V` | Non-polarized | `+12V` (`U1.4` / `U2.4`) | `GND` | Place `< 3–5 mm` from IC `V+` pin |
-| **`C_DEC2`, `C_DEC4`** | `100 nF` `50 V` | Non-polarized | `-12V` (`U1.11` / `U2.11`) | `GND` | Place `< 3–5 mm` from IC `V-` pin |
-
----
-
-## 4. Stage-by-Stage Circuit Description
-
-```
-J1 (IN) ─► [R_IN_PROT 1k] ─► [C1 1µF] ─► IN_AC ([R1 100k→GND] + [D_IN BAV99±12V]) ─► [R_IN_BUF 1k] ─► [U2D Buffer]
-                                                                                                             │
-                               ┌─────────────────────────────────────────────────────────────────────────────┘
-                               ▼
-                         [R2 10k] ─► [U1A Preamp (R_GAIN_MIN 1k + RV1 A100k || R_GAIN_FAIL 1M || C_HF 47pF)] ─► PREAMP_OUT
-                                                                                                                     │
-                          ┌──────────────── [R4 10k 0.1%] ── [R5 10k 0.1%] (20k FF) ─────────────────────────────────┤
-                          │                                                                                          ▼
-                          │    [U1B Half-Wave Rectifier (R3/R6 10k 0.1%, D1_D2 BAT54S)] ─► [R7 10k 0.1%] ───► [U1C Summer (R8A+R8B 20k 0.1%)]
-                          │                                                                                          │
-                          └──────────────────────────────────────────────────────────────────────────────────────────┘
-                                                                                                                     │
-                                                                                                                     ▼
- [U2C Active Peak Detector (D3 1N4148WS in loop)] ◄────────────────────────────────────────────────────────────── RECT_OUT
-            │
-            ▼
-  [R_ATK_MIN 470Ω + RV2 A50k] ─► ENV_NODE ([C2 1µF→GND] + [R10 10k + RV3 A1M→GND])
-                                     ├──► [R20 10k] ─► [U2B LED Sink (D4 || 1N4148WS, R_LED 2.2k→GND)]
-                                     └──► [R_ENV_PROT 10k] ─► [U1D Summer (+ OFFSET RV4 B10k / R13 18k)]
-                                                                   │
-                                                                   ▼
-                                           [R16A 470Ω 0.5W] ─► OUT_CLAMP (BAV99±12V, R15 fb) ─► [R16B 470Ω 0.5W] ─► J2 (OUT)
-                                                                   │
-                                                                   ▼
-                                           [R17 10k] ─► [U2A Inverter] ─► [R19A 470Ω 0.5W] ─► INV_OUT_CLAMP (BAV99±12V, R18 fb) ─► [R19B 470Ω 0.5W] ─► J3 (INV_OUT)
+  Power / Reference TPs (B.Cu Rear THT, DNP):  [TP1] = +12V_PROT   [TP2] = -12V_PROT   [TP3] = GND
 ```
 
-### Stage 0 — Eurorack Power Entry, Reverse-Polarity Protection & Decoupling
-- `J4` receives external `+12V_IN`, `GND`, and `-12V_IN` through a keyed shrouded `2×5` header.
-- `D_PWR_P` and `D_PWR_N` (`B5819W`) block reversed power cables and row-shifted headers with zero fault current, followed by `R_PWR_P` and `R_PWR_N` (`10 Ω`, `1206`) and `C3`/`C4` (`22 µF 50 V`) forming a `723 Hz` supply low-pass filter and inrush damper. At `~15 mA` nominal draw, internal rails sit at `≈ ±11.55 V`.
-- `C_DEC1`–`C_DEC4` (`100 nF 50 V` X7R `0603`) bypass `U1.4`/`U1.11` and `U2.4`/`U2.11` locally to `GND`.
+---
 
-### Stage 1A — Input Protection, AC Coupling & `100 kΩ` Input Buffer (`U2D`)
-- `J1.TN` connects unconditionally to `GND` so unpatched hum is muted.
-- `J1.Tip` passes through `R_IN_PROT` (`1 kΩ`) and `C1` (`1 µF` film) into `IN_AC`, biased to `GND` by `R1` (`100 kΩ`), yielding $Z_{\text{in}} = 101\text{ k}\Omega$ and $f_c = 1.58\text{ Hz}$.
-- `D_IN` (`BAV99`) clamps `IN_AC` to `[−12.3 V, +12.3 V]`, while `R_IN_BUF` (`1 kΩ`) limits current into `U2D+` (`U2.12`). Unity-gain buffer `U2D` (`U2.14` = `IN_BUF`) drives `R2` (`10 kΩ`) without loading `C1`/`R1`.
+## 3. PCB Side Allocation & Manufacturing Strategy
 
-### Stage 1B — Protected Inverting Preamp (`U1A`)
-- `U1A` (`U1.3` to `GND`) inverts `IN_BUF` through `R2` (`10 kΩ`).
-- Feedback uses `R_GAIN_MIN` (`1 kΩ`) + `RV1` (`A100k` rheostat) in parallel with `R_GAIN_FAIL` (`1 MΩ`) and `C_HF` (`47 pF` `C0G`), providing smooth audio-taper control from `-0.10×` (`-20 dB`) to `-9.17×` (`+19.25 dB`), bounded `-100×` gain if a pot wire breaks, and a `36.9 kHz` HF pole at max gain.
+The PCB is partitioned for **single-sided JLCPCB Economic PCBA** on the bottom side (`B.Cu`) followed by simple manual through-hole assembly of the panel interface (`F.Cu`) and rear THT components (`B.Cu`).
 
-### Stages 2 & 3 — `0.1%`-Matched Unity-Gain Precision Rectifier (`U1B`, `U1C`, `D1_D2`)
-- `R3`, `R4`, `R5`, `R6`, `R7`, `R8A`, and `R8B` are all `10 kΩ ±0.1%` (`25 ppm/°C`) thin-film resistors, with `R4+R5 = 20.00 kΩ` feedforward and `R8A+R8B = 20.00 kΩ` feedback.
-- `D1_D2` (`BAT54S`) improves negative swing margin at `U1B_OUT` by `~0.35 V` while `R8A+R8B = 20 kΩ` locks full-wave output to $V_{\text{RECT\_OUT}} = +1.000\,|V_{\text{PREAMP\_OUT}}|$ with `≤ 0.80%` worst-case half-cycle asymmetry.
+| Assembly Layer / Side | Process | Components | Qty | Notes |
+|---|---|---|---|---|
+| **`B.Cu` (Rear SMD)** | **JLCPCB Economic PCBA** (single-sided reflow) | `U1`, `U2` (`TL074HIDR` SOIC-14), `D1`–`D3`, `D5`–`D11` (`SOD-323` / `SOT-23`), `R1`–`R29` (`0603` / `2512`), `C3`–`C10` (`6.3×5.4 mm` / `0603`) | **`49`** | All SMT components placed strictly on `B.Cu`; **`0` SMT parts on `F.Cu`** so JLCPCB Economic single-sided assembly applies with zero double-sided surcharge. |
+| **`B.Cu` (Rear THT — Populated)** | **Manual Hand-Solder** (after PCBA) | `J4` (`2×5` shrouded keyed IDC power header), `C1`, `C2` (`1 µF 63 V` `P=5mm` metallized polyester box film) | **`3`** | Mounted on `B.Cu` facing away from the front panel; `C1`/`C2` height (`~9.5 mm`) clears the rear Eurorack envelope cleanly without colliding with the `~10.5 mm` front-panel standoff. |
+| **`B.Cu` (Rear THT — `DNP`)** | **Optional Hand-Solder** (`DNP` in BOM/PCBA) | `TP1`–`TP8` (`Ronghe RH-5001` `2.5 mm` black through-board test points, `TestPoint:TestPoint_Keystone_5000-5004_Miniature`, `Ø 1.0 mm` drill) | **`8 (DNP)`** | Excluded from JLCPCB SMT BOM & CPL (`DNP`). Leave unpopulated as probeable `1.0 mm` plated holes, or insert from `B.Cu` (`4.6 mm` rear height; trim `~3.0 mm` split pins flush on `F.Cu` before panel fitment). |
+| **`F.Cu` (Front THT)** | **Manual Hand-Solder** (after panel fitment) | `J1`–`J3` (`WQP-PJ398SM` 3.5 mm mono jacks), `RV1`–`RV4` (`Alpha RD901F` 9 mm vertical pots: `A100k`, `A50k`, `A1M`, `B10k`), `D4` (`3 mm` round LED) | **`8`** | Reserved strictly for panel-facing controls. Loosely insert into `F.Cu`, bolt the `3U` front panel (`128.5 mm` height, `~10.5 mm` standoff) with M6/M7 nuts, seat `D4` into its `3.2 mm` hole, then solder from `B.Cu` for zero mechanical stress. |
 
-### Stage 4 — Active Zero-Deadzone Peak Detector & Attack/Release (`U2C`)
-- `U2C` (`+` = `RECT_OUT`, `OUT` → `D3.A`, `D3.K` → `-`) places low-leakage `1N4148WS` (`D3`) inside the feedback loop, removing the `~0.65 V` deadband and thermal drift (`< 5 mV` threshold).
-- `ATK_IN` charges `C2` (`1 µF` film) through `R_ATK_MIN` (`470 Ω`, capping peak charge current at `~21 mA`) + `RV2` (`A50k`), giving $\tau_{\text{atk}} \approx 0.47\text{ ms to }50.5\text{ ms}$.
-- `R9` is deleted so `ENV_CAP` = `ENV_NODE` directly (eliminating the `9.1%` release droop). Discharge flows through `R10` (`10 kΩ`) + `RV3` (`A1M`), giving $\tau_{\text{rel}} = 10\text{ ms to }1.01\text{ s}$.
-
-### Stage 5 — Linearized `OFFSET`, In-Loop Feedback & Protected Outputs (`U1D`, `U2A`)
-- `R_ENV_PROT` (`10 kΩ`) isolates `U1D+` (`U1.12`) from `C2` during rail brownouts.
-- `RV4` (`B10k`) between `R11` (`1 kΩ` to `+12V`) and `R12` (`1 kΩ` to `-12V`) produces `±9.63 V` with $R_{\text{th}} \in [0.92\text{ k}\Omega, 3.00\text{ k}\Omega]$. With `R14` removed and `R13 = 18 kΩ`, `OUT_CLAMP` achieves `1.476×–1.529×` envelope gain (`3.5%` variation vs. `12%`) and **`±5.09 V`** near-linear offset (`CW` → `+OUT`).
-- `R16A`/`R16B` (`470 Ω + 470 Ω`, `0.5 W` `1210`) and `R19A`/`R19B` (`470 Ω + 470 Ω`, `0.5 W` `1210`) safely handle continuous `±12 V` output-to-output clashes (`0.269 W` per resistor, `1.86×` continuous margin). Midpoint `BAV99` clamps (`D_OUT`, `D_INV_OUT`) shunt ESD/overvoltage spikes into the bypassed rails, while `R15`/`R18` tap the clamp nodes (`§3.5`, compensated locally by `C_OUT1`/`C_OUT2 = 100 pF` `C0G`).
-
-### Stage 6 — In-Loop Precision LED Current Sink (`U2B`)
-- `ENV_NODE` drives `U2B+` via `R20` (`10 kΩ`). `D4` (`3 mm` LED) sits inside `U2B`'s loop with `R_LED` (`2.2 kΩ`) to `GND`, producing $I_{\text{LED}} = V_{\text{ENV}} / 2.2\text{ k}\Omega$ (`0.00 mA` idle glow, up to `~4.5 mA` peak) regardless of LED color/$V_f$. `D_LED_CLAMP` (`1N4148WS`) clamps reverse swings at `-0.65 V`.
+### Layout & Eurorack Mechanical Guidelines (For Stage 4/5)
+1. **Main PCB Height & Clearance:** Keep rear PCB height `≤ 108.0 mm` centered behind the `128.5 mm` `3U` Eurorack panel (`10.25 mm` top/bottom rail clearance).
+2. **THT Courtyard Discipline on `B.Cu`:** Keep all `B.Cu` SMD parts outside the `F.Cu` jack/pot pin bands and mounting-lug holes, clustering SMDs in clear horizontal corridors between control rows.
+3. **Decoupling & Grounding:** Place `C5`–`C8` (`100 nF`) `< 5 mm` from `U1`/`U2` pins `4` and `11` with immediate `GND` stitching vias before routing signals.
+4. **Rear Test Point Placement & Labeling (`TP1`–`TP8`):**
+   - Place `TP4`–`TP8` locally within `≤ 3 mm` of their respective op-amp output nets (`V_GAIN`, `V_RECT`, `V_ENV_BUF`, `V_OUT_BUF`, `V_INV_BUF`) rather than grouping AC and DC signals onto a single header strip (avoiding trace crosstalk). `TP1` (`+12V_PROT`), `TP3` (`GND`), and `TP2` (`-12V_PROT`) may sit near `J4` in an accessible rear corridor.
+   - Connect `TP3` (`GND`) to the ground pour using **thermal-relief spokes** (not a solid flood) so optional hand-soldering of `RH-5001` is not heat-sunk by the plane.
+   - Label every `TP1`–`TP8` on **`B.SilkS`** (and `F.SilkS` where space permits) with both designator and net name (e.g., `TP1 +12V_PROT`, `TP6 V_ENV_BUF`).
+5. **JLCPCB Silkscreen QR Placeholder:** Reserve a `5 mm × 5 mm` clear square on `B.SilkS` for JLCPCB's automated assembly QR code.
 
 ---
 
-## 5. Complete Pin-Level Netlist
+## 4. Stage-by-Stage Circuit Description & Mathematical Analysis
 
-Pin conventions: `U1`/`U2` = `TL074HIDR` (`SOIC-14`); 2-pin passives = `.1`, `.2`; polarized caps = `.+`, `.-`; 2-pin diodes & LED (`1N4148WS`, `B5819W`, `LED`) = `.K` (Pin 1) and `.A` (Pin 2); `SOT-23` dual series diodes (`BAV99`, `BAT54S`) = `.1` (`A1`), `.2` (`K2`), `.3` (`COM = K1/A2`); pots = `.1` (CCW), `.2` (Wiper), `.3` (CW); jacks = `.S` (Sleeve), `.T` (Tip), `.TN` (Tip-Normal); test points (`TP1`–`TP8`) = `.1`.
+### 4.1 Power Input, Reverse-Polarity Protection & Filtering (`J4`, `D7`, `D8`, `R28`, `R29`, `C3`–`C8`)
+- **Connector (`J4`):** Shrouded, keyed `2×5` (`2.54 mm`) Eurorack IDC header on `B.Cu` following Doepfer A-100 pinout:
+  - Pins `1, 2` = `-12V_IN` (red stripe)
+  - Pins `3–8` = `GND` (all 6 pins bonded to ground plane)
+  - Pins `9, 10` = `+12V_IN`
+- **Reverse-Polarity Protection (`D7`, `D8`):** Series `1N5819WS` (`40 V, 1 A`, `SOD-323`) Schottky diodes block reversed bus cables with zero standby fault dissipation:
+  - **`D7` (`+12 V` rail):** Anode (`A`) to `+12V_IN`, Cathode (`K`) to `+12V_FILT_IN`.
+  - **`D8` (`-12 V` rail):** Cathode (`K`) to `-12V_IN`, Anode (`A`) to `-12V_FILT_IN`.
+- **RC Rail Filtering & Bulk Storage (`R28`, `R29`, `C3`, `C4`):**
+  - `R28` (`10 Ω`) and `R29` (`10 Ω`) feed downstream `47 µF 35 V` SMD aluminum electrolytic bulk capacitors `C3` (`+` to `+12V_PROT`, `-` to `GND`) and `C4` (`+` to `GND`, `-` to `-12V_PROT`), forming a `339 Hz` RC supply filter that damps hot-plug inrush spikes and switching-PSU ripple.
+  - At total typical module current (`~7.5 mA` quiescent for `2 × TL074H` + `0–5 mA` LED = `~12.5 mA`), `D7`/`D8` drop `~0.28 V` and `R28`/`R29` drop `~0.12 V`, yielding **`±11.6 V`** protected internal rails (`+12V_PROT`, `-12V_PROT`).
+- **Local IC Supply Decoupling (`C5`–`C8`):** Four `100 nF` (`50 V` X7R `0603`) ceramic capacitors placed `< 5 mm` from `U1` (`Pin 4`, `Pin 11`) and `U2` (`Pin 4`, `Pin 11`) to `GND`.
 
-| Net Name | Connected Pins |
+### 4.2 Stage 1 — High-Z Protected AC Input & Gain Stage (`J1`, `R1`–`R5`, `D9`, `C1`, `C9`, `RV1`, `U1A`)
+- **Jack Normalization (`J1`):** Tip feeds `R1`; Sleeve connects to `GND`; normalled switch pin `TN` connects directly to `GND` so unplugged cables never inject hum.
+- **ESD/Overvoltage Protection Ahead of `C1` (`R1`, `D9`):**
+  - `R1` (`10 kΩ`) feeds `IN_CLAMP`, which is clamped to `+12V_PROT` and `-12V_PROT` by `D9` (`BAT54S`: Pin `1` `A` → `-12V_PROT`, Pin `2` `K` → `+12V_PROT`, Pin `3` `COM` → `IN_CLAMP`).
+  - Placing `D9` **ahead of `C1`** ensures that `BAT54S` reverse leakage (`≤ 2 µA`) drains harmlessly through `R1` / `J1` and **cannot cross `C1`** into `U1A`'s `11×` DC-gain input (preventing false zero-deadzone baseline envelopes), while `R1` limits even `±24 V` sustained external faults to `~1.2 mA` (`14.4 mW` in `R1`).
+- **AC Coupling & `A100k` Attenuator with Gain Floor (`C1`, `RV1`, `R2`, `R3`):**
+  - `C1` (`1 µF 63 V` metallized polyester box film, `B.Cu` THT) blocks incoming DC offsets without piezoelectric microphonics or DC-bias distortion.
+  - `RV1` (`A100k` log pot, `F.Cu`) has Pin `3` (`CW`) on `IN_POT_TOP` (`C1`), Pin `1` (`CCW`) returned to `GND` through `R2` (`4.7 kΩ` gain-floor resistor), and Pin `2` (`Wiper`) feeding `U1A +` (`Pin 3`) alongside open-wiper pull-down `R3` (`1 MΩ` to `GND`).
+  - **Input Impedance & Cutoff:** $Z_{\text{in}} \approx 10\,\text{k}\Omega + 100\,\text{k}\Omega + 4.7\,\text{k}\Omega \parallel 1\,\text{M}\Omega \approx 113\,\text{k}\Omega$ (`f_c = 1.41 Hz` with `C1 = 1 µF`), matching the `~100 kΩ` Eurorack standard with `< 2%` variation over pot travel.
+- **Fixed `+11.0×` Non-Inverting Gain (`U1A`, `R4`, `R5`, `C9`):**
+  - `R4` (`10 kΩ` to `GND`) and `R5` (`100 kΩ` feedback, bypassed by `C9 = 22 pF` C0G giving `f_-3dB = 72 kHz` stability rolloff) set fixed gain $A_{v,\text{U1A}} = 1 + 100\,\text{k}\Omega / 10\,\text{k}\Omega = +11.0\times$.
+  - **Overall Input Gain Span:**
+    - **Minimum (`0%` CCW):** $\dfrac{4.7\,\text{k}\Omega}{114.7\,\text{k}\Omega} \times 0.99 \times 11.0 = \mathbf{+0.45\times}$ (`-6.9 dB` floor — accepts `±10 V` = `20 Vpp` hot Eurorack signals without clipping `U1A`, while avoiding a silent `0×` dead zone).
+    - **Mid (`50%`, `A100k` ~15% log taper):** $\mathbf{+1.89\times}$ (`+5.5 dB` — ideal for `±5 V` audio/synth sources around 12 o'clock).
+    - **Maximum (`100%` CW):** $\dfrac{104.7\,\text{k}\Omega}{114.7\,\text{k}\Omega} \times 0.99 \times 11.0 = \mathbf{+10.04\times}$ (`+20.0 dB` — matches baseline maximum gain).
+  - **Zero Phase Reversal:** `TL074H` is phase-reversal immune and `V(U1A +)` never exceeds `±10.5 V` (`< +11.6 V`), remaining well inside its `[-11.6 V, +9.6 V]` linear input range at normal audio levels.
+
+### 4.3 Stage 2 — Precision `1.00×` Full-Wave Rectifier (`U1B`, `U1C`, `R6`–`R10`, `D1`, `D2`)
+- **Topology:** Classic 2-op-amp inverting precision full-wave rectifier scaled for **exact `1.00×` gain** (eliminating the original `+1.1×` premature clipping and consolidating `10k+10k` into a single `20 kΩ` `0603` Basic resistor).
+- **Half-Wave Stage (`U1B`):** `R6` (`10 kΩ`) feeds `V_GAIN` to `U1B -` (`Pin 6`, `U1B +` at `GND`); `D1` (`1N4148WS`, `A` at `U1B OUT` Pin `7`, `K` at `U1B -`), `D2` (`1N4148WS`, `A` at `RECT_MID`, `K` at `U1B OUT`), and `R7` (`10 kΩ` from `RECT_MID` to `U1B -`).
+- **Summing Stage (`U1C`):** `R8` (`20 kΩ`) feeds `V_GAIN` and `R9` (`10 kΩ`) feeds `RECT_MID` into `U1C -` (`Pin 9`, `U1C +` at `GND`), with `R10` (`20 kΩ`) feedback to `V_RECT` (`Pin 8`):
+  $$V_{\text{RECT}} = +1.00\,\left|V_{\text{GAIN}}\right| \ge 0$$
+
+### 4.4 Stage 3 — Active Zero-Deadzone Peak Detector (`U2C`), `C2` Buffer (`U2D`) & Attack/Release Core (`D3`, `D5`, `R11`–`R14`, `C10`, `RV2`, `RV3`, `C2`)
+- **Active Zero-Deadzone Peak Detector (`U2C`, `D3`, `D5`, `R11`, `C10`):**
+  - `V_RECT` drives `U2C +` (`Pin 10`).
+  - `U2C OUT` (`Pin 8`) drives `D3` (`1N4148WS`, `A` at `Pin 8`, `K` at `RECT_DIODE_OUT`) → `R12` (`150 Ω` minimum attack protection) → `RV2` (`A50k`, `ATK` rheostat) → `C2` (`1 µF 63 V` film to `GND`, node `ENV_CAP`).
+  - `U2D` (`Pins 12, 13, 14`) acts as a **unity-gain JFET/CMOS buffer** directly sensing `ENV_CAP` (`Pin 12` `+`, `Pin 13` `-` tied to `Pin 14` `OUT`, net `V_ENV_BUF`).
+  - `V_ENV_BUF` feeds back to `U2C -` (`Pin 9`, net `PEAK_INV`) through `R11` (`200 kΩ`), closing the peak-detector loop around `D3`, `R12`, `RV2`, and `C2`. Because `D3` sits **inside `U2C`'s feedback loop**, signals down to a few millivolts charge `C2` cleanly with **`0 mV` diode deadzone** and zero temperature drift of `V_f`.
+  - **Anti-Saturation Clamp (`D5`):** `1N4148WS` (`A` at `U2C -` Pin `9`, `K` at `U2C OUT` Pin `8`) clamps `U2C OUT` at `V_RECT - 0.55 V` whenever `V_RECT < V(ENV_CAP)` instead of saturating to `-11.6 V`, allowing `~55 ns` recovery (`20 V/µs` slew) on the next peak.
+  - **Loop Compensation (`R11 = 200 kΩ`, `C10 = 100 pF` C0G):** Because `(R12 + RV2) · C2` introduces a variable `3.17 Hz`–`1.06 kHz` pole inside `U2C`'s loop, `C10` (`100 pF` directly across `U2C OUT` ↔ `U2C -`) paired with `R11` (`200 kΩ`) provides a high-frequency bypass zero (`τ_c = 20 µs`, `f_z = 7.96 kHz`), yielding **`70.4°` unity-gain crossover phase margin** and **`+19.3 dB` gain margin (`16.1°` phase margin)** at the worst-case RC/compensation notch across all `ATK` settings (`150 Ω` to `50.15 kΩ`) and diode impedances.
+- **Attack & Release Dynamics (`RV2 = A50k`, `RV3 = A1M`, `R12`–`R14`, `C2`):**
+  - **Attack (`RV2 = A50k`):** `R_atk = 150 Ω` (`0%` CCW) to `50.15 kΩ` (`100%` CW). Audio/log taper (`~15%` at midpoint = `7.5 kΩ`) spreads crisp percussive `0.15–7.7 ms` attacks across the lower half of rotation. Because `U2C` drives `D3` toward `+10.5 V` while `V(C2) < V_RECT`, charging acts as a fast active slew (`I_chg ≈ (10.5 V - V(C2)) / R_atk`) stopping cleanly at `V(C2) = V_RECT`.
+  - **Release (`RV3 = A1M`, `R13 = 10 kΩ`, `R14 = 4.7 MΩ`):** `U2D`, `U1D`, and `U2B` tap `C2` exclusively via `U2D` (`~1 pA` input bias), and `R13` (`10 kΩ`) connects directly to `ENV_CAP`, completely eliminating the baseline `9.1%` release-dependent amplitude drop. `R14` (`4.7 MΩ`) parallels `RV3` (`A1M`) so an open wiper never latches the envelope high:
+    - `0%` CCW: $\tau_{\text{rel}} = 10\,\text{k}\Omega \times 1\,\mu\text{F} = \mathbf{10.0\text{ ms}}$
+    - `50%` (~15% taper, `150 kΩ || 4.7 MΩ`): $\tau_{\text{rel}} = \mathbf{155\text{ ms}}$
+    - `100%` CW (`1 MΩ || 4.7 MΩ = 825 kΩ`): $\tau_{\text{rel}} = \mathbf{835\text{ ms}}$ (`~2.5 s` for `95%` decay).
+
+### 4.5 Stage 4 — Unity Difference/Offset Output (`U1D`), Inverted Output (`U2A`) & Jack Protection (`R15`–`R24`, `RV4`, `D10`, `D11`, `J2`, `J3`)
+- **Difference / DC Offset Stage (`U1D`, `RV4 = B10k`, `R15`–`R20`):**
+  - Positive leg: `R15` (`100 kΩ`) from `V_ENV_BUF` to `U1D +` (`Pin 12`), and `R16` (`100 kΩ`) from `U1D +` to `GND`, giving $V_+ = 0.500\,V_{\text{ENV\_BUF}}$.
+  - Offset divider: `RV4` (`B10k`, `10 kΩ` linear) sits between `R17` (`6.8 kΩ` to `+12V_PROT`, Pin `1` `CCW`) and `R18` (`6.8 kΩ` to `-12V_PROT`, Pin `3` `CW`), producing an unloaded wiper swing of $\pm 11.6\,\text{V} \times \frac{5\,\text{k}\Omega}{11.8\,\text{k}\Omega} = \pm 4.92\,\text{V}$ and Thevenin source resistance `R_pot,th = 4.84 kΩ` (extremes) to `5.90 kΩ` (center).
+  - Inverting leg: `R19` (`100 kΩ`) from `RV4` wiper (`Pin 2`) to `U1D -` (`Pin 13`), with `R20` (`100 kΩ`) feedback to `V_OUT_BUF` (`Pin 14`).
+  - **Transfer Function:**
+    $$V_{\text{OUT\_BUF}} = \frac{1}{2}\left(1 + \frac{100\,\text{k}\Omega}{100\,\text{k}\Omega + R_{\text{pot,th}}}\right) V_{\text{ENV\_BUF}} - \left(\frac{100\,\text{k}\Omega}{100\,\text{k}\Omega + R_{\text{pot,th}}}\right) V_{\text{th}}$$
+    - **Envelope Gain:** **`0.972×` (center) to `0.977×` (extremes)** — `±0.25%` gain flatness across full offset sweep, passing the entire `0–10 V` envelope completely unclipped!
+    - **Offset Sweep:** **`-4.69 V` (CCW) to `+4.69 V` (CW)** with `< 1%` linearity error and **clockwise = more positive `OUT`**.
+- **Inverted Output Stage (`U2A`, `R22`, `R23`):**
+  - `U2A +` (`Pin 3`) → `GND`, `R22` (`10 kΩ`) from `V_OUT_BUF` to `U2A -` (`Pin 2`), `R23` (`10 kΩ`) feedback to `V_INV_BUF` (`Pin 1`):
+    $$V_{\text{INV\_BUF}} = -1.00\,V_{\text{OUT\_BUF}}$$
+- **Output Fault & ESD Protections (`D10`, `D11`, `R21`, `R24`, `J2`, `J3`):**
+  - `D10` (`BAT54S` at `V_OUT_BUF`) and `D11` (`BAT54S` at `V_INV_BUF`) clamp op-amp outputs to `±12V_PROT` **behind** `R21` and `R24`.
+  - `R21` and `R24` use **`1 kΩ` `2512` `1 W` `1%`** resistors (`C54315`), surviving continuous worst-case cross-patching (`-10.5 V` patched into external `+12 V` = `0.51 W` dissipation, `51%` of `1 W` rating) while isolating cable capacitance.
+  - `J2.TN` and `J3.TN` are left **`NC`** (unconnected) so unplugged outputs are never shorted to `GND`.
+
+### 4.6 Stage 5 — Precision Constant-Current LED Driver (`U2B`, `R25`–`R27`, `D4`, `D6`)
+- **Connections:**
+  - `R25` (`10 kΩ`) and `R26` (`10 kΩ`) divide `V_ENV_BUF` by `0.500` into `U2B +` (`Pin 5`, net `LED_REF_IN`).
+  - `D4` (`3 mm` THT LED on `F.Cu`) sits in `U2B`'s feedback path (`Anode` at `U2B OUT` `Pin 7`, `Cathode` at `U2B -` `Pin 6`, net `LED_SENSE`), with `R27` (`1 kΩ` `0603` Basic) sensing current to `GND`.
+  - `D6` (`1N4148WS`, `A` at `LED_SENSE`, `K` at `V_LED_DRV`) clamps reverse voltage across `D4` to `≤ 0.6 V` if `V_ENV_BUF` has sub-millivolt negative offset.
+- **Performance:**
+  $$I_{\text{LED}} = \frac{0.500 \cdot V_{\text{ENV\_BUF}}}{1\,\text{k}\Omega} = 0.50\,\text{mA/V} \cdot V_{\text{ENV\_BUF}}$$
+  - Exact **`0.00 mA` OFF** at `0 V`, turning on below `~20 mV`, reaching **`2.50 mA` at `+5 V`** and **`5.00 mA` at `+10 V`**, completely independent of LED forward voltage (`1.8 V` red to `3.4 V` green/blue/white) with zero static `-12V` bleed.
+
+---
+
+## 5. Complete Pin-for-Pin Netlist & IC Pin Mapping
+
+### 5.1 Op-Amp IC Pin Assignment (`U1 = TL074HIDR`, `U2 = TL074HIDR`)
+
+| IC & Unit | Function | `+` Pin (Net) | `-` Pin (Net) | `OUT` Pin (Net) | Supply Pins |
+|---|---|---|---|---|---|
+| **`U1A`** | Input Gain (`+0.45×` to `+10.04×`) | `3` (`IN_WIPER`) | `2` (`IN_GAIN_INV`) | `1` (`V_GAIN`) | `4` (`+12V_PROT`), `11` (`-12V_PROT`) |
+| **`U1B`** | Precision Rectifier Half-Wave | `5` (`GND`) | `6` (`RECT_INV`) | `7` (`RECT_OP_OUT`) | Shared on `U1` |
+| **`U1C`** | Precision Rectifier `1.00×` Summer | `10` (`GND`) | `9` (`SUM_INV`) | `8` (`V_RECT`) | Shared on `U1` |
+| **`U1D`** | Output `0.975×` Diff / `OFFSET` | `12` (`OUT_NONINV`) | `13` (`OUT_INV_NODE`) | `14` (`V_OUT_BUF`) | Shared on `U1` |
+| **`U2A`** | Inverted Output (`-1.00×`) | `3` (`GND`) | `2` (`INV_SUM`) | `1` (`V_INV_BUF`) | `4` (`+12V_PROT`), `11` (`-12V_PROT`) |
+| **`U2B`** | Constant-Current LED Driver | `5` (`LED_REF_IN`) | `6` (`LED_SENSE`) | `7` (`V_LED_DRV`) | Shared on `U2` |
+| **`U2C`** | **Active Zero-Deadzone Peak Detector** | `10` (`V_RECT`) | `9` (`PEAK_INV`) | `8` (`PEAK_OP_OUT`) | Shared on `U2` |
+| **`U2D`** | **Dedicated `C2` Unity Buffer (`+1×`)** | `12` (`ENV_CAP`) | `13` (`V_ENV_BUF`) | `14` (`V_ENV_BUF`) | Shared on `U2` |
+
+### 5.2 Designator Cross-Reference (Original → Improved)
+
+| Original Ref ([EnvelopeFollower.md](./EnvelopeFollower.md)) | Improved Ref(s) | Change Summary |
+|---|---|---|
+| `U1` (`TL074`), `U2` (`TL072`) | `U1`, `U2` (`2 × TL074HIDR`) | Upgraded to `TL074H` SOIC-14; `U2C`/`U2D` added for peak detector & buffer |
+| `R1` (`1M`), `R2` (`10k`) | `R1` (`10k`), `R2` (`4.7k`), `R3` (`1M`), `R4` (`10k`), `R5` (`100k`) | Converted to high-Z non-inverting `A100k` attenuator + `+11×` gain |
+| `R3`, `R4`, `R5+R6`, `R7`, `R8` | `R6` (`10k`), `R7` (`10k`), `R8` (`20k`), `R9` (`10k`), `R10` (`20k`) | Exact `1.00×` rectifier; `10k+10k` consolidated to single `20k` Basic |
+| `R9` (`1k`), `R10` (`10k`) | Removed `R9`; `R12` (`150R`), `R13` (`10k`), `R14` (`4.7M`) | `150 Ω` min attack + direct `C2` tap + `4.7 MΩ` release safety |
+| `R11`–`R15` | `R15`, `R16`, `R19`, `R20` (`100k`), `R17`, `R18` (`6.8k`) | `R14` omitted; converted to `0.975×` diff amp with `B10k` pot |
+| `R16`, `R17`, `R18`, `R19` | `R21` (`1k 1W`), `R22` (`10k`), `R23` (`10k`), `R24` (`1k 1W`) | Output build-out resistors upgraded to `2512` `1 W` fault rating |
+| `R20`–`R23` | `R25` (`10k`), `R26` (`10k`), `R27` (`1k`) | Converted to `0.5 mA/V` constant-current LED sink (`-12V` divider removed) |
+| *(New)* | `R11` (`200k`), `R28` (`10R`), `R29` (`10R`) | Peak detector feedback + `±12 V` RC rail damping |
+| `D1`–`D4` | `D1`–`D3`, `D4` (`3mm LED`), plus `D5`–`D11` | Added `D5` peak clamp, `D6` LED clamp, `D7`/`D8` `1N5819WS`, `D9`–`D11` `BAT54S` |
+| `C1`–`C4` (+ `C5`–`C8` note) | `C1`, `C2` (`1µF 63V` film), `C3`, `C4` (`47µF 35V`), `C5`–`C8` (`100nF`), `C9` (`22pF`), `C10` (`100pF`) | Film caps on `B.Cu` THT, SMD bulk/decoupling/C0G comp caps on `B.Cu` SMT |
+| `RV1`–`RV4` (`100k, 50k, 1M, 100k` lin) | `RV1` (`A100k`), `RV2` (`A50k`), `RV3` (`A1M`), `RV4` (`B10k`) | Audio tapers for `GAIN`/`ATK`/`Release`; linear `B10k` for `OFFSET` |
+
+### 5.3 Complete Net-by-Net Connectivity Table (`60` Populated + `8` `DNP` Test Points = `68` Footprints, `170` Total Pins)
+
+Every pin of all `60` populated components (`49` SMT on `B.Cu` + `3` THT on `B.Cu` + `8` THT on `F.Cu`) and all `8` rear `B.Cu` `DNP` test points (`TP1`–`TP8`) is explicitly mapped below:
+
+| Net Name | Connected Component Pins |
 |---|---|
-| **`+12V_IN`** | `J4.9`, `J4.10`, `D_PWR_P.A` |
-| **`-12V_IN`** | `J4.1`, `J4.2`, `D_PWR_N.K` |
-| **`+12V_PROT`** | `D_PWR_P.K`, `R_PWR_P.1` |
-| **`-12V_PROT`** | `D_PWR_N.A`, `R_PWR_N.1` |
-| **`+12V`** | `R_PWR_P.2`, `C3.+`, `C_DEC1.1`, `C_DEC3.1`, `U1.4` (`V+`), `U2.4` (`V+`), `D_IN.2` (`K2`), `D_OUT.2` (`K2`), `D_INV_OUT.2` (`K2`), `R11.1`, `TP2.1` |
-| **`-12V`** | `R_PWR_N.2`, `C4.-`, `C_DEC2.1`, `C_DEC4.1`, `U1.11` (`V-`), `U2.11` (`V-`), `D_IN.1` (`A1`), `D_OUT.1` (`A1`), `D_INV_OUT.1` (`A1`), `R12.1`, `TP3.1` |
-| **`GND`** | `J4.3`, `J4.4`, `J4.5`, `J4.6`, `J4.7`, `J4.8`, `C3.-`, `C4.+`, `C_DEC1.2`, `C_DEC2.2`, `C_DEC3.2`, `C_DEC4.2`, `J1.S`, `J1.TN`, `R1.2`, `U1.3` (`U1A+`), `U1.5` (`U1B+`), `U1.10` (`U1C+`), `C2.2`, `RV3.2`, `RV3.3`, `J2.S`, `U2.3` (`U2A+`), `J3.S`, `R_LED.2`, `TP1.1` |
-| **`IN_TIP`** | `J1.T`, `R_IN_PROT.1` |
-| **`IN_AC_PRE`** | `R_IN_PROT.2`, `C1.1` |
-| **`IN_AC`** | `C1.2`, `R1.1`, `D_IN.3` (`COM`), `R_IN_BUF.1` |
-| **`U2D_IN`** | `R_IN_BUF.2`, `U2.12` (`U2D+`) |
-| **`IN_BUF`** | `U2.14` (`U2D_OUT`), `U2.13` (`U2D-`), `R2.1`, `TP4.1` |
-| **`U1A_INV`** | `R2.2`, `U1.2` (`U1A-`), `R_GAIN_MIN.1`, `R_GAIN_FAIL.1`, `C_HF.1` |
-| **`GAIN_POT_1`** | `R_GAIN_MIN.2`, `RV1.1` |
-| **`PREAMP_OUT`** | `U1.1` (`U1A_OUT`), `RV1.2`, `RV1.3`, `R_GAIN_FAIL.2`, `C_HF.2`, `R3.1`, `R4.1`, `TP5.1` |
-| **`U1B_INV`** | `R3.2`, `U1.6` (`U1B-`), `R6.1`, `D1_D2.2` (`K2`, `D1.K`) |
-| **`U1B_OUT`** | `U1.7` (`U1B_OUT`), `D1_D2.3` (`COM`, `D1.A`/`D2.K`) |
-| **`RECT_HW`** | `D1_D2.1` (`A1`, `D2.A`), `R6.2`, `R7.1` |
-| **`FF_MID`** | `R4.2`, `R5.1` |
-| **`U1C_INV`** | `R5.2`, `R7.2`, `U1.9` (`U1C-`), `R8A.1` |
-| **`RECT_FB_MID`** | `R8A.2`, `R8B.1` |
-| **`RECT_OUT`** | `U1.8` (`U1C_OUT`), `R8B.2`, `U2.10` (`U2C+`), `TP6.1` |
-| **`U2C_OUT`** | `U2.8` (`U2C_OUT`), `D3.A` |
-| **`ATK_IN`** | `D3.K`, `U2.9` (`U2C-`), `R_ATK_MIN.1` |
-| **`ATK_POT_1`** | `R_ATK_MIN.2`, `RV2.1` |
-| **`ENV_NODE`** | `RV2.2`, `RV2.3`, `C2.1`, `R10.1`, `R_ENV_PROT.1`, `R20.1` |
-| **`REL_POT_TOP`** | `R10.2`, `RV3.1` |
-| **`U1D_IN`** | `R_ENV_PROT.2`, `U1.12` (`U1D+`) |
-| **`OFF_TOP`** | `R11.2`, `RV4.1` |
-| **`OFF_BOT`** | `R12.2`, `RV4.3` |
-| **`OFF_WIPER`** | `RV4.2`, `R13.1` |
-| **`U1D_INV`** | `R13.2`, `R15.1`, `C_OUT1.1`, `U1.13` (`U1D-`) |
-| **`U1D_OUT`** | `U1.14` (`U1D_OUT`), `C_OUT1.2`, `R16A.1` |
-| **`OUT_CLAMP`** | `R16A.2`, `R15.2`, `D_OUT.3` (`COM`), `R16B.1`, `R17.1`, `TP7.1` |
-| **`OUT_TIP`** | `R16B.2`, `J2.T` |
-| **`U2A_INV`** | `R17.2`, `R18.1`, `C_OUT2.1`, `U2.2` (`U2A-`) |
-| **`U2A_OUT`** | `U2.1` (`U2A_OUT`), `C_OUT2.2`, `R19A.1` |
-| **`INV_OUT_CLAMP`** | `R19A.2`, `R18.2`, `D_INV_OUT.3` (`COM`), `R19B.1`, `TP8.1` |
-| **`INV_OUT_TIP`** | `R19B.2`, `J3.T` |
-| **`U2B_IN`** | `R20.2`, `U2.5` (`U2B+`) |
-| **`U2B_OUT`** | `U2.7` (`U2B_OUT`), `D4.A`, `D_LED_CLAMP.K` |
-| **`LED_K`** | `D4.K`, `D_LED_CLAMP.A`, `U2.6` (`U2B-`), `R_LED.1` |
-| **`NC`** | `J2.TN`, `J3.TN` |
+| **`+12V_IN`** | `J4.9`, `J4.10`, `D7.A` |
+| **`-12V_IN`** | `J4.1`, `J4.2`, `D8.K` |
+| **`+12V_FILT_IN`** | `D7.K`, `R28.1` |
+| **`-12V_FILT_IN`** | `D8.A`, `R29.1` |
+| **`+12V_PROT`** | `R28.2`, `C3.+`, `C5.1`, `C7.1`, `U1.4`, `U2.4`, `R17.1`, `D9.2` (`K`), `D10.2` (`K`), `D11.2` (`K`), **`TP1.1`** |
+| **`-12V_PROT`** | `R29.2`, `C4.-`, `C6.1`, `C8.1`, `U1.11`, `U2.11`, `R18.1`, `D9.1` (`A`), `D10.1` (`A`), `D11.1` (`A`), **`TP2.1`** |
+| **`GND`** | `J4.3`, `J4.4`, `J4.5`, `J4.6`, `J4.7`, `J4.8`, `C3.-`, `C4.+`, `C5.2`, `C6.2`, `C7.2`, `C8.2`, `J1.S`, `J1.TN`, `R2.2`, `R3.2`, `R4.2`, `U1.5`, `U1.10`, `C2.2`, `R14.2`, `RV3.2`, `RV3.3`, `R16.2`, `U2.3`, `R26.2`, `R27.2`, `J2.S`, `J3.S`, **`TP3.1`** |
+| **`IN_TIP`** | `J1.T`, `R1.1` |
+| **`IN_CLAMP`** | `R1.2`, `D9.3` (`COM`), `C1.1` |
+| **`IN_POT_TOP`** | `C1.2`, `RV1.3` (`CW`) |
+| **`IN_POT_BOT`** | `RV1.1` (`CCW`), `R2.1` |
+| **`IN_WIPER`** | `RV1.2` (`Wiper`), `R3.1`, `U1.3` (`U1A+`) |
+| **`IN_GAIN_INV`** | `R4.1`, `U1.2` (`U1A-`), `R5.1`, `C9.1` |
+| **`V_GAIN`** | `U1.1` (`U1A OUT`), `R5.2`, `C9.2`, `R6.1`, `R8.1`, **`TP4.1`** |
+| **`RECT_INV`** | `R6.2`, `U1.6` (`U1B-`), `R7.1`, `D1.K` |
+| **`RECT_OP_OUT`** | `U1.7` (`U1B OUT`), `D1.A`, `D2.K` |
+| **`RECT_MID`** | `D2.A`, `R7.2`, `R9.1` |
+| **`SUM_INV`** | `R8.2`, `R9.2`, `U1.9` (`U1C-`), `R10.1` |
+| **`V_RECT`** | `U1.8` (`U1C OUT`), `R10.2`, `U2.10` (`U2C+`), **`TP5.1`** |
+| **`PEAK_INV`** | `U2.9` (`U2C-`), `R11.2`, `C10.1`, `D5.A` |
+| **`PEAK_OP_OUT`** | `U2.8` (`U2C OUT`), `C10.2`, `D5.K`, `D3.A` |
+| **`RECT_DIODE_OUT`** | `D3.K`, `R12.1` |
+| **`ATK_MID`** | `R12.2`, `RV2.1` (`CCW`) |
+| **`ENV_CAP`** | `RV2.2`, `RV2.3` (`Wiper+CW`), `C2.1`, `R13.1`, `U2.12` (`U2D+`) |
+| **`REL_MID`** | `R13.2`, `RV3.1` (`CCW`), `R14.1` |
+| **`V_ENV_BUF`** | `U2.13` (`U2D-`), `U2.14` (`U2D OUT`), `R11.1`, `R15.1`, `R25.1`, **`TP6.1`** |
+| **`OUT_NONINV`** | `R15.2`, `R16.1`, `U1.12` (`U1D+`) |
+| **`OFF_TOP`** | `R17.2`, `RV4.1` (`CCW`) |
+| **`OFF_BOT`** | `R18.2`, `RV4.3` (`CW`) |
+| **`OFF_WIPER`** | `RV4.2` (`Wiper`), `R19.1` |
+| **`OUT_INV_NODE`** | `R19.2`, `R20.1`, `U1.13` (`U1D-`) |
+| **`V_OUT_BUF`** | `U1.14` (`U1D OUT`), `R20.2`, `D10.3` (`COM`), `R21.1`, `R22.1`, **`TP7.1`** |
+| **`OUT_TIP`** | `R21.2`, `J2.T` |
+| **`INV_SUM`** | `R22.2`, `R23.1`, `U2.2` (`U2A-`) |
+| **`V_INV_BUF`** | `U2.1` (`U2A OUT`), `R23.2`, `D11.3` (`COM`), `R24.1`, **`TP8.1`** |
+| **`INV_OUT_TIP`** | `R24.2`, `J3.T` |
+| **`LED_REF_IN`** | `R25.2`, `R26.1`, `U2.5` (`U2B+`) |
+| **`LED_SENSE`** | `U2.6` (`U2B-`), `D4.K` (`Pin 1`), `D6.A`, `R27.1` |
+| **`V_LED_DRV`** | `U2.7` (`U2B OUT`), `D4.A` (`Pin 2`), `D6.K` |
+| **`NC` (Unconnected)** | `J2.TN`, `J3.TN` |
+
+### 5.4 Rear `B.Cu` Test Point Allocation (`TP1`–`TP8`, `Ronghe RH-5001`, `DNP`)
+
+All `8` test points use `Connector:TestPoint` (`TestPoint:TestPoint_Keystone_5000-5004_Miniature`: `Ø 2.0 mm` circular pad, `Ø 1.0 mm` plated drill, `Ø 2.8 mm` silk ring, `Ø 3.3 mm` courtyard) on **`B.Cu`** for rear access behind the `3U` front panel, marked **`DNP`** (`Manual THT`, excluded from JLCPCB SMT BOM & CPL) so they can be probed bare or optionally populated with **Ronghe `RH-5001`** (`C5199801`, `2.5 mm` black nylon bead, `4.6 mm` above-board height, `7.6 ± 0.4 mm` overall length, `0.25 mm` split phosphor-bronze spring pins splayed to `1.4 mm` for `1.0 mm` snap-fit retention).
+
+| Ref | Net | Source Pin | Expected Range / Signal | Diagnostic Purpose & Guardrails |
+|---|---|---|---|---|
+| **`TP1`** | `+12V_PROT` | Post-`D7`/`R28` | `+11.6 V` DC (`±0.2 V`) | Unpowered rail resistance check (`> 10 kΩ`) & powered `+12 V` rail verification |
+| **`TP2`** | `-12V_PROT` | Post-`D8`/`R29` | `-11.6 V` DC (`±0.2 V`) | Unpowered rail resistance check (`> 10 kΩ`) & powered `-12 V` rail verification |
+| **`TP3`** | `GND` | Ground plane | `0.00 V` reference | Rear-side oscilloscope ground-clip loop near signal TPs (connect via thermal-relief spokes) |
+| **`TP4`** | `V_GAIN` | `U1.1` (`U1A OUT`) | `±10.5 V` max (`+0.45×`–`+10.04×`) | Low-Z Stage 1 output; confirms `J1`, `C1`, `RV1` (`GAIN`), idle DC (`±15 mV`), and headroom |
+| **`TP5`** | `V_RECT` | `U1.8` (`U1C OUT`) | `0` to `+10.5 V` (`+\|V_GAIN\|`) | Low-Z Stage 2 output; confirms `1.00×` full-wave symmetry (`U1B`/`U1C`) and `75 mV` sensitivity |
+| **`TP6`** | `V_ENV_BUF` | `U2.14` (`U2D OUT`) | `0` to `+10.5 V` DC envelope | Low-Z buffered copy of `C2`; measures `ATK` (`0.15–50 ms`) & `Release` (`10–835 ms`) with **zero probe loading on `ENV_CAP`** |
+| **`TP7`** | `V_OUT_BUF` | `U1.14` (`U1D OUT`) | `0–10 V` env `± 4.69 V` offset | Pre-`R21` (`1 kΩ 1 W`) op-amp output; checks `R21` continuity (`1 kΩ` to `J2.T`) & isolates `U1D`/`RV4`/`D10` |
+| **`TP8`** | `V_INV_BUF` | `U2.1` (`U2A OUT`) | `-V_OUT_BUF` (`-1.00×`) | Pre-`R24` (`1 kΩ 1 W`) op-amp output; checks `R24` continuity (`1 kΩ` to `J3.T`) & isolates `U2A`/`D11` |
+
+*(Intentionally omitted nodes: `ENV_CAP` (`C2.1`) is high-Z (`4.7 MΩ` parallel bleed) so direct `1–10 MΩ` probing loads down `Release`—always probe `TP6` (`V_ENV_BUF`) instead; op-amp inverting inputs `IN_GAIN_INV`, `RECT_INV`, `SUM_INV`, `PEAK_INV`, `OUT_INV_NODE`, and `INV_SUM` are omitted to avoid adding stray pad capacitance to summing/compensation nodes.)*
 
 ---
 
-## 6. Practical PCB Layout & Assembly Guidelines
+## 6. Assembly, Control Polarity & Bring-Up Verification
 
-1. **JLCPCB Economic Single-Sided SMT Assembly**: Place all 49 SMT components on `F.Cu` (`U1`, `U2`, `0603`/`1206`/`1210` resistors, `0603` ceramic caps, `D6.3×5.4mm` SMD electrolytics, `SOD-123`/`SOD-323`/`SOT-23` diodes) so JLCPCB populates the board in a single Economic SMT pass.
-2. **Later Manual THT Mounting & Height Clearances**:
-   - Front-panel THT parts (`J1`–`J3`, `RV1`–`RV4`, `D4`) mount on `F.Cu` and align to the `3U` Eurorack front panel (`~10.5 mm` board-to-panel standoff).
-   - `J4` (`2×5` shrouded IDC header) mounts on **`B.Cu`** (rear side) with silkscreen `RED STRIPE / -12V` marking Pins `1–2`.
-   - `C1` and `C2` (`B32529D1105J000`, `7.2 × 6.0 × 11.0 mm` box film) exceed `10.5 mm` if mounted upright on `F.Cu`; mount `C1` and `C2` on **`B.Cu`** (same hand-soldering pass as `J4`) so `F.Cu` clears the front panel cleanly.
-   - `TP1`–`TP8` (`Ronghe RH-5001` through-board test pins, **DNP** in PCBA BOM) are plated through-hole pads accessible from **`B.Cu`**, allowing bare-pad probing or optional rear-side pin installation (`F.Cu` remains flush behind the front panel, and probing works with the module mounted to the faceplate). Label each pad clearly on `B.SilkS` (`TP1 GND`, `TP2 +12V`, `TP3 -12V`, `TP4 IN_BUF`, `TP5 PREAMP`, `TP6 RECT`, `TP7 OUT`, `TP8 INV_OUT`) and keep `≥ 2.5–3.0 mm` clip clearance around adjacent `J4`/`C1`/`C2` bodies.
-3. **Critical Layout Rules**:
-   - Place `C_DEC1`–`C_DEC4` (`100 nF`) within `< 3–5 mm` of `U1.4`, `U1.11`, `U2.4`, and `U2.11` with direct vias to the ground plane.
-   - Keep `C_HF` (`47 pF`) and `R_GAIN_FAIL` (`1 MΩ`) close to `U1.1`/`U1.2` to minimize stray capacitance at the summing node.
-   - Keep the `ATK_IN` / `ENV_NODE` traces (`U2.9`, `D3.K`, `C2.1`) compact and guarded away from `PREAMP_OUT`, clock/power traces, and test-point THT pads.
-   - Give `R16A/B` and `R19A/B` (`1210`, `0.5 W`) generous copper pad/pour area for thermal relief during continuous output-to-output rail clashes.
-4. **Potentiometer Rotation Verification**:
-   - `RV1` (`GAIN`, `A100k`): `1` = `GAIN_POT_1`, `2+3` = `PREAMP_OUT` → clockwise increases gain (`-0.10×` → `-9.17×`).
-   - `RV2` (`ATK`, `A50k`): `1` = `ATK_POT_1`, `2+3` = `ENV_NODE` → clockwise lengthens attack (`0.47 ms` → `50.5 ms`).
-   - `RV3` (`Release`, `A1M`): `1` = `REL_POT_TOP`, `2+3` = `GND` → clockwise lengthens release (`10 ms` → `1.01 s`).
-   - `RV4` (`OFFSET`, `B10k`): `1` = `OFF_TOP` (`+9.63 V`), `3` = `OFF_BOT` (`-9.63 V`), `2` = `OFF_WIPER` → clockwise pushes `OFF_WIPER` negative and `U1D` (`OUT`) **positive** (`-5.09 V` → `+5.09 V`).
+### 6.1 Post-PCBA Manual Assembly Sequence
+1. **Inspect `B.Cu` SMT assembly:** Confirm orientation of `U1`/`U2` (`SOIC-14` Pin `1`), `C3`/`C4` electrolytics (`+` stripe), `D1`–`D3`/`D5`–`D8` (`SOD-323` cathode band to Pad `1`), and `D9`–`D11` (`SOT-23`).
+2. **Solder Rear `B.Cu` THT (`J4`, `C1`, `C2`, and Optional `TP1`–`TP8`):**
+   - Install `J4` (`2×5` shrouded IDC header with key notch facing board interior/silkscreen outline) and `C1`, `C2` (`1 µF 63 V` `P=5mm` film caps) on `B.Cu`, soldering cleanly on `F.Cu` pads and trimming leads flush so nothing protrudes toward the front panel.
+   - **Optional `TP1`–`TP8` (`Ronghe RH-5001`, `DNP`):** Leave unpopulated for bare plated-hole probing, or snap `RH-5001` loops into `B.Cu` (`4.6 mm` rear height), solder on `F.Cu`, and trim the `~3.0 mm` protruding split pins flush on `F.Cu` before mounting the front panel (alternatively, tack-solder from `B.Cu` later without removing the panel).
+3. **Fit & Solder Front `F.Cu` Controls (`J1`–`J3`, `RV1`–`RV4`, `D4`):**
+   - Insert `J1`–`J3` (`WQP-PJ398SM`), `RV1`–`RV4` (`A100k`, `A50k`, `A1M`, `B10k`), and `D4` (`3 mm` LED, `Pin 1` square pad = Cathode `K`, `Pin 2` round pad = Anode `A` — **do not trim `D4` leads yet**) onto `F.Cu` without soldering.
+   - Slide the `3U` front panel over the shafts/bushings, tighten M6 jack nuts and M7 pot nuts finger-tight, push `D4`'s lens dome flush into its `3.2 mm` panel hole, then solder all `F.Cu` THT pins from `B.Cu` and trim leads.
+
+### 6.2 Bench Bring-Up & Verification Checklist
+1. **Unpowered Resistance Check:** Verify `> 10 kΩ` across **`TP1` (`+12V_PROT`)**, **`TP2` (`-12V_PROT`)**, and **`TP3` (`GND`)**, and confirm `J2.T` / `J3.T` read `1 kΩ` to **`TP7` (`V_OUT_BUF`)** / **`TP8` (`V_INV_BUF`)** (never `0 Ω` to `GND`).
+2. **Power & Reverse-Polarity Test:** Power via `J4` (`±12 V` current-limited bench supply) with DMM/scope reference on **`TP3` (`GND`)**. Confirm **`TP1` (`+12V_PROT`) ≈ `+11.6 V`** and **`TP2` (`-12V_PROT`) ≈ `-11.6 V`**.
+3. **Zero-Input Idle Check (`J1` unplugged, `OFFSET` centered):**
+   - Verify **`TP4` (`V_GAIN`)**, **`TP5` (`V_RECT`)**, and **`TP6` (`V_ENV_BUF`)** are all within `±15 mV` of `0.00 V` (and `ENV_CAP` follows `TP6` without direct probe loading).
+   - Confirm **`D4` (`LED`) is completely dark (`0.00 mA`)**.
+   - Sweep `RV4` (`OFFSET`): confirm **`TP7` (`V_OUT_BUF`)** and `OUT` (`J2.T`) track smoothly and linearly from **`-4.69 V` (full CCW)** to **`+4.69 V` (full CW)**, while **`TP8` (`V_INV_BUF`)** and `INV_OUT` (`J3.T`) track `-OUT`. Return `RV4` to center (`OUT ≈ 0.00 V`).
+4. **Zero-Deadzone & Dynamic Envelope Check:**
+   - Set `RV1` (`GAIN`) to `100%` CW, `RV2` (`ATK`) to `0%` CCW, `RV3` (`Release`) to `30%`.
+   - Inject a **`1 kHz`, `100 mVpp` (`50 mV` peak)** sine wave into `J1` (`IN`): confirm **`TP4` (`V_GAIN`) ≈ `1.00 Vpp`**, **`TP5` (`V_RECT`) ≈ `+0.50 V` peaks**, **`TP6` (`V_ENV_BUF`) ≈ `+0.50 V` DC**, and `OUT` rises to **`~+0.49 V`** (previously `0 V` below `D3`'s `~0.6 V` deadband).
+   - Drop amplitude to **`15 mVpp`** (**`TP5` `V_RECT` ≈ `75 mV`**): confirm **`TP6` (`V_ENV_BUF`)**, `OUT`, and `D4` (`LED`) still track cleanly without deadband truncation.
+   - Increase input to `2 Vpp` and burst/gate the tone: verify on **`TP6` (`V_ENV_BUF`)** that `ATK` (`A50k`) smoothly slows rising edges (`0.15 ms`–`50 ms`) and `Release` (`A1M`) smoothly scales falling tails (`10 ms`–`835 ms` `τ`) with zero probe loading on `C2` and zero level droop across fast vs. slow `Release` settings.
