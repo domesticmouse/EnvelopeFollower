@@ -1,141 +1,219 @@
-# Envelope Follower (Improved Eurorack Revision) — Bill of Materials (BOM)
+# Envelope Follower (Improved) — Bill of Materials (BOM) & JLCPCB Sourcing
 
-Complete, production-ready Bill of Materials for [EnvelopeFollowerImproved.md](./EnvelopeFollowerImproved.md).
+Complete Bill of Materials for [EnvelopeFollowerImproved.md](./EnvelopeFollowerImproved.md), partitioned for **single-sided JLCPCB Economic PCBA on the bottom side (`B.Cu`)**, post-PCBA **rear (`B.Cu`) hand-soldered THT**, post-PCBA **front (`F.Cu`) panel-facing hand-soldered THT controls**, and **rear (`B.Cu`) optional `DNP` through-hole test points (`TP1`–`TP8`)**.
 
-- **Live JLCPCB / LCSC Verification Date:** `2026-11-21` (verified directly against JLCPCB's live SMT catalog API `selectSmtComponentList/v2`, LCSC's live product API `wmsc.lcsc.com` / `jlcsearch`, and the `RH-5001` manufacturer datasheet PDF).
-- **Verification Coverage:** **100% of JLCPCB/LCSC components verified live** (zero unverified or `PENDING_VERIFY` entries).
-- **Assembly Architecture:**
-  - **`B.Cu` Single-Sided JLCPCB Economic PCBA (`49` SMT parts, `20` unique BOM lines):** All ICs (`2 × TL074HIDR`), diodes, ESD clamps, SMD resistors, decoupling capacitors, and SMD bulk electrolytics are placed strictly on **`B.Cu`** (`0` SMT parts on `F.Cu`).
-  - **`B.Cu` Rear Manual THT (`3` populated parts + `8` `DNP` test points):** `J4` (`2×5` shrouded Eurorack power header) and `C1`, `C2` (`1 µF 63 V` `P=5mm` box film capacitors) — LCSC-verified, hand-soldered on the rear after PCBA; plus `TP1`–`TP8` (`Ronghe RH-5001`, **`DNP`**) optional rear-side test points.
-  - **`F.Cu` Front-Panel Manual THT (`8` parts):** `J1`–`J3` (3.5 mm mono jacks), `RV1`–`RV4` (`A100k`, `A50k`, `A1M`, `B10k` 9 mm vertical potentiometers), and `D4` (3 mm indicator LED) — excluded from JLCPCB SMT BOM, fitted into the front panel and hand-soldered later.
+> **Verification Status:** All JLCPCB/LCSC parts listed below are live-verified (zero unverified placeholders). All SMT components, rear THT film capacitors, the shrouded `2×5` IDC header, the `3 mm` panel LED, and the optional `RH-5001` through-hole test points (`C5199801`) were live-verified against JLCPCB/LCSC stock, pricing, and Basic/Extended library status during this session. Front-panel jacks (`J1`–`J3`) and 9 mm vertical potentiometers (`RV1`–`RV4`) are explicitly designated as **Manual / Consigned THT (External Synth-DIY Hardware)** aligned to the front panel using KiCad Eurorack footprints documented in [eurorack_mechanical_spec.md](./.agents/skills/eurorack-panel/references/eurorack_mechanical_spec.md).
 
 ---
 
-## 1. BOM & Cost Summary (Live JLCPCB / LCSC Pricing)
+## BOM Partitioning & Cost Overview
 
-| Assembly Group | Side / Process | Unique BOM Lines | Total Qty / Board | Raw Parts Cost / Board (USD) | JLCPCB Feeder Fees / Order (USD) | Notes |
-|---|---|---:|---:|---:|---:|---|
-| **JLCPCB Basic SMT** | `B.Cu` Economic PCBA | `15` | `39` | `$0.1654` | `$0.00` | Pre-loaded (`$0` feeder setup fee) |
-| **JLCPCB Preferred Extended SMT** | `B.Cu` Economic PCBA | `1` | `1` | `$0.0041` | `$0.00` | `R14` (`4.7 MΩ` `0603`, `$0` setup fee) |
-| **JLCPCB Extended SMT** | `B.Cu` Economic PCBA | `4` | `9` | `$0.7060` | `$12.00` | `4 × $3.00` (`TL074HIDR`, `BAT54S`, `47 µF`, `1 kΩ 2512`) |
-| **Subtotal — JLCPCB SMT PCBA (`B.Cu`)** | **Single-Sided Reflow** | **`20`** | **`49`** | **`$0.8755`** | **`$12.00`** | **`$3.2755/board` @ 5 pcs · `$2.0755/board` @ 10 pcs** *(excl. bare PCB & base assembly/stencil)* |
-| **Rear Manual THT (`B.Cu`)** | Hand-Solder (LCSC) | `2` | `3` | `$0.6555` | `—` | `J4` (`C53207560`) + `C1`, `C2` (`C328852` film) |
-| **Rear Test Points (`B.Cu`, `DNP`)** | Optional Hand-Solder (LCSC) | `1` (`DNP`) | `8` (`DNP`) | `$0.0000` *(DNP)* | `—` | `TP1`–`TP8` (`C5199801` `Ronghe RH-5001`, `DNP`; `+$0.6704` @ 1+ or `+$0.6440` @ 5+ if populated) |
-| **Front Panel LED (`F.Cu`)** | Hand-Solder (LCSC) | `1` | `1` | `$0.0360` | `—` | `D4` (`C85161` 3 mm green LED) |
-| **Front Panel Controls (`F.Cu`)** | Hand-Solder (Eurorack) | `5` | `7` | *Vendor-dependent* | `—` | `3 × WQP-PJ398SM` jacks + `4 × Alpha RD901F` pots (`A100k`, `A50k`, `A1M`, `B10k`) |
-| **Grand Total (Populated Build)** | `B.Cu` + `F.Cu` | **`28`** *(+1 DNP)* | **`60`** *(+8 DNP)* | **`$1.5670` + jacks/pots** | **`$12.00`** | `60` populated parts (`68` total footprints incl. `TP1`–`TP8` `DNP`, `170` pins) |
+| Bucket | Side | Assembly Method | Qty Parts | Unique Lines | Basic / Ext / Consigned | Unit Parts Cost / Board |
+|---|---|---|---:|---:|---|---:|
+| **1. JLCPCB Economic PCBA (SMT)** | `B.Cu` | JLCPCB Single-Sided SMT (`--side back`) | `44` | `17` | `14` Basic / `3` Extended | **`$0.9078`** |
+| **2A. Rear Manual THT** | `B.Cu` | Hand-soldered after PCBA (LCSC-sourced) | `3` | `2` | `2` LCSC Extended (Manual THT — `$0` PCBA fee) | **`$0.6555`** |
+| **2B. Front Panel LED (THT)** | `F.Cu` | Hand-soldered w/ panel (LCSC-sourced) | `1` | `1` | `1` LCSC Extended (Manual THT — `$0` PCBA fee) | **`$0.0364`** |
+| **2C. Front Panel Controls (THT)** | `F.Cu` | Hand-soldered w/ panel (User-consigned) | `7` | `5` | `5` External / Synth-DIY Hardware | *External* |
+| **Populated Subtotal** | `B.Cu` + `F.Cu` | Mixed (`B.Cu` SMT + `B.Cu`/`F.Cu` THT) | **`55`** | **`25`** | **`14` Basic / `3` PCBA Ext / `3` THT LCSC / `5` Consigned** | **`$1.5997` (LCSC subtotal)** |
+| **3. Optional / `DNP` Test Points (THT)** | `B.Cu` | **DNP** / Optional post-PCBA hand-solder (`TP1`–`TP8`) | `8` (`DNP`) | `1` | `1` LCSC Extended (`DNP` — `$0` PCBA fee) | **`$0.0000` bare** *(`$0.6704` if all 8 fitted)* |
 
-> **Cost-Saving Note (Optional `$3.00` Feeder Reduction):** Replacing `R21`, `R24` (`1 kΩ 2512 1 W`, Extended `C54315`, `$3.00` fee) with two `2 kΩ 1206 250 mW 1%` Basic resistors (`C17944`, `1206W4F2001T5E`, `$0.0077`, `1,578,804` in stock) in parallel per output (`4 ×` total) saves `$3.00` in feeder fees, though total power headroom drops from `1.00 W` (`51%` fault load) to `0.50 W` (`~102%` worst-case `22.5 V` continuous fault). Keeping `C54315` (`1 W 2512`) is recommended for Eurorack fault durability.
+* **JLCPCB Extended Feeder Fees (PCBA only):** `3` Extended SMT lines (`TL074HIDR` `C2878713`, `1 kΩ 1 W 2512` `C54315`, `22 µF 50 V SMD` `C2836438`) × `$3.00` = **`$9.00` per batch** (`$1.80/board` over a 5-board minimum order). Manual THT parts and **`DNP` test points (`TP1`–`TP8`)** are excluded from `jlcpcb_bom.csv` and the PCBA CPL (`--smd-only --exclude-dnp`), incurring `$0` PCBA loading fees.
+* **Removed Original Designators:** `R14`, `R22`, and `R23` from [EnvelopeFollower.md](./EnvelopeFollower.md) are intentionally removed (zero-attenuation `U1D` gain/offset scaling and active `U2B` LED feedback sink).
 
 ---
 
-## 2. JLCPCB Single-Sided Economic PCBA BOM (`B.Cu` SMT Parts — `49` Placements)
+## 1. Bucket 1 — JLCPCB Economic Single-Sided SMT Assembly (`B.Cu`)
 
-All parts in this section are placed on **`B.Cu`** for automated single-sided JLCPCB Economic PCBA.
+All 44 components below are placed on **`B.Cu`** and included in `jlcpcb_bom.csv` and the back-side CPL (`--side back --smd-only --exclude-dnp`).
 
-| Designator(s) | Qty | Comment / Value | Package / KiCad Footprint | LCSC Part # | MPN | Manufacturer | JLCPCB Class | Live JLCPCB Stock | Unit Price (USD) | Ext. Price (1×) | Feeder Fee | Circuit Role |
-|---|---:|---|---|---|---|---|---|---:|---:|---:|---:|---|
-| `U1`, `U2` | 2 | `TL074H` | `SOIC-14` (`Package_SO:SOIC-14_3.9x8.7mm_P1.27mm`) | `C2878713` | `TL074HIDR` | Texas Instruments | Extended | `465` | `$0.2558` | `$0.5116` | `$3.00` | Quad 40 V FET-input op-amps (`U1A`–`U1D`, `U2A`–`U2D`) |
-| `D1`, `D2`, `D3`, `D5`, `D6` | 5 | `1N4148WS` | `SOD-323` (`Diode_SMD:D_SOD-323`) | `C2128` | `1N4148WS` | Jiangsu Changjing (JSCJ) | **Basic** | `3,310,175` | `$0.0100` | `$0.0500` | `$0.00` | `D1`/`D2` rectifier, `D3` peak diode, `D5` anti-sat clamp, `D6` LED clamp |
-| `D7`, `D8` | 2 | `1N5819WS` | `SOD-323` (`Diode_SMD:D_SOD-323`) | `C191023` | `1N5819WS` | Guangdong Hottech | **Basic** | `5,672,689` | `$0.0119` | `$0.0238` | `$0.00` | `±12 V` reverse-polarity Schottky protection (`40 V, 1 A`) |
-| `D9`, `D10`, `D11` | 3 | `BAT54S` | `SOT-23` (`Package_TO_SOT_SMD:SOT-23`) | `C47546` | `BAT54S,215` | Nexperia | Extended | `430,138` | `$0.0200` | `$0.0600` | `$3.00` | Dual series Schottky ESD/rail clamps (`IN`, `OUT`, `INV_OUT`) |
-| `R1`, `R4`, `R6`, `R7`, `R9`, `R13`, `R22`, `R23`, `R25`, `R26` | 10 | `10k` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C25804` | `0603WAF1002T5E` | UNI-ROYAL | **Basic** | `42,821,833` | `$0.0017` | `$0.0170` | `$0.00` | `10 kΩ ±1% 100 mW` input prot, gain gnd, rect, release min, `-1×` inv, LED div |
-| `R5`, `R15`, `R16`, `R19`, `R20` | 5 | `100k` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C25803` | `0603WAF1003T5E` | UNI-ROYAL | **Basic** | `13,100,877` | `$0.0029` | `$0.0145` | `$0.00` | `100 kΩ ±1% 100 mW` `U1A` gain fb (`R5`) + `U1D` diff amp (`R15`, `R16`, `R19`, `R20`) |
-| `R8`, `R10` | 2 | `20k` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C4184` | `0603WAF2002T5E` | UNI-ROYAL | **Basic** | `4,914,296` | `$0.0018` | `$0.0036` | `$0.00` | `20 kΩ ±1% 100 mW` `1.00×` rectifier feedforward (`R8`) & feedback (`R10`) |
-| `R17`, `R18` | 2 | `6.8k` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C23212` | `0603WAF6801T5E` | UNI-ROYAL | **Basic** | `1,285,991` | `$0.0018` | `$0.0036` | `$0.00` | `6.8 kΩ ±1% 100 mW` `OFFSET` (`B10k`) rail dividers (`±4.69 V` sweep) |
-| `R28`, `R29` | 2 | `10R` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C22859` | `0603WAF100JT5E` | UNI-ROYAL | **Basic** | `5,425,289` | `$0.0018` | `$0.0036` | `$0.00` | `10 Ω ±1% 100 mW` `±12 V` inrush/ripple RC damping resistors |
-| `R21`, `R24` | 2 | `1k 1W` | `2512` (`Resistor_SMD:R_2512_6332Metric`) | `C54315` | `25121WF1001T4E` | UNI-ROYAL | Extended | `52,582` | `$0.0336` | `$0.0672` | `$3.00` | `1 kΩ ±1% 1 W` fault-rated `OUT`/`INV_OUT` build-out resistors |
-| `R27` | 1 | `1k` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C21190` | `0603WAF1001T5E` | UNI-ROYAL | **Basic** | `40,728,395` | `$0.0016` | `$0.0016` | `$0.00` | `1 kΩ ±1% 100 mW` LED constant-current sense resistor (`0.5 mA/V`) |
-| `R2` | 1 | `4.7k` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C23162` | `0603WAF4701T5E` | UNI-ROYAL | **Basic** | `19,374,141` | `$0.0028` | `$0.0028` | `$0.00` | `4.7 kΩ ±1% 100 mW` `GAIN` pot floor (`+0.45×` minimum gain) |
-| `R12` | 1 | `150R` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C22808` | `0603WAF1500T5E` | UNI-ROYAL | **Basic** | `1,027,005` | `$0.0015` | `$0.0015` | `$0.00` | `150 Ω ±1% 100 mW` minimum attack current-limiting resistor |
-| `R11` | 1 | `200k` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C25811` | `0603WAF2003T5E` | UNI-ROYAL | **Basic** | `1,659,651` | `$0.0019` | `$0.0019` | `$0.00` | `200 kΩ ±1% 100 mW` `U2C` peak-detector feedback from `U2D` buffer |
-| `R3` | 1 | `1M` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C22935` | `0603WAF1004T5E` | UNI-ROYAL | **Basic** | `5,686,105` | `$0.0018` | `$0.0018` | `$0.00` | `1 MΩ ±1% 100 mW` `U1A +` open-wiper pull-down |
-| `R14` | 1 | `4.7M` | `0603` (`Resistor_SMD:R_0603_1608Metric`) | `C23163` | `0603WAF4704T5E` | UNI-ROYAL | **Pref. Ext.** | `185,543` | `$0.0041` | `$0.0041` | `$0.00` | `4.7 MΩ ±1% 100 mW` `Release` open-wiper safety bleed |
-| `C3`, `C4` | 2 | `47uF 35V` | `SMD,D6.3xL5.4mm` (`Capacitor_SMD:CP_Elec_6.3x5.4`) | `C2836440` | `RVT47UF35V67RV0039` | KNSCHA | Extended | `332,900` | `$0.0336` | `$0.0672` | `$3.00` | `47 µF 35 V ±20%` protected `±12 V` bulk rail electrolytic caps |
-| `C5`, `C6`, `C7`, `C8` | 4 | `100nF 50V` | `0603` (`Capacitor_SMD:C_0603_1608Metric`) | `C14663` | `CC0603KRX7R9BB104` | YAGEO | **Basic** | `53,435,508` | `$0.0056` | `$0.0224` | `$0.00` | `100 nF 50 V X7R ±10%` local IC decoupling at `U1` & `U2` pins `4`/`11` |
-| `C9` | 1 | `22pF 50V` | `0603` (`Capacitor_SMD:C_0603_1608Metric`) | `C1653` | `CL10C220JB8NNNC` | Samsung Electro-Mechanics | **Basic** | `2,750,711` | `$0.0089` | `$0.0089` | `$0.00` | `22 pF 50 V C0G ±5%` `U1A` HF compensation (`f_-3dB = 72 kHz`) |
-| `C10` | 1 | `100pF 50V` | `0603` (`Capacitor_SMD:C_0603_1608Metric`) | `C14858` | `CL10C101JB8NNNC` | Samsung Electro-Mechanics | **Basic** | `3,044,717` | `$0.0084` | `$0.0084` | `$0.00` | `100 pF 50 V C0G ±5%` `U2C` peak-detector loop stabilization (`>70°` PM) |
-
-### Verified Drop-In SMT Alternatives
-- **`D1`–`D3`, `D5`, `D6` (`SOD-123` larger alt):** `C81598` (`1N4148W`, ST/Semtech, `SOD-123`, **Basic**, `4,501,771` stock, `$0.0123`).
-- **`D7`, `D8` (`SOD-123` larger alt):** `C8598` (`B5819W SL`, JSCJ, `SOD-123`, **Basic**, `823,629` stock, `$0.0251`).
-- **`D9`–`D11` (`BAT54S` alt MPNs):** `C19726` (`BAT54SLT1G`, onsemi, `SOT-23`, Extended, `406,747` stock, `$0.0231`) or `C12765` (`LBAT54SLT1G`, LRC, `SOT-23`, Extended, `227,898` stock, `$0.0135`).
-- **`C3`, `C4` (`22 µF 50 V` alt):** `C2836438` (`RVT22UF50V67RV0028`, KNSCHA, `SMD,D6.3xL5.4mm`, Extended, `124,555` stock, `$0.0406`).
-
----
-
-## 3. Rear `B.Cu` Manual Through-Hole BOM (`3` Populated + `8` `DNP` Test Points — Hand-Soldered Later)
-
-Excluded from the JLCPCB SMT PCBA BOM (`JLCPCB_Class = "Manual THT"`). Placed on **`B.Cu`** (rear side) so `F.Cu` stays exclusively reserved for front-panel controls.
-
-| Designator(s) | Qty | Status | Value / Spec | Package / KiCad Footprint | LCSC Part # | MPN | Manufacturer | Live JLCPCB / LCSC Stock | Unit Price (USD) | Ext. Price (1×) | Circuit Role |
+| Ref(s) | Qty | Value / Rating | MPN | Manufacturer | LCSC Package / KiCad Footprint | LCSC # | Class | Stock | Unit USD | Ext USD | Datasheet |
 |---|---:|---|---|---|---|---|---|---:|---:|---:|---|
-| `J4` | 1 | Populate | `2×5P 2.54mm` Shrouded Keyed IDC Header | `Plugin, P=2.54mm` (`Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical`) | `C53207560` | `IDC2.54-2*5PZ` | JXTCONN | `2,060` / `1,920` | `$0.1241` | `$0.1241` | Standard 10-pin Doepfer A-100 Eurorack power header on `B.Cu` |
-| `C1`, `C2` | 2 | Populate | `1uF 63V` ±5% Box Film (PET) | `Plugin, P=5mm` (`Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2`) | `C328852` | `C241J105J2SA201` | Xiamen Faratronic | `20,135` / `18,180` | `$0.2657` | `$0.5314` | `C1` AC input coupling; `C2` envelope timing cap (zero DC-bias loss/microphonics; no `1 µF` SMD film stocked at JLCPCB) |
-| `TP1`–`TP8` | 8 | **`DNP`** | `2.5mm` Black Pin-Type Test Point (`4.6 mm` H, `Ø 1.0 mm` drill) | Through-Board (`TestPoint:TestPoint_Keystone_5000-5004_Miniature`) | `C5199801` | `RH-5001` | Ronghe | `100,860` / `98,140` | `$0.0838` *(`$0.0805` @ 5+)* | `$0.0000` *(`$0.6704` if pop.)* | Optional rear `B.Cu` test points (`+12V_PROT`, `-12V_PROT`, `GND`, `V_GAIN`, `V_RECT`, `V_ENV_BUF`, `V_OUT_BUF`, `V_INV_BUF`) — **marked `DNP`** |
-
-- **`RH-5001` (`C5199801`) Verification & Mechanical Notes:**
-  - Verified live via JLCPCB (`100,860` stock) and LCSC (`98,140` stock; [LCSC Datasheet PDF](https://datasheet.lcsc.com/datasheet/pdf/4adec3e10718fa4444bfddc0d5622733.pdf?productCode=C5199801)): `2.5 mm` OD black high-temperature nylon bead (`3.0 mm` bead height, `4.6 mm` above-board height, `7.6 ± 0.4 mm` overall length), silver-plated phosphor-bronze `0.25 mm` split spring pins splayed to `1.4 mm` for snap-fit retention into `TestPoint:TestPoint_Keystone_5000-5004_Miniature` (`Ø 2.0 mm` pad, `Ø 1.0 mm` drill, `Ø 3.3 mm` courtyard).
-  - Marked **`DNP`** (`dnp=True`, `exclude_from_bom=True`) so standard PCBA orders skip them and bare `1.0 mm` plated holes remain probeable from `B.Cu`; if soldering `RH-5001` in optionally, order `8 × C5199801` per board, insert from `B.Cu`, solder on `F.Cu`, and trim the `~3.0 mm` protruding spring legs flush on `F.Cu`.
-
-- **Verified `1 µF 63 V P=5mm` Film Alternatives:**
-  - Budget: `C3975271` (`MEB105J63V82CB0235`, KNSCHA, `10,677` JLCPCB / `8,610` LCSC stock, `$0.1911`).
-  - Premium: `C92673` (`MKS2C041001F00JSSD`, WIMA, `5,573` stock, `$1.1437`).
+| `U1`, `U2` | 2 | `TL074H` Quad JFET/CMOS Op-Amp (`4.5–40 V`, `±20 V`) | `TL074HIDR` | Texas Instruments | `SOIC-14` / `Package_SO:SOIC-14_3.9x8.7mm_P1.27mm` | `C2878713` | Extended | `465` | `$0.2558` | `$0.5116` | [PDF](https://wmsc.lcsc.com/wmsc/upload/file/pdf/v2/lcsc/2302282300_Texas-Instruments-TL074HIDR_C2878713.pdf) |
+| `R2`–`R7`, `R9`, `R10`, `R15`, `R17`, `R18`, `R20`, `R27` | 13 | `10 kΩ` `±1%` `100 mW` `75 V` | `0603WAF1002T5E` | UNI-ROYAL | `0603` / `Resistor_SMD:R_0603_1608Metric` | `C25804` | **Basic** | `42,582,187` | `$0.0017` | `$0.0221` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010045_UNI-ROYAL-Uniroyal-Elec-0603WAF1002T5E_C25804.pdf) |
+| `R11`, `R12` | 2 | `1 kΩ` `±1%` `100 mW` `75 V` | `0603WAF1001T5E` | UNI-ROYAL | `0603` / `Resistor_SMD:R_0603_1608Metric` | `C21190` | **Basic** | `40,562,224` | `$0.0016` | `$0.0032` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010130_UNI-ROYAL-Uniroyal-Elec-0603WAF1001T5E_C21190.pdf) |
+| `R16`, `R19`, `R26` | 3 | `1 kΩ` `±1%` **`1 W`** `200 V` | `25121WF1001T4E` | UNI-ROYAL | `2512` / `Resistor_SMD:R_2512_6332Metric` | `C54315` | Extended | `52,554` | `$0.0336` | `$0.1008` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010000_UNI-ROYAL-Uniroyal-Elec-25121WF1001T4E_C54315.pdf) |
+| `R1` | 1 | `100 kΩ` `±1%` `100 mW` `75 V` | `0603WAF1003T5E` | UNI-ROYAL | `0603` / `Resistor_SMD:R_0603_1608Metric` | `C25803` | **Basic** | `13,049,690` | `$0.0029` | `$0.0029` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010045_UNI-ROYAL-Uniroyal-Elec-0603WAF1003T5E_C25803.pdf) |
+| `R8` | 1 | `20 kΩ` `±1%` `100 mW` `75 V` | `0603WAF2002T5E` | UNI-ROYAL | `0603` / `Resistor_SMD:R_0603_1608Metric` | `C4184` | **Basic** | `4,869,831` | `$0.0018` | `$0.0018` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010230_UNI-ROYAL-Uniroyal-Elec-0603WAF2002T5E_C4184.pdf) |
+| `R13` | 1 | `22 kΩ` `±1%` `100 mW` `75 V` | `0603WAF2202T5E` | UNI-ROYAL | `0603` / `Resistor_SMD:R_0603_1608Metric` | `C31850` | **Basic** | `2,203,056` | `$0.0042` | `$0.0042` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010030_UNI-ROYAL-Uniroyal-Elec-0603WAF2202T5E_C31850.pdf) |
+| `R24` | 1 | `4.7 kΩ` `±1%` `100 mW` `75 V` | `0603WAF4701T5E` | UNI-ROYAL | `0603` / `Resistor_SMD:R_0603_1608Metric` | `C23162` | **Basic** | `19,312,230` | `$0.0028` | `$0.0028` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010116_UNI-ROYAL-Uniroyal-Elec-0603WAF4701T5E_C23162.pdf) |
+| `R21` | 1 | `3.3 kΩ` `±1%` `100 mW` `75 V` | `0603WAF3301T5E` | UNI-ROYAL | `0603` / `Resistor_SMD:R_0603_1608Metric` | `C22978` | **Basic** | `4,036,281` | `$0.0020` | `$0.0020` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010116_UNI-ROYAL-Uniroyal-Elec-0603WAF3301T5E_C22978.pdf) |
+| `R25` | 1 | `330 Ω` `±1%` `100 mW` `75 V` | `0603WAF3300T5E` | UNI-ROYAL | `0603` / `Resistor_SMD:R_0603_1608Metric` | `C23138` | **Basic** | `2,614,499` | `$0.0015` | `$0.0015` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2206010116_UNI-ROYAL-Uniroyal-Elec-0603WAF3300T5E_C23138.pdf) |
+| `C5`–`C8` | 4 | `100 nF` `50 V` `X7R` `±10%` | `CC0603KRX7R9BB104` | YAGEO | `0603` / `Capacitor_SMD:C_0603_1608Metric` | `C14663` | **Basic** | `53,170,848` | `$0.0056` | `$0.0224` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2211101700_YAGEO-CC0603KRX7R9BB104_C14663.pdf) |
+| `C9` | 1 | `22 pF` `50 V` `C0G` `±5%` | `CL10C220JB8NNNC` | Samsung Electro-Mechanics | `0603` / `Capacitor_SMD:C_0603_1608Metric` | `C1653` | **Basic** | `2,736,905` | `$0.0089` | `$0.0089` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_Samsung-Electro-Mechanics-CL10C220JB8NNNC_C1653.pdf) |
+| `C10`, `C11` | 2 | `47 pF` `50 V` `C0G` `±5%` | `CL10C470JB8NNNC` | Samsung Electro-Mechanics | `0603` / `Capacitor_SMD:C_0603_1608Metric` | `C1671` | **Basic** | `1,100,428` | `$0.0053` | `$0.0106` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_Samsung-Electro-Mechanics-CL10C470JB8NNNC_C1671.pdf) |
+| `C3`, `C4` | 2 | `22 µF` `50 V` `±20%` Alum. Elec. | `RVT22UF50V67RV0028` | KNSCHA | `SMD,D6.3xL5.4mm` / `Capacitor_SMD:CP_Elec_6.3x5.4` | `C2836438` | Extended | `124,542` | `$0.0406` | `$0.0812` | [PDF](https://wmsc.lcsc.com/wmsc/upload/file/pdf/v2/lcsc/2105281608_KNSCHA-RVT22UF50V67RV0028_C2836438.pdf) |
+| `D1`–`D3`, `D10` | 4 | `1N4148W` `75 V` `150 mA` Fast Diode | `1N4148W` | ST (Semtech) | `SOD-123` / `Diode_SMD:D_SOD-123` | `C81598` | **Basic** | `4,489,926` | `$0.0123` | `$0.0492` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_1811061725_ST-Semtech-1N4148W_C81598.pdf) |
+| `D5`, `D6` | 2 | `40 V` `1 A` Schottky Diode | `B5819W SL` | Jiangsu Changjing | `SOD-123` / `Diode_SMD:D_SOD-123` | `C8598` | **Basic** | `820,298` | `$0.0251` | `$0.0502` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_Jiangsu-Changjing-Electronics-Technology-Co---Ltd--B5819W-SL_C8598.pdf) |
+| `D7`–`D9` | 3 | `BAV99` `100 V` `125 mA` Dual Series | `BAV99,215` | Nexperia | `SOT-23` / `Package_TO_SOT_SMD:SOT-23` | `C2500` | **Basic** | `2,113,716` | `$0.0108` | `$0.0324` | [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2407250951_Nexperia-BAV99-215_C2500.pdf) |
 
 ---
 
-## 4. Front `F.Cu` Panel-Facing Manual Through-Hole BOM (`8` Parts — Hand-Soldered Later)
+## 2. Bucket 2A — Rear Hand-Soldered THT (`B.Cu`, Post-PCBA)
 
-Placed strictly on **`F.Cu`** facing the `3U` front panel and excluded from the JLCPCB SMT PCBA BOM.
+Mounted on the rear (`B.Cu`) side and hand-soldered after JLCPCB SMT assembly (excluded from `jlcpcb_bom.csv` and PCBA CPL).
 
-| Designator(s) | Qty | Value / Taper | KiCad Footprint | LCSC Status | Primary MPN / Sourcing | Unit Price (Est.) | Circuit Role & Pinout Notes |
+| Ref(s) | Qty | Value / Spec | MPN | Manufacturer | LCSC Package / KiCad Footprint | LCSC # | Stock | Unit USD | Ext USD | Notes & Datasheet |
+|---|---:|---|---|---|---|---|---:|---:|---:|---|
+| `C1`, `C2` | 2 | `1 µF` `63 V` `±5%` Metallized Polyester Film | `C241J105J2SA201` | XIAMEN FARATRONIC | `Plugin,P=5mm` / `5.00 mm` radial box film (`B.Cu`) | `C328852` | `20,135` | `$0.2657` | `$0.5314` | Non-MLCC timing/coupling cap; verify exact body width from [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_2304140030_XIAMEN-FARATRONIC-C241J105J2SA201_C328852.pdf) |
+| `J4` | 1 | `2×5` `2.54 mm` Shrouded Box Header (`250 V`, `3 A`) | `IDC2.54-2*5PZ` | JXTCONN | `Plugin,P=2.54mm` / `Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical` | `C53207560` | `2,060` | `$0.1241` | `$0.1241` | Eurorack keyed power (`1–2 = -12V_IN`, `3–8 = GND`, `9–10 = +12V_IN`); no LCSC PDF linked |
+
+---
+
+## 3. Bucket 2B — Front Panel-Facing Hand-Soldered THT (`F.Cu`, Post-PCBA)
+
+Placed on **`F.Cu`**, mechanically aligned to the `10.5 mm` standoff Eurorack front panel prior to hand-soldering, and excluded from `jlcpcb_bom.csv` / PCBA CPL.
+
+### 3.1 LCSC-Verified Indicator LED (`F.Cu`)
+
+| Ref | Qty | Value / Spec | MPN | Manufacturer | LCSC Package / KiCad Footprint | LCSC # | Stock | Unit USD | Notes & Datasheet |
+|---|---:|---|---|---|---|---|---:|---:|---|
+| `D4` | 1 | `3 mm` Yellow-Green Diffused LED (`2.0 V` `V_F`, `100 mcd @ 20 mA`, `573 nm`) | `204-10SYGD/S530-E3` | Everlight Elec | `Plugin,D=3mm` / `LED_THT:LED_D3.0mm` | `C85161` | `166,421` | `$0.0364` | Pad `1` = Cathode (`LED_K`), Pad `2` = Anode (`LED_A`); `3.2 mm` NPTH panel hole; [PDF](https://www.lcsc.com/datasheet/lcsc_datasheet_1811141531_Everlight-Elec-204-10SYGD-S530-E3_C85161.pdf) |
+
+### 3.2 User-Sourced / Consigned Synth-DIY Panel Hardware (`F.Cu`)
+
+Per Eurorack mechanical standards ([eurorack_mechanical_spec.md](./.agents/skills/eurorack-panel/references/eurorack_mechanical_spec.md)), panel jacks and 9 mm vertical potentiometers are sourced externally from synth-DIY vendors (e.g., Thonk, Tayda, Modular Addict, Mouser/DigiKey) and marked **`Manual / Consigned THT`**:
+
+| Ref | Qty | Panel Label | Value / Taper | Standard Synth-DIY Part | KiCad Footprint (`F.Cu`) | Panel Drill / Nut Keepout | Sourcing & Wiring Notes |
 |---|---:|---|---|---|---|---|---|
-| `J1`, `J2`, `J3` | 3 | `3.5mm Mono Jack` (Switched) | `Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `0` stock on JLCPCB/LCSC *(Manual Eurorack)* | QingPu `WQP-PJ398SM` ("Thonkiconn", M6 bushing; Thonk / SynthCube / Tayda) | `~$0.45–$0.65` | `J1` (`IN`, `TN→GND`), `J2` (`OUT`, `TN=NC`), `J3` (`INV_OUT`, `TN=NC`) |
-| `RV1` | 1 | `A100k` (100 kΩ Log) | `Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical` | `0` stock on JLCPCB/LCSC *(Manual Eurorack)* | Taiwan Alpha `RD901F-40-15F-A100K` (or `RV09AF-40-15F-A100K`; Thonk / Tayda / LoveMySwitches) | `~$0.80–$1.20` | `GAIN` input attenuator (`+0.45×` to `+10.04×`) |
-| `RV2` | 1 | `A50k` (50 kΩ Log) | `Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical` | `0` stock on JLCPCB/LCSC *(Manual Eurorack)* | Taiwan Alpha `RD901F-40-15F-A50K` (or `RV09AF-40-15F-A50K`) | `~$0.80–$1.20` | `ATK` attack time control (`0.15 ms`–`50.15 ms`) |
-| `RV3` | 1 | `A1M` (1 MΩ Log) | `Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical` | `0` stock on JLCPCB/LCSC *(Manual Eurorack)* | Taiwan Alpha `RD901F-40-15F-A1M` (or `RV09AF-40-15F-A1M`) | `~$0.80–$1.20` | `Release` decay time control (`10 ms`–`835 ms` `τ`) |
-| `RV4` | 1 | `B10k` (10 kΩ Linear) | `Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical` | `0` stock on JLCPCB/LCSC *(Manual Eurorack)* | Taiwan Alpha `RD901F-40-15F-B10K` (or center-detent `-00D` variant; `RV09AF-40-15F-B10K`) | `~$0.80–$1.20` | `OFFSET` DC shift control (`-4.69 V` CCW to `+4.69 V` CW) |
-| `D4` | 1 | `3mm LED` (Green) | `LED_THT:LED_D3.0mm` | **Verified LCSC: `C85161`** (`36,941` JLCPCB stock) | Everlight `204-10SYGD/S530-E3` (`573 nm`, `100 mcd`, `2 V` — or any 3 mm LED) | `$0.0360` | Envelope indicator (`0–5 mA` constant-current sink; `Pin 1` rect = Cathode) |
-
-- **Verified `D4` `3 mm` LED Alternatives on LCSC:** `C84774` (Everlight `204-10SDRD/S530-A3-L`, Red, `46,956` JLCPCB stock, `$0.0356`) or `C85160` (Everlight `204-10UYD/S530-A3-L`, Yellow, `36,051` JLCPCB stock, `$0.0365`). Because `U2B` regulates current (`0.5 mA/V`) independent of `V_f`, any LED color behaves identically without changing resistor values.
+| `J1` | 1 | `IN` | `3.5 mm` Mono Jack | QingPu `WQP-PJ398SM` (`PJ301M-12`) | `Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `6.2–6.3 mm` / `9.5 mm` (`+6.48 mm` Y-offset) | **External / Consigned THT** (`T=IN_TIP`, `TN=GND`, `S=GND`) |
+| `J2` | 1 | `OUT` | `3.5 mm` Mono Jack | QingPu `WQP-PJ398SM` (`PJ301M-12`) | `Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `6.2–6.3 mm` / `9.5 mm` (`+6.48 mm` Y-offset) | **External / Consigned THT** (`T=OUT_TIP`, **`TN=NC`**, `S=GND`) |
+| `J3` | 1 | `INV_OUT` | `3.5 mm` Mono Jack | QingPu `WQP-PJ398SM` (`PJ301M-12`) | `Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles` | `6.2–6.3 mm` / `9.5 mm` (`+6.48 mm` Y-offset) | **External / Consigned THT** (`T=INV_OUT_TIP`, **`TN=NC`**, `S=GND`) |
+| `RV1` | 1 | `GAIN` | **`A100k`** (`100 kΩ` Audio/Log) | Alpha `RD901F-40-00D` / Alps `RK09K` 9 mm Vertical | `Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical` *(or `Alps_RK09K`)* | `7.2–7.5 mm` / `10.5–11.0 mm` | **External / Consigned THT** (`1=GAIN_MID`, `2+3=V_AMP`; CW = higher gain) |
+| `RV2` | 1 | `ATK` | **`A50k`** (`50 kΩ` Audio/Log) | Alpha `RD901F-40-00D` / Alps `RK09K` 9 mm Vertical | `Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical` *(or `Alps_RK09K`)* | `7.2–7.5 mm` / `10.5–11.0 mm` | **External / Consigned THT** (`1=ATK_POT_IN`, `2+3=ENV_CAP`; CW = slower attack) |
+| `RV3` | 1 | `Release` | **`A1M`** (`1 MΩ` Audio/Log) | Alpha `RD901F-40-00D` / Alps `RK09K` 9 mm Vertical | `Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical` *(or `Alps_RK09K`)* | `7.2–7.5 mm` / `10.5–11.0 mm` | **External / Consigned THT** (`1=REL_MID`, `2+3=GND`; CW = longer release) |
+| `RV4` | 1 | `OFFSET` | **`B10k`** (`10 kΩ` Linear) | Alpha `RD901F-40-00D` / Alps `RK09K` 9 mm Vertical | `Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical` *(or `Alps_RK09K`)* | `7.2–7.5 mm` / `10.5–11.0 mm` | **External / Consigned THT** (`1=OFFSET_TOP`, `2=OFFSET_WIPER`, `3=OFFSET_BOT`; CW = `+OUT`) |
 
 ---
 
-## 5. JLCPCB SMT Assembly CSV Export Preview (`B.Cu` Only)
+## 4. Bucket 3 — Optional / `DNP` Rear Test Points (`B.Cu` THT, Post-PCBA)
 
-Matches JLCPCB's required 4-column upload schema (`Comment,Designator,Footprint,LCSC Part #`), containing only the `49` `B.Cu` SMT placements (`Manual THT` and `DNP` parts `J1`–`J4`, `RV1`–`RV4`, `C1`, `C2`, `D4`, `TP1`–`TP8` omitted):
+Placed on the **rear (`B.Cu`)** side so test rings protrude behind the board away from the `10.5 mm` front-panel standoff. All `8` test points (`TP1`–`TP8`) MUST be marked **`DNP`**, **`Exclude from BOM`**, and **`Exclude from Position Files`** in KiCad/SKiDL so they incur `$0` JLCPCB PCBA fees and never leak into `jlcpcb_bom.csv` or the bottom-side CPL. Left unsoldered, the `2.0 mm` copper annular rings (`1.0 mm` plated drills) remain directly probeable from either side.
+
+| Ref(s) | Qty | Value / Spec | MPN | Manufacturer | LCSC Package / KiCad Footprint | LCSC # | Stock | Unit USD | Ext USD | Notes & Datasheet |
+|---|---:|---|---|---|---|---|---:|---:|---:|---|
+| `TP1`–`TP8` | 8 (`DNP`) | `2.5 mm` Black Pin-Type THT Test Point (`1.0 mm` PCB drill) | `RH-5001` | ronghe | `-` (Through-Board) / `TestPoint:TestPoint_Keystone_5000-5004_Miniature` *(or `TestPoint_Loop_D2.50mm_Drill1.0mm`)* | `C5199801` | `98,835` | `$0.0838` *(`$0.0805` @ `5+`)* | `$0.6704` *(`$0.00` bare)* | **DNP / Optional THT (`B.Cu`):** `TP1=GND`, `TP2=+12V`, `TP3=-12V`, `TP4=IN_BUF`, `TP5=V_AMP`, `TP6=V_FWR`, `TP7=ENV_CAP`, `TP8=V_OUT_PRE`. `"2.5mm"` is the insulated bead OD; verify PCB drill (`1.0 mm`) & height from [PDF](https://datasheet.lcsc.com/datasheet/pdf/4adec3e10718fa4444bfddc0d5622733.pdf?productCode=C5199801) |
+
+---
+
+## 5. Complete Itemized Component List (55 Populated + 8 Optional `DNP` Test Points)
+
+| Ref | Value | Function / Stage | Side | Assembly | LCSC # / Source | MPN |
+|---|---|---|---|---|---|---|
+| `R1` | `100 kΩ` (`0603`, 1%) | `IN` Impedance / DC Pull-Down | `B.Cu` | JLCPCB SMT | `C25803` (Basic) | `0603WAF1003T5E` |
+| `R2` | `10 kΩ` (`0603`, 1%) | `U1A` Gain Input | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R3` | `10 kΩ` (`0603`, 1%) | `U1B` Half-Wave Input | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R4` | `10 kΩ` (`0603`, 1%) | `U1B` Half-Wave Feedback | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R5` | `10 kΩ` (`0603`, 1%) | `U1C` Full-Wave Rectified Sum | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R6` | `10 kΩ` (`0603`, 1%) | `U1C` Feed-Forward #1 (`20 kΩ` pair) | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R7` | `10 kΩ` (`0603`, 1%) | `U1C` Feed-Forward #2 (`20 kΩ` pair) | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R8` | `20 kΩ` (`0603`, 1%) | `U1C` Unity Rectifier Feedback | `B.Cu` | JLCPCB SMT | `C4184` (Basic) | `0603WAF2002T5E` |
+| `R9` | `10 kΩ` (`0603`, 1%) | `U1D +` ESD/Power-Off Isolation | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R10` | `10 kΩ` (`0603`, 1%) | Minimum Release Resistor | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R11` | `1 kΩ` (`0603`, 1%) | `OFFSET` Divider (`+12V` end) | `B.Cu` | JLCPCB SMT | `C21190` (Basic) | `0603WAF1001T5E` |
+| `R12` | `1 kΩ` (`0603`, 1%) | `OFFSET` Divider (`-12V` end) | `B.Cu` | JLCPCB SMT | `C21190` (Basic) | `0603WAF1001T5E` |
+| `R13` | `22 kΩ` (`0603`, 1%) | `OFFSET` Summing (`1.400×–1.436×`) | `B.Cu` | JLCPCB SMT | `C31850` (Basic) | `0603WAF2202T5E` |
+| `R15` | `10 kΩ` (`0603`, 1%) | `U1D` Output Stage Feedback | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R16` | `1 kΩ` (`2512`, `1 W`, 1%) | `OUT` Fault-Proof Protection | `B.Cu` | JLCPCB SMT | `C54315` (Extended) | `25121WF1001T4E` |
+| `R17` | `10 kΩ` (`0603`, 1%) | `U2A` `INV_OUT` Input | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R18` | `10 kΩ` (`0603`, 1%) | `U2A` `INV_OUT` Feedback | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R19` | `1 kΩ` (`2512`, `1 W`, 1%) | `INV_OUT` Fault-Proof Protection | `B.Cu` | JLCPCB SMT | `C54315` (Extended) | `25121WF1001T4E` |
+| `R20` | `10 kΩ` (`0603`, 1%) | `U2B +` `LED` Input Isolation | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `R21` | `3.3 kΩ` (`0603`, 1%) | `LED` Linear Current Sense | `B.Cu` | JLCPCB SMT | `C22978` (Basic) | `0603WAF3301T5E` |
+| `R24` | `4.7 kΩ` (`0603`, 1%) | `GAIN` Minimum Floor (`0.47×`) | `B.Cu` | JLCPCB SMT | `C23162` (Basic) | `0603WAF4701T5E` |
+| `R25` | `330 Ω` (`0603`, 1%) | Attack Peak Current Limiter (`0.33 ms`) | `B.Cu` | JLCPCB SMT | `C23138` (Basic) | `0603WAF3300T5E` |
+| `R26` | `1 kΩ` (`2512`, `1 W`, 1%) | `IN` ESD / Hot-Plug Surge Limiter | `B.Cu` | JLCPCB SMT | `C54315` (Extended) | `25121WF1001T4E` |
+| `R27` | `10 kΩ` (`0603`, 1%) | `U2C` Clamp Current Limiter | `B.Cu` | JLCPCB SMT | `C25804` (Basic) | `0603WAF1002T5E` |
+| `C1` | `1 µF` (`63 V`, Film) | Input AC Coupling (`1.58 Hz`) | `B.Cu` | Manual THT | `C328852` (Extended) | `C241J105J2SA201` |
+| `C2` | `1 µF` (`63 V`, Film) | Envelope Storage Timing Cap | `B.Cu` | Manual THT | `C328852` (Extended) | `C241J105J2SA201` |
+| `C3` | `22 µF` (`50 V`, Elec SMD) | `+12V` Bulk Filter (`+`=`+12V`, `-`=`GND`) | `B.Cu` | JLCPCB SMT | `C2836438` (Extended) | `RVT22UF50V67RV0028` |
+| `C4` | `22 µF` (`50 V`, Elec SMD) | `-12V` Bulk Filter (`+`=`GND`, `-`=`-12V`) | `B.Cu` | JLCPCB SMT | `C2836438` (Extended) | `RVT22UF50V67RV0028` |
+| `C5` | `100 nF` (`50 V`, X7R, `0603`) | `U1.4` (`+12V`) Local Bypass | `B.Cu` | JLCPCB SMT | `C14663` (Basic) | `CC0603KRX7R9BB104` |
+| `C6` | `100 nF` (`50 V`, X7R, `0603`) | `U1.11` (`-12V`) Local Bypass | `B.Cu` | JLCPCB SMT | `C14663` (Basic) | `CC0603KRX7R9BB104` |
+| `C7` | `100 nF` (`50 V`, X7R, `0603`) | `U2.4` (`+12V`) Local Bypass | `B.Cu` | JLCPCB SMT | `C14663` (Basic) | `CC0603KRX7R9BB104` |
+| `C8` | `100 nF` (`50 V`, X7R, `0603`) | `U2.11` (`-12V`) Local Bypass | `B.Cu` | JLCPCB SMT | `C14663` (Basic) | `CC0603KRX7R9BB104` |
+| `C9` | `22 pF` (`50 V`, C0G, `0603`) | `U1A` Ultrasonic Comp (`69.1 kHz`) | `B.Cu` | JLCPCB SMT | `C1653` (Basic) | `CL10C220JB8NNNC` |
+| `C10` | `47 pF` (`50 V`, C0G, `0603`) | `U1D` Output Stage Stabilization | `B.Cu` | JLCPCB SMT | `C1671` (Basic) | `CL10C470JB8NNNC` |
+| `C11` | `47 pF` (`50 V`, C0G, `0603`) | `U2A` Inverter Stabilization | `B.Cu` | JLCPCB SMT | `C1671` (Basic) | `CL10C470JB8NNNC` |
+| `D1` | `1N4148W` (`SOD-123`) | `U1B` Rectifier Feedback Clamp | `B.Cu` | JLCPCB SMT | `C81598` (Basic) | `1N4148W` |
+| `D2` | `1N4148W` (`SOD-123`) | `U1B` Rectifier Output | `B.Cu` | JLCPCB SMT | `C81598` (Basic) | `1N4148W` |
+| `D3` | `1N4148W` (`SOD-123`) | `U2D` Active Zero-Deadzone Peak Diode | `B.Cu` | JLCPCB SMT | `C81598` (Basic) | `1N4148W` |
+| `D4` | `3 mm` Yellow-Green LED | Active Envelope Indicator | `F.Cu` | Manual THT | `C85161` (Extended) | `204-10SYGD/S530-E3` |
+| `D5` | `B5819W SL` (`SOD-123`, `40 V`) | `+12V` Reverse-Polarity Schottky | `B.Cu` | JLCPCB SMT | `C8598` (Basic) | `B5819W SL` |
+| `D6` | `B5819W SL` (`SOD-123`, `40 V`) | `-12V` Reverse-Polarity Schottky | `B.Cu` | JLCPCB SMT | `C8598` (Basic) | `B5819W SL` |
+| `D7` | `BAV99,215` (`SOT-23`) | `OUT` ESD / Overvoltage Rail Clamp | `B.Cu` | JLCPCB SMT | `C2500` (Basic) | `BAV99,215` |
+| `D8` | `BAV99,215` (`SOT-23`) | `INV_OUT` ESD / Overvoltage Rail Clamp | `B.Cu` | JLCPCB SMT | `C2500` (Basic) | `BAV99,215` |
+| `D9` | `BAV99,215` (`SOT-23`) | `IN` Buffer ESD / Overvoltage Clamp | `B.Cu` | JLCPCB SMT | `C2500` (Basic) | `BAV99,215` |
+| `D10` | `1N4148W` (`SOD-123`) | `D4` Anti-Parallel Reverse Clamp | `B.Cu` | JLCPCB SMT | `C81598` (Basic) | `1N4148W` |
+| `U1` | `TL074HIDR` (`SOIC-14`) | `U1A` Gain, `U1B`/`U1C` FWR, `U1D` Out | `B.Cu` | JLCPCB SMT | `C2878713` (Extended) | `TL074HIDR` |
+| `U2` | `TL074HIDR` (`SOIC-14`) | `U2A` Inv, `U2B` LED, `U2C` Buf, `U2D` Peak | `B.Cu` | JLCPCB SMT | `C2878713` (Extended) | `TL074HIDR` |
+| `RV1` | `A100k` (9 mm Vertical) | `GAIN` Control | `F.Cu` | Consigned THT | External Synth-DIY | Alpha `RD901F` / Alps `RK09K` |
+| `RV2` | `A50k` (9 mm Vertical) | `ATK` Control | `F.Cu` | Consigned THT | External Synth-DIY | Alpha `RD901F` / Alps `RK09K` |
+| `RV3` | `A1M` (9 mm Vertical) | `Release` Control | `F.Cu` | Consigned THT | External Synth-DIY | Alpha `RD901F` / Alps `RK09K` |
+| `RV4` | `B10k` (9 mm Vertical) | `OFFSET` Control | `F.Cu` | Consigned THT | External Synth-DIY | Alpha `RD901F` / Alps `RK09K` |
+| `J1` | `3.5 mm` Mono Jack | `IN` Panel Jack (`TN` to `GND`) | `F.Cu` | Consigned THT | External Synth-DIY | `WQP-PJ398SM` |
+| `J2` | `3.5 mm` Mono Jack | `OUT` Panel Jack (`TN` = `NC`) | `F.Cu` | Consigned THT | External Synth-DIY | `WQP-PJ398SM` |
+| `J3` | `3.5 mm` Mono Jack | `INV_OUT` Panel Jack (`TN` = `NC`) | `F.Cu` | Consigned THT | External Synth-DIY | `WQP-PJ398SM` |
+| `J4` | `2×5` `2.54 mm` Box Header | Eurorack Shrouded Power Header | `B.Cu` | Manual THT | `C53207560` (Extended) | `IDC2.54-2*5PZ` |
+| `TP1` | `RH-5001` (`DNP` Test Point) | `GND` Reference Ground Clip | `B.Cu` | **DNP** / Optional THT | `C5199801` (Optional) | `RH-5001` |
+| `TP2` | `RH-5001` (`DNP` Test Point) | `+12V` Protected Rail (`+11.65 V`) | `B.Cu` | **DNP** / Optional THT | `C5199801` (Optional) | `RH-5001` |
+| `TP3` | `RH-5001` (`DNP` Test Point) | `-12V` Protected Rail (`-11.65 V`) | `B.Cu` | **DNP** / Optional THT | `C5199801` (Optional) | `RH-5001` |
+| `TP4` | `RH-5001` (`DNP` Test Point) | `IN_BUF` (`U2C` Buffer Output) | `B.Cu` | **DNP** / Optional THT | `C5199801` (Optional) | `RH-5001` |
+| `TP5` | `RH-5001` (`DNP` Test Point) | `V_AMP` (`U1A` Gain Stage Output) | `B.Cu` | **DNP** / Optional THT | `C5199801` (Optional) | `RH-5001` |
+| `TP6` | `RH-5001` (`DNP` Test Point) | `V_FWR` (`U1C` Full-Wave Rectifier) | `B.Cu` | **DNP** / Optional THT | `C5199801` (Optional) | `RH-5001` |
+| `TP7` | `RH-5001` (`DNP` Test Point) | `ENV_CAP` (`C2` Envelope Storage) | `B.Cu` | **DNP** / Optional THT | `C5199801` (Optional) | `RH-5001` |
+| `TP8` | `RH-5001` (`DNP` Test Point) | `V_OUT_PRE` (`U1D` Pre-`R16` Output) | `B.Cu` | **DNP** / Optional THT | `C5199801` (Optional) | `RH-5001` |
+
+*(Removed from original circuit: `R14`, `R22`, `R23`.)*
+
+---
+
+## 6. JLCPCB Single-Sided PCBA BOM CSV (`B.Cu` SMT Only)
+
+Exact 4-column JLCPCB PCBA CSV structure (`44` SMT parts; upload alongside `B.Cu` CPL exported with `--side back --smd-only --exclude-dnp` and select **Bottom Side** under JLCPCB Economic PCBA — `TP1`–`TP8` are `DNP` and excluded from both `jlcpcb_bom.csv` and the CPL):
 
 ```csv
 Comment,Designator,Footprint,LCSC Part #
-TL074H,"U1, U2",SOIC-14_3.9x8.7mm_P1.27mm,C2878713
-1N4148WS,"D1, D2, D3, D5, D6",D_SOD-323,C2128
-1N5819WS,"D7, D8",D_SOD-323,C191023
-BAT54S,"D9, D10, D11",SOT-23,C47546
-10k,"R1, R4, R6, R7, R9, R13, R22, R23, R25, R26",R_0603_1608Metric,C25804
-100k,"R5, R15, R16, R19, R20",R_0603_1608Metric,C25803
-20k,"R8, R10",R_0603_1608Metric,C4184
-6.8k,"R17, R18",R_0603_1608Metric,C23212
-10R,"R28, R29",R_0603_1608Metric,C22859
-1k 1W,"R21, R24",R_2512_6332Metric,C54315
-1k,R27,R_0603_1608Metric,C21190
-4.7k,R2,R_0603_1608Metric,C23162
-150R,R12,R_0603_1608Metric,C22808
-200k,R11,R_0603_1608Metric,C25811
-1M,R3,R_0603_1608Metric,C22935
-4.7M,R14,R_0603_1608Metric,C23163
-47uF 35V,"C3, C4",CP_Elec_6.3x5.4,C2836440
-100nF 50V,"C5, C6, C7, C8",C_0603_1608Metric,C14663
-22pF 50V,C9,C_0603_1608Metric,C1653
-100pF 50V,C10,C_0603_1608Metric,C14858
+TL074HIDR,"U1, U2",SOIC-14_3.9x8.7mm_P1.27mm,C2878713
+10k,"R2, R3, R4, R5, R6, R7, R9, R10, R15, R17, R18, R20, R27",R_0603_1608Metric,C25804
+1k,"R11, R12",R_0603_1608Metric,C21190
+1k 1W,"R16, R19, R26",R_2512_6332Metric,C54315
+100k,R1,R_0603_1608Metric,C25803
+20k,R8,R_0603_1608Metric,C4184
+22k,R13,R_0603_1608Metric,C31850
+4.7k,R24,R_0603_1608Metric,C23162
+3.3k,R21,R_0603_1608Metric,C22978
+330R,R25,R_0603_1608Metric,C23138
+100nF,"C5, C6, C7, C8",C_0603_1608Metric,C14663
+22pF,C9,C_0603_1608Metric,C1653
+47pF,"C10, C11",C_0603_1608Metric,C1671
+22uF 50V,"C3, C4",CP_Elec_6.3x5.4,C2836438
+1N4148W,"D1, D2, D3, D10",D_SOD-123,C81598
+B5819W,"D5, D6",D_SOD-123,C8598
+BAV99,"D7, D8, D9",SOT-23,C2500
 ```
 
 ---
 
-## 6. JLCPCB Ordering & Hand-Assembly Checklist
+## 7. Verified Alternate Parts & 5-Board Prototype Budget
 
-1. **JLCPCB Order Options:** Select **2-layer PCB**, **Economic PCBA**, **Assembly Side: Bottom (`B.Cu`) only**, and upload the `B.Cu`-only BOM CSV and filtered `B.Cu` CPL (`--bom` filtered to exclude `J1`–`J4`, `RV1`–`RV4`, `C1`, `C2`, `D4`, `TP1`–`TP8` (`DNP`), fiducials, and mounting holes).
-2. **Verify `TL074HIDR` (`C2878713`) Stock Before Ordering:** Live stock was `465` pcs at verification time; if ordering a large batch (`> 200` boards), confirm live inventory or pre-book stock on JLCPCB.
-3. **Verify Component Rotations in JLCPCB 3D Preview:** Confirm Pin `1` orientation for `SOIC-14` (`U1`, `U2`), `SOT-23` (`D9`–`D11`), `SOD-323` cathode bars (`D1`–`D3`, `D5`–`D8`), and `CP_Elec_6.3x5.4` polarity stripes (`C3`, `C4`).
-4. **Post-PCBA Hand Soldering:**
-   - First solder rear `B.Cu` THT parts (`J4`, `C1`, `C2`) and, if populating the optional `DNP` test points, snap `TP1`–`TP8` (`Ronghe RH-5001`, `C5199801`) in from `B.Cu`, solder on `F.Cu`, and trim all leads flush on `F.Cu`.
-   - Next place front `F.Cu` panel components (`J1`–`J3`, `RV1`–`RV4`, `D4`) loosely, mount the `3U` front panel with M6/M7 hardware to set exact alignment and `~10.5 mm` standoff, seat `D4` into its `3.2 mm` cutout, and solder all `F.Cu` pins from `B.Cu`.
+### Live-Verified Alternate LCSC Options (from Batch 1)
+
+| Target Ref(s) | Primary Selected | Verified LCSC Alternate | MPN / Package | Class | Stock | Unit USD | Trade-off |
+|---|---|---|---|---|---:|---:|---|
+| `D1`–`D3`, `D10` | `C81598` (`SOD-123`) | `C2128` (`1N4148WS`, Jiangsu Changjing) | `SOD-323` | **Basic** | `3,287,956` | `$0.0100` | Smaller `SOD-323` footprint |
+| `D5`, `D6` | `C8598` (`SOD-123`) | `C191023` (`1N5819WS`, Hottech) | `SOD-323` | **Basic** | `5,666,945` | `$0.0119` | `-38%` footprint area vs. `SOD-123` |
+| `D5`, `D6` | `C8598` (`SOD-123`) | `C2480` (`SS14`, MDD) | `SMA(DO-214AC)` | **Basic** | `1,218,607` | `$0.0192` | Larger `SMA` package (`6.5×3.5 mm`) |
+| `C3`, `C4` | `C2836438` (`22 µF 50 V`) | `C970678` (`RVT1V470M0605 47UF 35V`) | `SMD,D6.3xL5.4mm` | Extended | `12,150` | `$0.0346` | `2.1×` capacitance (`35 V` vs. `50 V`) |
+| `C1`, `C2` | `C328852` (Faratronic) | `C92673` (`MKS2C041001F00JSSD`, WIMA) | `Plugin,P=5mm` | Extended | `5,573` | `$1.1437` | Premium WIMA MKS2 (`4.3×` cost) |
+| `C1`, `C2` | `C328852` (Faratronic) | `C3975271` (`MEB105J63V82CB0235`, KNSCHA) | `Plugin,P=5mm` | Extended | `10,566` | `$0.1911` | Lower-cost polyester film (`P=5mm`) |
+| `D4` | `C85161` (Yellow-Green) | `C99761` (`204-10SUGD/S400-A5`) | `3 mm` Emerald Green | Extended | `83,190` | `$0.0457` | `500–1000 mcd` high brightness (`3.4 V` `V_F`) |
+| `D4` | `C85161` (Yellow-Green) | `C99771` (`204-10SURD/S530-A3-L`) | `3 mm` Red | Extended | `155,197` | `$0.0329` | Classic red diffused lens |
+| `R16`, `R19`, `R26` | `C54315` (`2512`, `1 W`) | `C52444` (`1210W2F1001T5E`, `500 mW`) | `1210` | Extended | `25,757` | `$0.0143` | Compact `1210` (`0.5 W` tight at `24 V` `0.58 W`) |
+
+### Cost Summary (LCSC-Verified Parts, `5`-Board Economic PCBA Run)
+
+- **SMT PCBA Parts (`44` parts/board × 5):** `$0.9078 × 5 = $4.54`
+- **JLCPCB Extended Feeder Setup Fees (`3` lines × `$3.00`):** `$9.00`
+- **Manual LCSC THT Parts (`C1`, `C2`, `J4`, `D4`, 5× boards):** `$0.6919 × 5 = $3.46`
+- **LCSC Parts + Extended Fee Subtotal (5 populated boards, excl. bare PCB fab, SMT placement/stencil, shipping, consigned jacks/pots, and optional `DNP` test points):** **`$17.00`** (`~$3.40/board`).
+- **Optional `DNP` Test Points (`RH-5001` `C5199801`, `B.Cu`):** **`$0.00`** if probed as bare THT pads (`1.0 mm` drill); **`+$3.22`** if populating all `8` TPs across `5` boards (`40 × $0.0805` at `5+` break, or `$3.28` for a `50`-pack at `$0.0656/ea`).
