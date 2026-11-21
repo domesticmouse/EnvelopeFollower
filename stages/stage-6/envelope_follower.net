@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "envelope_follower.py")
-    (date "11/20/2026 10:13 PM")
+    (date "11/21/2026 06:03 PM")
     (tool "SKiDL (3.0.0)")
     (sheet
       (number 1)
@@ -44,32 +44,34 @@
   (components
     (comp
       (ref "C1")
-      (value "1uF 100V")
+      (value "1uF 63V")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_THT:C_Rect_L7.2mm_W6.0mm_P5.00mm")
+      (footprint "Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2")
       (fields
         (field
-          (name "LCSC") "C125397")
+          (name "LCSC") "C328852")
         (field
-          (name "MPN") "B32529D1105J000")
+          (name "MPN") "C241J105J2SA201")
         (field
-          (name "Manufacturer") "TDK")
+          (name "Manufacturer") "Xiamen Faratronic")
         (field
           (name "JLCPCB_Class") "Manual THT")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "1uF")
         (field
-          (name "Notes") "B.Cu manual THT; non-polarized PET film; echo 1uF on F.SilkS+B.SilkS; Alt W5.5mm fp: Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2; Alt WIMA: C92673")
+          (name "Notes") "B.Cu Rear Manual THT; AC input coupling ahead of RV1; P=5.0mm box film; Alt: C3975271 (KNSCHA), C92673 (WIMA)")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_THT:C_Rect_L7.2mm_W6.0mm_P5.00mm")
+          (name "Footprint") "Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "c1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:624"))
+          (name "SKiDL Line") "envelope_follower.py:277"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -79,33 +81,73 @@
       (component_classes)
       (tstamps "5cb6eb24-0d74-52ca-af8d-2b32e86b6959"))
     (comp
-      (ref "C2")
-      (value "1uF 100V")
+      (ref "C10")
+      (value "100pF 50V")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_THT:C_Rect_L7.2mm_W6.0mm_P5.00mm")
+      (footprint "Capacitor_SMD:C_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C125397")
+          (name "LCSC") "C14858")
         (field
-          (name "MPN") "B32529D1105J000")
+          (name "MPN") "CL10C101JB8NNNC")
         (field
-          (name "Manufacturer") "TDK")
+          (name "Manufacturer") "Samsung Electro-Mechanics")
         (field
-          (name "JLCPCB_Class") "Manual THT")
+          (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "1uF")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "B.Cu manual THT; non-polarized PET film hold cap; echo 1uF on F.SilkS+B.SilkS; Alt W5.5mm fp; Alt WIMA: C92673")
+          (name "Silkscreen") "100pF")
+        (field
+          (name "Notes") "B.Cu SMT; 100pF 50V C0G 5% 0603 U2C peak-detector loop comp (>70deg PM)")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_THT:C_Rect_L7.2mm_W6.0mm_P5.00mm")
+          (name "Footprint") "Capacitor_SMD:C_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "c10")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:226"))
+      (libsource
+        (lib "Device")
+        (part "C"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "e36c6bf1-1d09-55b6-958d-4713483d2018"))
+    (comp
+      (ref "C2")
+      (value "1uF 63V")
+      (description "Unpolarized capacitor")
+      (footprint "Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2")
+      (fields
+        (field
+          (name "LCSC") "C328852")
+        (field
+          (name "MPN") "C241J105J2SA201")
+        (field
+          (name "Manufacturer") "Xiamen Faratronic")
+        (field
+          (name "JLCPCB_Class") "Manual THT")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "1uF")
+        (field
+          (name "Notes") "B.Cu Rear Manual THT; Envelope hold timing cap (ENV_CAP); P=5.0mm box film; Alt: C3975271 (KNSCHA), C92673 (WIMA)")
+        (field
+          (name "Description") "Unpolarized capacitor")
+        (field
+          (name "Footprint") "Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "c2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:642"))
+          (name "SKiDL Line") "envelope_follower.py:277"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -116,22 +158,24 @@
       (tstamps "2d6d4a5d-755d-56dc-a9fc-81c993b72b40"))
     (comp
       (ref "C3")
-      (value "22uF 50V")
+      (value "47uF 35V")
       (description "Polarized capacitor")
       (footprint "Capacitor_SMD:CP_Elec_6.3x5.4")
       (fields
         (field
-          (name "LCSC") "C2836438")
+          (name "LCSC") "C2836440")
         (field
-          (name "MPN") "RVT22UF50V67RV0028")
+          (name "MPN") "RVT47UF35V67RV0039")
         (field
           (name "Manufacturer") "KNSCHA")
         (field
           (name "JLCPCB_Class") "Extended")
         (field
-          (name "Silkscreen") "22uF")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; bold + mark on F.SilkS (+12V to GND); Alt 35V D5x5.4: C2887274")
+          (name "Silkscreen") "47uF")
+        (field
+          (name "Notes") "B.Cu SMT; +12V_PROT bulk storage (+ -> +12V_PROT, - -> GND); mandatory +/- polarity on B.SilkS; Alt: C2836438 (22uF 50V)")
         (field
           (name "Description") "Polarized capacitor")
         (field
@@ -141,7 +185,7 @@
         (field
           (name "SKiDL Tag") "c3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:587"))
+          (name "SKiDL Line") "envelope_follower.py:250"))
       (libsource
         (lib "Device")
         (part "C_Polarized"))
@@ -152,22 +196,24 @@
       (tstamps "399892ab-5f87-54c3-9edd-55de342a04e6"))
     (comp
       (ref "C4")
-      (value "22uF 50V")
+      (value "47uF 35V")
       (description "Polarized capacitor")
       (footprint "Capacitor_SMD:CP_Elec_6.3x5.4")
       (fields
         (field
-          (name "LCSC") "C2836438")
+          (name "LCSC") "C2836440")
         (field
-          (name "MPN") "RVT22UF50V67RV0028")
+          (name "MPN") "RVT47UF35V67RV0039")
         (field
           (name "Manufacturer") "KNSCHA")
         (field
           (name "JLCPCB_Class") "Extended")
         (field
-          (name "Silkscreen") "22uF")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; bold + mark on F.SilkS (+ pad to GND, - pad to -12V); Alt 35V D5x5.4: C2887274")
+          (name "Silkscreen") "47uF")
+        (field
+          (name "Notes") "B.Cu SMT; -12V_PROT bulk storage (+ -> GND, - -> -12V_PROT); mandatory +/- polarity on B.SilkS; Alt: C2836438 (22uF 50V)")
         (field
           (name "Description") "Polarized capacitor")
         (field
@@ -177,7 +223,7 @@
         (field
           (name "SKiDL Tag") "c4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:605"))
+          (name "SKiDL Line") "envelope_follower.py:250"))
       (libsource
         (lib "Device")
         (part "C_Polarized"))
@@ -187,8 +233,8 @@
       (component_classes)
       (tstamps "4c1634d7-d3ab-5e85-84f3-0a3c7f14af9c"))
     (comp
-      (ref "C_DEC1")
-      (value "100nF")
+      (ref "C5")
+      (value "100nF 50V")
       (description "Unpolarized capacitor")
       (footprint "Capacitor_SMD:C_0603_1608Metric")
       (fields
@@ -201,9 +247,11 @@
         (field
           (name "JLCPCB_Class") "Basic")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "100nF")
         (field
-          (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
+          (name "Notes") "B.Cu SMT; 100nF 50V X7R 10% 0603 local IC decoupling (<5mm to U1/U2)")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -211,9 +259,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "c_dec1")
+          (name "SKiDL Tag") "c5")
         (field
-          (name "SKiDL Line") "envelope_follower.py:540"))
+          (name "SKiDL Line") "envelope_follower.py:226"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -221,10 +269,10 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "7e1da421-4431-5162-b4ba-e44ebb6c8cc1"))
+      (tstamps "3ed33a03-bbd2-5b59-8861-7e799faa0b3c"))
     (comp
-      (ref "C_DEC2")
-      (value "100nF")
+      (ref "C6")
+      (value "100nF 50V")
       (description "Unpolarized capacitor")
       (footprint "Capacitor_SMD:C_0603_1608Metric")
       (fields
@@ -237,9 +285,11 @@
         (field
           (name "JLCPCB_Class") "Basic")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "100nF")
         (field
-          (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
+          (name "Notes") "B.Cu SMT; 100nF 50V X7R 10% 0603 local IC decoupling (<5mm to U1/U2)")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -247,9 +297,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "c_dec2")
+          (name "SKiDL Tag") "c6")
         (field
-          (name "SKiDL Line") "envelope_follower.py:540"))
+          (name "SKiDL Line") "envelope_follower.py:226"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -257,10 +307,10 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "ce5a1b6d-e674-5765-b9a1-5d06df000399"))
+      (tstamps "dff7013c-dc64-55c6-bddb-f090d718456e"))
     (comp
-      (ref "C_DEC3")
-      (value "100nF")
+      (ref "C7")
+      (value "100nF 50V")
       (description "Unpolarized capacitor")
       (footprint "Capacitor_SMD:C_0603_1608Metric")
       (fields
@@ -273,9 +323,11 @@
         (field
           (name "JLCPCB_Class") "Basic")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "100nF")
         (field
-          (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
+          (name "Notes") "B.Cu SMT; 100nF 50V X7R 10% 0603 local IC decoupling (<5mm to U1/U2)")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -283,9 +335,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "c_dec3")
+          (name "SKiDL Tag") "c7")
         (field
-          (name "SKiDL Line") "envelope_follower.py:540"))
+          (name "SKiDL Line") "envelope_follower.py:226"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -293,10 +345,10 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "884748a2-b8a3-5f36-bb69-c8a879a903b7"))
+      (tstamps "db004fb7-0379-53f4-9ec2-be6e561b74b3"))
     (comp
-      (ref "C_DEC4")
-      (value "100nF")
+      (ref "C8")
+      (value "100nF 50V")
       (description "Unpolarized capacitor")
       (footprint "Capacitor_SMD:C_0603_1608Metric")
       (fields
@@ -309,9 +361,11 @@
         (field
           (name "JLCPCB_Class") "Basic")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "100nF")
         (field
-          (name "Notes") "F.Cu SMT; local V+/V- decoupling within 3-5mm of U1/U2 supply pins")
+          (name "Notes") "B.Cu SMT; 100nF 50V X7R 10% 0603 local IC decoupling (<5mm to U1/U2)")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -319,9 +373,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "c_dec4")
+          (name "SKiDL Tag") "c8")
         (field
-          (name "SKiDL Line") "envelope_follower.py:540"))
+          (name "SKiDL Line") "envelope_follower.py:226"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -329,25 +383,27 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "254d05c0-28ed-57ab-98ca-349f0d8920a7"))
+      (tstamps "98cb0415-7bd5-5c3a-ac3f-bf5fd2175fdd"))
     (comp
-      (ref "C_HF")
-      (value "47pF C0G")
+      (ref "C9")
+      (value "22pF 50V")
       (description "Unpolarized capacitor")
       (footprint "Capacitor_SMD:C_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C1671")
+          (name "LCSC") "C1653")
         (field
-          (name "MPN") "CL10C470JB8NNNC")
+          (name "MPN") "CL10C220JB8NNNC")
         (field
-          (name "Manufacturer") "Samsung")
+          (name "Manufacturer") "Samsung Electro-Mechanics")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "47pF")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; place close to U1.1/U1.2; Alt C0G: 33pF (C1663) or 22pF (C1653)")
+          (name "Silkscreen") "22pF")
+        (field
+          (name "Notes") "B.Cu SMT; 22pF 50V C0G 5% 0603 U1A HF compensation (72kHz)")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
@@ -355,9 +411,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "c_hf")
+          (name "SKiDL Tag") "c9")
         (field
-          (name "SKiDL Line") "envelope_follower.py:553"))
+          (name "SKiDL Line") "envelope_follower.py:226"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -365,81 +421,47 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "82a92084-25b1-5566-b462-685970a4ac08"))
+      (tstamps "2acf1c02-6aa1-5bc6-b827-7c183b9075d9"))
     (comp
-      (ref "C_OUT1")
-      (value "100pF C0G")
-      (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0603_1608Metric")
+      (ref "D1")
+      (value "1N4148WS")
+      (description "75V 0.15A Fast switching Diode, SOD-323")
+      (footprint "Diode_SMD:D_SOD-323")
       (fields
         (field
-          (name "LCSC") "C14858")
+          (name "LCSC") "C2128")
         (field
-          (name "MPN") "CL10C101JB8NNNC")
+          (name "MPN") "1N4148WS")
         (field
-          (name "Manufacturer") "Samsung")
+          (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "100pF")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; U1D local HF compensation")
+          (name "Silkscreen") "D1 1N4148WS")
         (field
-          (name "Description") "Unpolarized capacitor")
+          (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0603_1608Metric")
+          (name "Description") "75V 0.15A Fast switching Diode, SOD-323")
         (field
-          (name "Datasheet"))
+          (name "Footprint") "Diode_SMD:D_SOD-323")
         (field
-          (name "SKiDL Tag") "c_out1")
+          (name "Datasheet") "https://www.vishay.com/docs/85751/1n4148ws.pdf")
         (field
-          (name "SKiDL Line") "envelope_follower.py:564"))
+          (name "SKiDL Tag") "d1")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:328"))
       (libsource
-        (lib "Device")
-        (part "C"))
+        (lib "Diode")
+        (part "1N4148WS"))
       (sheetpath
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "c7577971-7196-55eb-b1ee-0b81c91009b2"))
+      (tstamps "a847daf2-c380-5be5-b34e-3e64dc3f42e0"))
     (comp
-      (ref "C_OUT2")
-      (value "100pF C0G")
-      (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C14858")
-        (field
-          (name "MPN") "CL10C101JB8NNNC")
-        (field
-          (name "Manufacturer") "Samsung")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "100pF")
-        (field
-          (name "Notes") "F.Cu SMT; U2A local HF compensation")
-        (field
-          (name "Description") "Unpolarized capacitor")
-        (field
-          (name "Footprint") "Capacitor_SMD:C_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "c_out2")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:575"))
-      (libsource
-        (lib "Device")
-        (part "C"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "80e49b82-bc47-5a42-bfa5-f4971d6f947b"))
-    (comp
-      (ref "D1_D2")
+      (ref "D10")
       (value "BAT54S")
       (description "Vr 30V, If 200mA, Dual schottky barrier diode, in series, SOT-323")
       (footprint "Package_TO_SOT_SMD:SOT-23")
@@ -453,9 +475,11 @@
         (field
           (name "JLCPCB_Class") "Extended")
         (field
-          (name "Silkscreen") "D1_D2 BAT54S")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; Pin-1 (A1) dot on F.SilkS")
+          (name "Silkscreen") "D10 BAT54S")
+        (field
+          (name "Notes") "B.Cu SMT; Pin 1=A (-12V_PROT), Pin 2=K (+12V_PROT), Pin 3=COM; Alt: C19726 (onsemi), C12765 (LRC)")
         (field
           (name "Description") "Vr 30V, If 200mA, Dual schottky barrier diode, in series, SOT-323")
         (field
@@ -463,9 +487,9 @@
         (field
           (name "Datasheet") "https://www.diodes.com/assets/Datasheets/ds11005.pdf")
         (field
-          (name "SKiDL Tag") "d1_d2")
+          (name "SKiDL Tag") "d10")
         (field
-          (name "SKiDL Line") "envelope_follower.py:346"))
+          (name "SKiDL Line") "envelope_follower.py:382"))
       (libsource
         (lib "Diode")
         (part "BAT54S"))
@@ -473,7 +497,83 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "9171f609-1e42-5c67-b3f5-28daa7cbc1d9"))
+      (tstamps "2671940a-32af-5fb6-b5bf-dae1ea5855e6"))
+    (comp
+      (ref "D11")
+      (value "BAT54S")
+      (description "Vr 30V, If 200mA, Dual schottky barrier diode, in series, SOT-323")
+      (footprint "Package_TO_SOT_SMD:SOT-23")
+      (fields
+        (field
+          (name "LCSC") "C47546")
+        (field
+          (name "MPN") "BAT54S,215")
+        (field
+          (name "Manufacturer") "Nexperia")
+        (field
+          (name "JLCPCB_Class") "Extended")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "D11 BAT54S")
+        (field
+          (name "Notes") "B.Cu SMT; Pin 1=A (-12V_PROT), Pin 2=K (+12V_PROT), Pin 3=COM; Alt: C19726 (onsemi), C12765 (LRC)")
+        (field
+          (name "Description") "Vr 30V, If 200mA, Dual schottky barrier diode, in series, SOT-323")
+        (field
+          (name "Footprint") "Package_TO_SOT_SMD:SOT-23")
+        (field
+          (name "Datasheet") "https://www.diodes.com/assets/Datasheets/ds11005.pdf")
+        (field
+          (name "SKiDL Tag") "d11")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:382"))
+      (libsource
+        (lib "Diode")
+        (part "BAT54S"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "9f122938-23da-5f44-91a5-81641ebe1760"))
+    (comp
+      (ref "D2")
+      (value "1N4148WS")
+      (description "75V 0.15A Fast switching Diode, SOD-323")
+      (footprint "Diode_SMD:D_SOD-323")
+      (fields
+        (field
+          (name "LCSC") "C2128")
+        (field
+          (name "MPN") "1N4148WS")
+        (field
+          (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "D2 1N4148WS")
+        (field
+          (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
+        (field
+          (name "Description") "75V 0.15A Fast switching Diode, SOD-323")
+        (field
+          (name "Footprint") "Diode_SMD:D_SOD-323")
+        (field
+          (name "Datasheet") "https://www.vishay.com/docs/85751/1n4148ws.pdf")
+        (field
+          (name "SKiDL Tag") "d2")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:328"))
+      (libsource
+        (lib "Diode")
+        (part "1N4148WS"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "ced7d7aa-9102-5461-b0e4-9bce6b53b41f"))
     (comp
       (ref "D3")
       (value "1N4148WS")
@@ -485,13 +585,15 @@
         (field
           (name "MPN") "1N4148WS")
         (field
-          (name "Manufacturer") "Changjing Elec")
+          (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "D3 1N4148WS")
         (field
-          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to ATK_IN); Alt SOD-123: 1N4148W (C81598)")
+          (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
         (field
           (name "Description") "75V 0.15A Fast switching Diode, SOD-323")
         (field
@@ -501,7 +603,7 @@
         (field
           (name "SKiDL Tag") "d3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:364"))
+          (name "SKiDL Line") "envelope_follower.py:328"))
       (libsource
         (lib "Diode")
         (part "1N4148WS"))
@@ -512,22 +614,24 @@
       (tstamps "cbb0a9b7-8556-5a9f-8966-94cb11c9e11c"))
     (comp
       (ref "D4")
-      (value "3mm Red LED")
+      (value "3mm Green LED")
       (description "Light emitting diode")
       (footprint "LED_THT:LED_D3.0mm")
       (fields
         (field
-          (name "LCSC") "C99771")
+          (name "LCSC") "C85161")
         (field
-          (name "MPN") "204-10SURD/S530-A3-L")
+          (name "MPN") "204-10SYGD/S530-E3")
         (field
           (name "Manufacturer") "Everlight")
         (field
           (name "JLCPCB_Class") "Manual THT")
         (field
-          (name "Silkscreen") "D4 LED")
+          (name "Side") "F.Cu")
         (field
-          (name "Notes") "F.Cu panel THT; dual-sided silkscreen + +/- polarity marks (Pin 1=K, Pin 2=A)")
+          (name "Silkscreen") "D4 ENV")
+        (field
+          (name "Notes") "F.Cu Front-Panel Manual THT; Pin 1 rect = Cathode (K), Pin 2 round = Anode (A); Alt LCSC: C84774 (Red), C85160 (Yellow)")
         (field
           (name "Description") "Light emitting diode")
         (field
@@ -537,7 +641,7 @@
         (field
           (name "SKiDL Tag") "d4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:678"))
+          (name "SKiDL Line") "envelope_follower.py:813"))
       (libsource
         (lib "Device")
         (part "LED"))
@@ -547,79 +651,7 @@
       (component_classes)
       (tstamps "77e78b8f-9089-5ae2-96bd-2de86a903fe7"))
     (comp
-      (ref "D_IN")
-      (value "BAV99")
-      (description "BAV99 High-speed switching diodes, SOT-23")
-      (footprint "Package_TO_SOT_SMD:SOT-23")
-      (fields
-        (field
-          (name "LCSC") "C2500")
-        (field
-          (name "MPN") "BAV99,215")
-        (field
-          (name "Manufacturer") "Nexperia")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "D_IN BAV99")
-        (field
-          (name "Notes") "F.Cu SMT; Pin-1 (A1) dot on F.SilkS; IN_AC ±12V clamp")
-        (field
-          (name "Description") "BAV99 High-speed switching diodes, SOT-23")
-        (field
-          (name "Footprint") "Package_TO_SOT_SMD:SOT-23")
-        (field
-          (name "Datasheet") "https://assets.nexperia.com/documents/data-sheet/BAV99_SER.pdf")
-        (field
-          (name "SKiDL Tag") "d_in")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:409"))
-      (libsource
-        (lib "Diode")
-        (part "BAV99"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "8480b409-a341-5121-88c8-8b24a3f40fb8"))
-    (comp
-      (ref "D_INV_OUT")
-      (value "BAV99")
-      (description "BAV99 High-speed switching diodes, SOT-23")
-      (footprint "Package_TO_SOT_SMD:SOT-23")
-      (fields
-        (field
-          (name "LCSC") "C2500")
-        (field
-          (name "MPN") "BAV99,215")
-        (field
-          (name "Manufacturer") "Nexperia")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "D_INV_OUT BAV99")
-        (field
-          (name "Notes") "F.Cu SMT; Pin-1 (A1) dot on F.SilkS; INV_OUT_CLAMP ±12V clamp")
-        (field
-          (name "Description") "BAV99 High-speed switching diodes, SOT-23")
-        (field
-          (name "Footprint") "Package_TO_SOT_SMD:SOT-23")
-        (field
-          (name "Datasheet") "https://assets.nexperia.com/documents/data-sheet/BAV99_SER.pdf")
-        (field
-          (name "SKiDL Tag") "d_inv_out")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:409"))
-      (libsource
-        (lib "Diode")
-        (part "BAV99"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "4d498795-0cd7-5a8f-aa84-05faaccc058a"))
-    (comp
-      (ref "D_LED_CLAMP")
+      (ref "D5")
       (value "1N4148WS")
       (description "75V 0.15A Fast switching Diode, SOD-323")
       (footprint "Diode_SMD:D_SOD-323")
@@ -629,13 +661,15 @@
         (field
           (name "MPN") "1N4148WS")
         (field
-          (name "Manufacturer") "Changjing Elec")
+          (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "D_LED_CLAMP 1N4148WS")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to U2B_OUT, anti-parallel across D4); Alt SOD-123: C81598")
+          (name "Silkscreen") "D5 1N4148WS")
+        (field
+          (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
         (field
           (name "Description") "75V 0.15A Fast switching Diode, SOD-323")
         (field
@@ -643,9 +677,9 @@
         (field
           (name "Datasheet") "https://www.vishay.com/docs/85751/1n4148ws.pdf")
         (field
-          (name "SKiDL Tag") "d_led_clamp")
+          (name "SKiDL Tag") "d5")
         (field
-          (name "SKiDL Line") "envelope_follower.py:382"))
+          (name "SKiDL Line") "envelope_follower.py:328"))
       (libsource
         (lib "Diode")
         (part "1N4148WS"))
@@ -653,214 +687,162 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "f0b0f88e-bfb6-5ec2-95b6-3e4a162dfda9"))
+      (tstamps "2edafed5-cf60-5e61-96af-131da93398ec"))
     (comp
-      (ref "D_OUT")
-      (value "BAV99")
-      (description "BAV99 High-speed switching diodes, SOT-23")
+      (ref "D6")
+      (value "1N4148WS")
+      (description "75V 0.15A Fast switching Diode, SOD-323")
+      (footprint "Diode_SMD:D_SOD-323")
+      (fields
+        (field
+          (name "LCSC") "C2128")
+        (field
+          (name "MPN") "1N4148WS")
+        (field
+          (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "D6 1N4148WS")
+        (field
+          (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
+        (field
+          (name "Description") "75V 0.15A Fast switching Diode, SOD-323")
+        (field
+          (name "Footprint") "Diode_SMD:D_SOD-323")
+        (field
+          (name "Datasheet") "https://www.vishay.com/docs/85751/1n4148ws.pdf")
+        (field
+          (name "SKiDL Tag") "d6")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:328"))
+      (libsource
+        (lib "Diode")
+        (part "1N4148WS"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "7605c5e8-b470-5a08-a149-07dd528cbdc1"))
+    (comp
+      (ref "D7")
+      (value "1N5819WS")
+      (description "40V 600mV@1A 1A SOD-323 Schottky Barrier Diodes, SOD-323")
+      (footprint "Diode_SMD:D_SOD-323")
+      (fields
+        (field
+          (name "LCSC") "C191023")
+        (field
+          (name "MPN") "1N5819WS")
+        (field
+          (name "Manufacturer") "Guangdong Hottech")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "D7 1N5819WS")
+        (field
+          (name "Notes") "B.Cu SMT; 40V 1A Schottky reverse-polarity protection; Pad 1 = K (cathode bar on B.SilkS); Alt: C8598 (B5819W SOD-123 Basic)")
+        (field
+          (name "Description") "40V 600mV@1A 1A SOD-323 Schottky Barrier Diodes, SOD-323")
+        (field
+          (name "Footprint") "Diode_SMD:D_SOD-323")
+        (field
+          (name "Datasheet") "https://datasheet.lcsc.com/lcsc/2204281430_Guangdong-Hottech-1N5819WS_C191023.pdf")
+        (field
+          (name "SKiDL Tag") "d7")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:355"))
+      (libsource
+        (lib "Diode")
+        (part "1N5819WS"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "b451f84f-c01d-521e-988c-7d12663cf97f"))
+    (comp
+      (ref "D8")
+      (value "1N5819WS")
+      (description "40V 600mV@1A 1A SOD-323 Schottky Barrier Diodes, SOD-323")
+      (footprint "Diode_SMD:D_SOD-323")
+      (fields
+        (field
+          (name "LCSC") "C191023")
+        (field
+          (name "MPN") "1N5819WS")
+        (field
+          (name "Manufacturer") "Guangdong Hottech")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "D8 1N5819WS")
+        (field
+          (name "Notes") "B.Cu SMT; 40V 1A Schottky reverse-polarity protection; Pad 1 = K (cathode bar on B.SilkS); Alt: C8598 (B5819W SOD-123 Basic)")
+        (field
+          (name "Description") "40V 600mV@1A 1A SOD-323 Schottky Barrier Diodes, SOD-323")
+        (field
+          (name "Footprint") "Diode_SMD:D_SOD-323")
+        (field
+          (name "Datasheet") "https://datasheet.lcsc.com/lcsc/2204281430_Guangdong-Hottech-1N5819WS_C191023.pdf")
+        (field
+          (name "SKiDL Tag") "d8")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:355"))
+      (libsource
+        (lib "Diode")
+        (part "1N5819WS"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "c26069a2-c952-5118-a3cc-c358e6455e47"))
+    (comp
+      (ref "D9")
+      (value "BAT54S")
+      (description "Vr 30V, If 200mA, Dual schottky barrier diode, in series, SOT-323")
       (footprint "Package_TO_SOT_SMD:SOT-23")
       (fields
         (field
-          (name "LCSC") "C2500")
+          (name "LCSC") "C47546")
         (field
-          (name "MPN") "BAV99,215")
+          (name "MPN") "BAT54S,215")
         (field
           (name "Manufacturer") "Nexperia")
         (field
-          (name "JLCPCB_Class") "Basic")
+          (name "JLCPCB_Class") "Extended")
         (field
-          (name "Silkscreen") "D_OUT BAV99")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; Pin-1 (A1) dot on F.SilkS; OUT_CLAMP ±12V clamp")
+          (name "Silkscreen") "D9 BAT54S")
         (field
-          (name "Description") "BAV99 High-speed switching diodes, SOT-23")
+          (name "Notes") "B.Cu SMT; Pin 1=A (-12V_PROT), Pin 2=K (+12V_PROT), Pin 3=COM; Alt: C19726 (onsemi), C12765 (LRC)")
+        (field
+          (name "Description") "Vr 30V, If 200mA, Dual schottky barrier diode, in series, SOT-323")
         (field
           (name "Footprint") "Package_TO_SOT_SMD:SOT-23")
         (field
-          (name "Datasheet") "https://assets.nexperia.com/documents/data-sheet/BAV99_SER.pdf")
+          (name "Datasheet") "https://www.diodes.com/assets/Datasheets/ds11005.pdf")
         (field
-          (name "SKiDL Tag") "d_out")
+          (name "SKiDL Tag") "d9")
         (field
-          (name "SKiDL Line") "envelope_follower.py:409"))
+          (name "SKiDL Line") "envelope_follower.py:382"))
       (libsource
         (lib "Diode")
-        (part "BAV99"))
+        (part "BAT54S"))
       (sheetpath
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "33a41647-627d-5e84-9791-5fddf552f4a3"))
-    (comp
-      (ref "D_PWR_N")
-      (value "B5819W")
-      (description "Schottky diode")
-      (footprint "Diode_SMD:D_SOD-123")
-      (fields
-        (field
-          (name "LCSC") "C8598")
-        (field
-          (name "MPN") "B5819W SL")
-        (field
-          (name "Manufacturer") "Changjing Elec")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "D_PWR_N B5819W")
-        (field
-          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to -12V_IN, reversed vs D_PWR_P); Alt SOD-323: C191023")
-        (field
-          (name "Description") "Schottky diode")
-        (field
-          (name "Footprint") "Diode_SMD:D_SOD-123")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "d_pwr_n")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:327"))
-      (libsource
-        (lib "Device")
-        (part "D_Schottky"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "b36cfec0-2945-5a6f-97aa-1d7762affc75"))
-    (comp
-      (ref "D_PWR_P")
-      (value "B5819W")
-      (description "Schottky diode")
-      (footprint "Diode_SMD:D_SOD-123")
-      (fields
-        (field
-          (name "LCSC") "C8598")
-        (field
-          (name "MPN") "B5819W SL")
-        (field
-          (name "Manufacturer") "Changjing Elec")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "D_PWR_P B5819W")
-        (field
-          (name "Notes") "F.Cu SMT; 0.25mm cathode bar outside Pad 1 (K to +12V_PROT); Alt SOD-323: 1N5819WS (C191023)")
-        (field
-          (name "Description") "Schottky diode")
-        (field
-          (name "Footprint") "Diode_SMD:D_SOD-123")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "d_pwr_p")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:309"))
-      (libsource
-        (lib "Device")
-        (part "D_Schottky"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "3e4621b5-ad91-5f68-8a2b-a97edf1d64f0"))
-    (comp
-      (ref "FID1")
-      (value "Fiducial")
-      (description "Fiducial Marker")
-      (footprint "Fiducial:Fiducial_1mm_Mask2mm")
-      (fields
-        (field
-          (name "JLCPCB_Class") "Fiducial")
-        (field
-          (name "Notes") "F.Cu SMT optical fiducial (1.0mm pad, 2.0mm mask, ±1.25mm silk keepout, zero silkscreen)")
-        (field
-          (name "Description") "Fiducial Marker")
-        (field
-          (name "Footprint") "Fiducial:Fiducial_1mm_Mask2mm")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "fid1")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:795"))
-      (libsource
-        (lib "Mechanical")
-        (part "Fiducial"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "d23ef8e8-d7ff-5978-94a8-4c56e74cbbf5")
-      (property
-        (name "dnp"))
-      (property
-        (name "exclude_from_bom")))
-    (comp
-      (ref "FID2")
-      (value "Fiducial")
-      (description "Fiducial Marker")
-      (footprint "Fiducial:Fiducial_1mm_Mask2mm")
-      (fields
-        (field
-          (name "JLCPCB_Class") "Fiducial")
-        (field
-          (name "Notes") "F.Cu SMT optical fiducial (1.0mm pad, 2.0mm mask, ±1.25mm silk keepout, zero silkscreen)")
-        (field
-          (name "Description") "Fiducial Marker")
-        (field
-          (name "Footprint") "Fiducial:Fiducial_1mm_Mask2mm")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "fid2")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:795"))
-      (libsource
-        (lib "Mechanical")
-        (part "Fiducial"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "7c69af2c-8ea5-57b0-b506-649dd7b89a75")
-      (property
-        (name "dnp"))
-      (property
-        (name "exclude_from_bom")))
-    (comp
-      (ref "FID3")
-      (value "Fiducial")
-      (description "Fiducial Marker")
-      (footprint "Fiducial:Fiducial_1mm_Mask2mm")
-      (fields
-        (field
-          (name "JLCPCB_Class") "Fiducial")
-        (field
-          (name "Notes") "F.Cu SMT optical fiducial (1.0mm pad, 2.0mm mask, ±1.25mm silk keepout, zero silkscreen)")
-        (field
-          (name "Description") "Fiducial Marker")
-        (field
-          (name "Footprint") "Fiducial:Fiducial_1mm_Mask2mm")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "fid3")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:795"))
-      (libsource
-        (lib "Mechanical")
-        (part "Fiducial"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "4e9ba082-bd09-5010-b0b4-0cbc33bc68b0")
-      (property
-        (name "dnp"))
-      (property
-        (name "exclude_from_bom")))
+      (tstamps "f3e04da6-4ef5-5ca2-9ac1-61915e08ff72"))
     (comp
       (ref "J1")
-      (value "WQP-PJ398SM")
+      (value "IN")
       (description "Audio Jack, 2 Poles (Mono / TS), Switched T Pole (Normalling)")
       (footprint "Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles")
       (fields
@@ -869,11 +851,13 @@
         (field
           (name "Manufacturer") "QingPu")
         (field
-          (name "JLCPCB_Class") "Consigned THT")
+          (name "JLCPCB_Class") "Manual THT")
+        (field
+          (name "Side") "F.Cu")
         (field
           (name "Silkscreen") "J1 IN")
         (field
-          (name "Notes") "F.Cu panel THT; J1.TN to GND (mandatory); dual-sided silkscreen; Alt LCSC: C56407602")
+          (name "Notes") "F.Cu Front-Panel Manual THT; 3.5mm Mono Switched Jack (Thonkiconn); TN->GND")
         (field
           (name "Description") "Audio Jack, 2 Poles (Mono / TS), Switched T Pole (Normalling)")
         (field
@@ -883,7 +867,7 @@
         (field
           (name "SKiDL Tag") "j1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:696"))
+          (name "SKiDL Line") "envelope_follower.py:409"))
       (libsource
         (lib "Connector_Audio")
         (part "AudioJack2_SwitchT"))
@@ -894,7 +878,7 @@
       (tstamps "5b521906-c9fe-5050-98b2-615b5415b6fd"))
     (comp
       (ref "J2")
-      (value "WQP-PJ398SM")
+      (value "OUT")
       (description "Audio Jack, 2 Poles (Mono / TS), Switched T Pole (Normalling)")
       (footprint "Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles")
       (fields
@@ -903,11 +887,13 @@
         (field
           (name "Manufacturer") "QingPu")
         (field
-          (name "JLCPCB_Class") "Consigned THT")
+          (name "JLCPCB_Class") "Manual THT")
+        (field
+          (name "Side") "F.Cu")
         (field
           (name "Silkscreen") "J2 OUT")
         (field
-          (name "Notes") "F.Cu panel THT; J2.TN = NC; dual-sided silkscreen; Alt LCSC: C56407602")
+          (name "Notes") "F.Cu Front-Panel Manual THT; 3.5mm Mono Switched Jack (Thonkiconn); TN=NC")
         (field
           (name "Description") "Audio Jack, 2 Poles (Mono / TS), Switched T Pole (Normalling)")
         (field
@@ -917,7 +903,7 @@
         (field
           (name "SKiDL Tag") "j2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:706"))
+          (name "SKiDL Line") "envelope_follower.py:409"))
       (libsource
         (lib "Connector_Audio")
         (part "AudioJack2_SwitchT"))
@@ -928,7 +914,7 @@
       (tstamps "a7e24b12-5984-5ed1-bdea-020a9d7ab7b9"))
     (comp
       (ref "J3")
-      (value "WQP-PJ398SM")
+      (value "INV_OUT")
       (description "Audio Jack, 2 Poles (Mono / TS), Switched T Pole (Normalling)")
       (footprint "Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles")
       (fields
@@ -937,11 +923,13 @@
         (field
           (name "Manufacturer") "QingPu")
         (field
-          (name "JLCPCB_Class") "Consigned THT")
+          (name "JLCPCB_Class") "Manual THT")
+        (field
+          (name "Side") "F.Cu")
         (field
           (name "Silkscreen") "J3 INV_OUT")
         (field
-          (name "Notes") "F.Cu panel THT; J3.TN = NC; dual-sided silkscreen; Alt LCSC: C56407602")
+          (name "Notes") "F.Cu Front-Panel Manual THT; 3.5mm Mono Switched Jack (Thonkiconn); TN=NC")
         (field
           (name "Description") "Audio Jack, 2 Poles (Mono / TS), Switched T Pole (Normalling)")
         (field
@@ -951,7 +939,7 @@
         (field
           (name "SKiDL Tag") "j3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:716"))
+          (name "SKiDL Line") "envelope_follower.py:409"))
       (libsource
         (lib "Connector_Audio")
         (part "AudioJack2_SwitchT"))
@@ -962,7 +950,7 @@
       (tstamps "8282f0b5-37dc-58c4-a421-f8290d0ae5d7"))
     (comp
       (ref "J4")
-      (value "IDC 2x5P 2.54mm")
+      (value "PWR_2x5")
       (description "Generic connector, double row, 02x05, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)")
       (footprint "Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical")
       (fields
@@ -975,9 +963,11 @@
         (field
           (name "JLCPCB_Class") "Manual THT")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "J4 PWR")
         (field
-          (name "Notes") "B.Cu manual THT; dual-sided silkscreen; RED STRIPE / -12V bar on pins 1-2; +12V on pins 9-10")
+          (name "Notes") "B.Cu Rear Manual THT; Doepfer A-100 2x5 keyed IDC header (Pins 1-2=-12V_IN RED, 3-8=GND, 9-10=+12V_IN)")
         (field
           (name "Description") "Generic connector, double row, 02x05, odd/even pin numbering scheme (row 1 odd numbers, row 2 even numbers), script generated (kicad-library-utils/schlib/autogen/connector/)")
         (field
@@ -987,7 +977,7 @@
         (field
           (name "SKiDL Tag") "j4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:660"))
+          (name "SKiDL Line") "envelope_follower.py:582"))
       (libsource
         (lib "Connector_Generic")
         (part "Conn_02x05_Odd_Even"))
@@ -998,6 +988,234 @@
       (tstamps "0b0d5cb2-215f-50c5-9148-01b010a12755"))
     (comp
       (ref "R1")
+      (value "10k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C25804")
+        (field
+          (name "MPN") "0603WAF1002T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r1")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "e50111d2-5406-5300-bcdf-6408d6805172"))
+    (comp
+      (ref "R10")
+      (value "20k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C4184")
+        (field
+          (name "MPN") "0603WAF2002T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "20k")
+        (field
+          (name "Notes") "B.Cu SMT; 20k 1% 100mW 0603 thick film (1.00x rectifier)")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r10")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "2c8754b2-8e0d-5ed5-b246-67a1df3458c3"))
+    (comp
+      (ref "R11")
+      (value "200k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C25811")
+        (field
+          (name "MPN") "0603WAF2003T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "200k")
+        (field
+          (name "Notes") "B.Cu SMT; 200k 1% 100mW 0603 U2C peak-detector feedback")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r11")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "d6644d31-7be4-5dc0-9d2a-428e57a34624"))
+    (comp
+      (ref "R12")
+      (value "150R")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C22808")
+        (field
+          (name "MPN") "0603WAF1500T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "150R")
+        (field
+          (name "Notes") "B.Cu SMT; 150R 1% 100mW 0603 minimum attack protection")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r12")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "c97ba8c9-c06b-5ab8-9889-8c5fd513e780"))
+    (comp
+      (ref "R13")
+      (value "10k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C25804")
+        (field
+          (name "MPN") "0603WAF1002T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r13")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "fe4f9d26-68a9-513b-b3b4-128187bd1729"))
+    (comp
+      (ref "R14")
+      (value "4.7M")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C23163")
+        (field
+          (name "MPN") "0603WAF4704T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Preferred Extended")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "4.7M")
+        (field
+          (name "Notes") "B.Cu SMT; 4.7M 1% 100mW 0603 Release open-wiper safety bleed")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r14")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "70a72e2a-7661-5062-8dad-faa97ea19fc7"))
+    (comp
+      (ref "R15")
       (value "100k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -1011,189 +1229,11 @@
         (field
           (name "JLCPCB_Class") "Basic")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "100k")
         (field
-          (name "Notes") "F.Cu SMT; Input AC-coupling GND bias (Z_in = 101k)")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r1")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "e50111d2-5406-5300-bcdf-6408d6805172"))
-    (comp
-      (ref "R10")
-      (value "10k")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C25804")
-        (field
-          (name "MPN") "0603WAF1002T5E")
-        (field
-          (name "Manufacturer") "UNI-ROYAL")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; Release minimum decay resistor (10ms floor)")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r10")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "2c8754b2-8e0d-5ed5-b246-67a1df3458c3"))
-    (comp
-      (ref "R11")
-      (value "1k")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C21190")
-        (field
-          (name "MPN") "0603WAF1001T5E")
-        (field
-          (name "Manufacturer") "UNI-ROYAL")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "1k")
-        (field
-          (name "Notes") "F.Cu SMT; OFFSET top end resistor (+9.63V)")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r11")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "d6644d31-7be4-5dc0-9d2a-428e57a34624"))
-    (comp
-      (ref "R12")
-      (value "1k")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C21190")
-        (field
-          (name "MPN") "0603WAF1001T5E")
-        (field
-          (name "Manufacturer") "UNI-ROYAL")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "1k")
-        (field
-          (name "Notes") "F.Cu SMT; OFFSET bottom end resistor (-9.63V)")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r12")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "c97ba8c9-c06b-5ab8-9889-8c5fd513e780"))
-    (comp
-      (ref "R13")
-      (value "18k")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C25810")
-        (field
-          (name "MPN") "0603WAF1802T5E")
-        (field
-          (name "Manufacturer") "UNI-ROYAL")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "18k")
-        (field
-          (name "Notes") "F.Cu SMT; OFFSET summing resistor (±5.09V range)")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r13")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "fe4f9d26-68a9-513b-b3b4-128187bd1729"))
-    (comp
-      (ref "R15")
-      (value "10k")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C25804")
-        (field
-          (name "MPN") "0603WAF1002T5E")
-        (field
-          (name "Manufacturer") "UNI-ROYAL")
-        (field
-          (name "JLCPCB_Class") "Basic")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; U1D in-loop DC feedback from OUT_CLAMP")
+          (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
         (field
           (name "Description") "Resistor")
         (field
@@ -1203,7 +1243,7 @@
         (field
           (name "SKiDL Tag") "r15")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1213,95 +1253,63 @@
       (component_classes)
       (tstamps "88965cbc-0c5f-5fcb-8f94-28a05463799e"))
     (comp
-      (ref "R16A")
-      (value "470R 0.5W")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_1210_3225Metric")
-      (fields
-        (field
-          (name "LCSC") "C333193")
-        (field
-          (name "MPN") "RTT124700FTP")
-        (field
-          (name "Manufacturer") "RALEC")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "470R")
-        (field
-          (name "Notes") "F.Cu SMT; 0.5W clash-rated with copper thermal relief; Alt 2010: C341646")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_1210_3225Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r16a")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "abc20537-072c-5e17-b3c7-abcfb23619ee"))
-    (comp
-      (ref "R16B")
-      (value "470R 0.5W")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_1210_3225Metric")
-      (fields
-        (field
-          (name "LCSC") "C333193")
-        (field
-          (name "MPN") "RTT124700FTP")
-        (field
-          (name "Manufacturer") "RALEC")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "470R")
-        (field
-          (name "Notes") "F.Cu SMT; 0.5W clash-rated with copper thermal relief; Alt 2010: C341646")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_1210_3225Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r16b")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "b7918677-6b8b-5209-876b-1961a11efa72"))
-    (comp
-      (ref "R17")
-      (value "10k")
+      (ref "R16")
+      (value "100k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C25804")
+          (name "LCSC") "C25803")
         (field
-          (name "MPN") "0603WAF1002T5E")
+          (name "MPN") "0603WAF1003T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "10k")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; U2A inverting input from OUT_CLAMP")
+          (name "Silkscreen") "100k")
+        (field
+          (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r16")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "0b87e677-f4b9-56d5-8c65-7b8a9f460d9c"))
+    (comp
+      (ref "R17")
+      (value "6.8k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C23212")
+        (field
+          (name "MPN") "0603WAF6801T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "6.8k")
+        (field
+          (name "Notes") "B.Cu SMT; 6.8k 1% 100mW 0603 thick film (OFFSET divider)")
         (field
           (name "Description") "Resistor")
         (field
@@ -1311,7 +1319,7 @@
         (field
           (name "SKiDL Tag") "r17")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1322,22 +1330,24 @@
       (tstamps "e35aa3e3-378b-5c7c-a093-664379152206"))
     (comp
       (ref "R18")
-      (value "10k")
+      (value "6.8k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C25804")
+          (name "LCSC") "C23212")
         (field
-          (name "MPN") "0603WAF1002T5E")
+          (name "MPN") "0603WAF6801T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "10k")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; U2A in-loop DC feedback from INV_OUT_CLAMP")
+          (name "Silkscreen") "6.8k")
+        (field
+          (name "Notes") "B.Cu SMT; 6.8k 1% 100mW 0603 thick film (OFFSET divider)")
         (field
           (name "Description") "Resistor")
         (field
@@ -1347,7 +1357,7 @@
         (field
           (name "SKiDL Tag") "r18")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1357,95 +1367,63 @@
       (component_classes)
       (tstamps "186c4b17-5d38-57c3-8734-8f5d18cb3d0e"))
     (comp
-      (ref "R19A")
-      (value "470R 0.5W")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_1210_3225Metric")
-      (fields
-        (field
-          (name "LCSC") "C333193")
-        (field
-          (name "MPN") "RTT124700FTP")
-        (field
-          (name "Manufacturer") "RALEC")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "470R")
-        (field
-          (name "Notes") "F.Cu SMT; 0.5W clash-rated with copper thermal relief; Alt 2010: C341646")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_1210_3225Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r19a")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "bdb19757-7628-5062-8ad7-86981b8f8793"))
-    (comp
-      (ref "R19B")
-      (value "470R 0.5W")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_1210_3225Metric")
-      (fields
-        (field
-          (name "LCSC") "C333193")
-        (field
-          (name "MPN") "RTT124700FTP")
-        (field
-          (name "Manufacturer") "RALEC")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "470R")
-        (field
-          (name "Notes") "F.Cu SMT; 0.5W clash-rated with copper thermal relief; Alt 2010: C341646")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_1210_3225Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r19b")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "b6949434-c783-5958-b466-4b3b6de825b4"))
-    (comp
-      (ref "R2")
-      (value "10k")
+      (ref "R19")
+      (value "100k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C25804")
+          (name "LCSC") "C25803")
         (field
-          (name "MPN") "0603WAF1002T5E")
+          (name "MPN") "0603WAF1003T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "10k")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; U1A preamp input resistor")
+          (name "Silkscreen") "100k")
+        (field
+          (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r19")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "78cad17a-2a7d-528c-9aa6-747601e7915b"))
+    (comp
+      (ref "R2")
+      (value "4.7k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C23162")
+        (field
+          (name "MPN") "0603WAF4701T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "4.7k")
+        (field
+          (name "Notes") "B.Cu SMT; 4.7k 1% 100mW 0603 GAIN floor")
         (field
           (name "Description") "Resistor")
         (field
@@ -1455,7 +1433,7 @@
         (field
           (name "SKiDL Tag") "r2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1466,22 +1444,24 @@
       (tstamps "d9cfd994-f753-5a0e-a5c8-4204c15e6a21"))
     (comp
       (ref "R20")
-      (value "10k")
+      (value "100k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C25804")
+          (name "LCSC") "C25803")
         (field
-          (name "MPN") "0603WAF1002T5E")
+          (name "MPN") "0603WAF1003T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "10k")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; U2B+ LED buffer input isolation")
+          (name "Silkscreen") "100k")
+        (field
+          (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
         (field
           (name "Description") "Resistor")
         (field
@@ -1491,7 +1471,7 @@
         (field
           (name "SKiDL Tag") "r20")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1501,421 +1481,35 @@
       (component_classes)
       (tstamps "1e81e021-c2e8-5243-81c7-839613b9b6cf"))
     (comp
-      (ref "R3")
-      (value "10k 0.1%")
+      (ref "R21")
+      (value "1k 1W")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (footprint "Resistor_SMD:R_2512_6332Metric")
       (fields
         (field
-          (name "LCSC") "C95204")
+          (name "LCSC") "C54315")
         (field
-          (name "MPN") "RT0603BRD0710KL")
-        (field
-          (name "Manufacturer") "YAGEO")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; 0.1% 25ppm matched rectifier network at U1B/U1C")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r3")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "31789a49-96cb-523c-946d-36c41ea06c03"))
-    (comp
-      (ref "R4")
-      (value "10k 0.1%")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C95204")
-        (field
-          (name "MPN") "RT0603BRD0710KL")
-        (field
-          (name "Manufacturer") "YAGEO")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; 0.1% 25ppm matched rectifier network at U1B/U1C")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r4")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "daf11c9d-7676-51d6-a437-beca850900d0"))
-    (comp
-      (ref "R5")
-      (value "10k 0.1%")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C95204")
-        (field
-          (name "MPN") "RT0603BRD0710KL")
-        (field
-          (name "Manufacturer") "YAGEO")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; 0.1% 25ppm matched rectifier network at U1B/U1C")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r5")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "f7eafc9b-67b4-5677-8f8b-c26182307d5f"))
-    (comp
-      (ref "R6")
-      (value "10k 0.1%")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C95204")
-        (field
-          (name "MPN") "RT0603BRD0710KL")
-        (field
-          (name "Manufacturer") "YAGEO")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; 0.1% 25ppm matched rectifier network at U1B/U1C")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r6")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "7e5e571b-43c7-537e-8fea-f6faeca23ac6"))
-    (comp
-      (ref "R7")
-      (value "10k 0.1%")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C95204")
-        (field
-          (name "MPN") "RT0603BRD0710KL")
-        (field
-          (name "Manufacturer") "YAGEO")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; 0.1% 25ppm matched rectifier network at U1B/U1C")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r7")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "48f48600-0460-59a7-81a9-76a1653a2412"))
-    (comp
-      (ref "R8A")
-      (value "10k 0.1%")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C95204")
-        (field
-          (name "MPN") "RT0603BRD0710KL")
-        (field
-          (name "Manufacturer") "YAGEO")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; 0.1% 25ppm matched rectifier network at U1B/U1C")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r8a")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "19677c85-1f38-5276-8484-50a21aae32de"))
-    (comp
-      (ref "R8B")
-      (value "10k 0.1%")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C95204")
-        (field
-          (name "MPN") "RT0603BRD0710KL")
-        (field
-          (name "Manufacturer") "YAGEO")
-        (field
-          (name "JLCPCB_Class") "Extended")
-        (field
-          (name "Silkscreen") "10k")
-        (field
-          (name "Notes") "F.Cu SMT; 0.1% 25ppm matched rectifier network at U1B/U1C")
-        (field
-          (name "Description") "Resistor")
-        (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "r8b")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
-      (libsource
-        (lib "Device")
-        (part "R"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "ef64e2c7-ff7d-561f-8cf4-dd5cb8027735"))
-    (comp
-      (ref "RV1")
-      (value "A100k")
-      (description "Potentiometer")
-      (footprint "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical")
-      (fields
-        (field
-          (name "MPN") "RV09AF-40-20K-A104")
-        (field
-          (name "Manufacturer") "Alpha")
-        (field
-          (name "JLCPCB_Class") "Consigned THT")
-        (field
-          (name "Silkscreen") "RV1 GAIN A100k")
-        (field
-          (name "Notes") "F.Cu panel THT; audio taper; mark Pin 1 on F.SilkS+B.SilkS; dual-sided silkscreen")
-        (field
-          (name "Description") "Potentiometer")
-        (field
-          (name "Footprint") "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "rv1")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:726"))
-      (libsource
-        (lib "Device")
-        (part "R_Potentiometer"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "9e52508d-09d9-521b-a181-da5dac28a662"))
-    (comp
-      (ref "RV2")
-      (value "A50k")
-      (description "Potentiometer")
-      (footprint "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical")
-      (fields
-        (field
-          (name "MPN") "RV09AF-40-20K-A503")
-        (field
-          (name "Manufacturer") "Alpha")
-        (field
-          (name "JLCPCB_Class") "Consigned THT")
-        (field
-          (name "Silkscreen") "RV2 ATK A50k")
-        (field
-          (name "Notes") "F.Cu panel THT; audio taper; mark Pin 1 on F.SilkS+B.SilkS; dual-sided silkscreen")
-        (field
-          (name "Description") "Potentiometer")
-        (field
-          (name "Footprint") "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "rv2")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:736"))
-      (libsource
-        (lib "Device")
-        (part "R_Potentiometer"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "9eb21962-2857-54be-8e84-18dab39d974d"))
-    (comp
-      (ref "RV3")
-      (value "A1M")
-      (description "Potentiometer")
-      (footprint "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical")
-      (fields
-        (field
-          (name "MPN") "RV09AF-40-20K-A105")
-        (field
-          (name "Manufacturer") "Alpha")
-        (field
-          (name "JLCPCB_Class") "Consigned THT")
-        (field
-          (name "Silkscreen") "RV3 REL A1M")
-        (field
-          (name "Notes") "F.Cu panel THT; audio taper; mark Pin 1 on F.SilkS+B.SilkS; dual-sided silkscreen")
-        (field
-          (name "Description") "Potentiometer")
-        (field
-          (name "Footprint") "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "rv3")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:746"))
-      (libsource
-        (lib "Device")
-        (part "R_Potentiometer"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "687e7b08-a3b6-5725-9200-ff54fd0022b5"))
-    (comp
-      (ref "RV4")
-      (value "B10k")
-      (description "Potentiometer")
-      (footprint "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical")
-      (fields
-        (field
-          (name "MPN") "RV09AF-40-20K-B103")
-        (field
-          (name "Manufacturer") "Alpha")
-        (field
-          (name "JLCPCB_Class") "Consigned THT")
-        (field
-          (name "Silkscreen") "RV4 OFF B10k")
-        (field
-          (name "Notes") "F.Cu panel THT; linear taper; mark Pin 1 (+9.63V CCW) on F.SilkS+B.SilkS; dual-sided silkscreen")
-        (field
-          (name "Description") "Potentiometer")
-        (field
-          (name "Footprint") "Potentiometer_THT:Potentiometer_Alps_RK09K_Single_Vertical")
-        (field
-          (name "Datasheet"))
-        (field
-          (name "SKiDL Tag") "rv4")
-        (field
-          (name "SKiDL Line") "envelope_follower.py:756"))
-      (libsource
-        (lib "Device")
-        (part "R_Potentiometer"))
-      (sheetpath
-        (names "/")
-        (tstamps "/"))
-      (component_classes)
-      (tstamps "750482cb-2a59-5b5b-a617-997085a21ac1"))
-    (comp
-      (ref "R_ATK_MIN")
-      (value "470R")
-      (description "Resistor")
-      (footprint "Resistor_SMD:R_0603_1608Metric")
-      (fields
-        (field
-          (name "LCSC") "C23179")
-        (field
-          (name "MPN") "0603WAF4700T5E")
+          (name "MPN") "25121WF1001T4E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
-          (name "JLCPCB_Class") "Basic")
+          (name "JLCPCB_Class") "Extended")
         (field
-          (name "Silkscreen") "470R")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; Attack current/ringing limiter (0.47ms floor)")
+          (name "Silkscreen") "1k")
+        (field
+          (name "Notes") "B.Cu SMT; 1k 1% 1W 2512 fault-rated output build-out; keep C54315")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+          (name "Footprint") "Resistor_SMD:R_2512_6332Metric")
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_atk_min")
+          (name "SKiDL Tag") "r21")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1923,9 +1517,9 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "890c7048-792b-574c-b4ab-af6457f1a782"))
+      (tstamps "44247b60-c1e0-597c-9dc6-4c1e66e68eaf"))
     (comp
-      (ref "R_ENV_PROT")
+      (ref "R22")
       (value "10k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -1939,9 +1533,11 @@
         (field
           (name "JLCPCB_Class") "Basic")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "10k")
         (field
-          (name "Notes") "F.Cu SMT; U1D+ brownout isolation resistor")
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
         (field
           (name "Description") "Resistor")
         (field
@@ -1949,9 +1545,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_env_prot")
+          (name "SKiDL Tag") "r22")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1959,9 +1555,275 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "ffb02850-68d8-555f-9fff-dd0d439fff94"))
+      (tstamps "aeb2fb27-5d24-530e-ae8d-e41f49f25e88"))
     (comp
-      (ref "R_GAIN_FAIL")
+      (ref "R23")
+      (value "10k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C25804")
+        (field
+          (name "MPN") "0603WAF1002T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r23")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "1b8034c9-c2e2-5c96-895e-496264b47120"))
+    (comp
+      (ref "R24")
+      (value "1k 1W")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_2512_6332Metric")
+      (fields
+        (field
+          (name "LCSC") "C54315")
+        (field
+          (name "MPN") "25121WF1001T4E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Extended")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "1k")
+        (field
+          (name "Notes") "B.Cu SMT; 1k 1% 1W 2512 fault-rated output build-out; keep C54315")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_2512_6332Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r24")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "960efa08-d604-5ce6-b522-fe39ff7d0606"))
+    (comp
+      (ref "R25")
+      (value "10k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C25804")
+        (field
+          (name "MPN") "0603WAF1002T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r25")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "4d6dece2-2def-5d23-ac0e-5f4aebf37880"))
+    (comp
+      (ref "R26")
+      (value "10k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C25804")
+        (field
+          (name "MPN") "0603WAF1002T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r26")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "d465015b-32d2-5943-b391-b039867b598d"))
+    (comp
+      (ref "R27")
+      (value "1k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C21190")
+        (field
+          (name "MPN") "0603WAF1001T5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "1k")
+        (field
+          (name "Notes") "B.Cu SMT; 1k 1% 100mW 0603 LED constant-current sense")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r27")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "ca35bd48-a55f-5c5f-aebb-2af4b885c6b7"))
+    (comp
+      (ref "R28")
+      (value "10R")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C22859")
+        (field
+          (name "MPN") "0603WAF100JT5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "10R")
+        (field
+          (name "Notes") "B.Cu SMT; 10R 1% 100mW 0603 RC rail damping")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r28")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "f962a1ae-c587-542d-9e43-587ffadcc2fd"))
+    (comp
+      (ref "R29")
+      (value "10R")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
+      (fields
+        (field
+          (name "LCSC") "C22859")
+        (field
+          (name "MPN") "0603WAF100JT5E")
+        (field
+          (name "Manufacturer") "UNI-ROYAL")
+        (field
+          (name "JLCPCB_Class") "Basic")
+        (field
+          (name "Side") "B.Cu")
+        (field
+          (name "Silkscreen") "10R")
+        (field
+          (name "Notes") "B.Cu SMT; 10R 1% 100mW 0603 RC rail damping")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "r29")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:201"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "fea2834a-89c7-5a79-b979-81b88a51f0ff"))
+    (comp
+      (ref "R3")
       (value "1M")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
@@ -1975,9 +1837,11 @@
         (field
           (name "JLCPCB_Class") "Basic")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "1M")
         (field
-          (name "Notes") "F.Cu SMT; place close to U1.1/U1.2; open-pot-wiper fail-safe")
+          (name "Notes") "B.Cu SMT; 1M 1% 100mW 0603 U1A+ open-wiper pull-down")
         (field
           (name "Description") "Resistor")
         (field
@@ -1985,9 +1849,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_gain_fail")
+          (name "SKiDL Tag") "r3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1995,25 +1859,27 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "4937b464-231a-5d5f-be70-e2bacc1c2f94"))
+      (tstamps "31789a49-96cb-523c-946d-36c41ea06c03"))
     (comp
-      (ref "R_GAIN_MIN")
-      (value "1k")
+      (ref "R4")
+      (value "10k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C21190")
+          (name "LCSC") "C25804")
         (field
-          (name "MPN") "0603WAF1001T5E")
+          (name "MPN") "0603WAF1002T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "1k")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; U1A minimum gain floor (-0.10x)")
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
         (field
           (name "Description") "Resistor")
         (field
@@ -2021,9 +1887,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_gain_min")
+          (name "SKiDL Tag") "r4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -2031,25 +1897,27 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "f24cb89f-cc1d-5d23-900f-6cb2ffbc87b6"))
+      (tstamps "daf11c9d-7676-51d6-a437-beca850900d0"))
     (comp
-      (ref "R_IN_BUF")
-      (value "1k")
+      (ref "R5")
+      (value "100k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C21190")
+          (name "LCSC") "C25803")
         (field
-          (name "MPN") "0603WAF1001T5E")
+          (name "MPN") "0603WAF1003T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "1k")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; U2D+ ESD input current limiter")
+          (name "Silkscreen") "100k")
+        (field
+          (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
         (field
           (name "Description") "Resistor")
         (field
@@ -2057,9 +1925,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_in_buf")
+          (name "SKiDL Tag") "r5")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -2067,25 +1935,27 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "b3ee297c-f3ee-5fc9-9ca3-4725cb682d77"))
+      (tstamps "f7eafc9b-67b4-5677-8f8b-c26182307d5f"))
     (comp
-      (ref "R_IN_PROT")
-      (value "1k")
+      (ref "R6")
+      (value "10k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C21190")
+          (name "LCSC") "C25804")
         (field
-          (name "MPN") "0603WAF1001T5E")
+          (name "MPN") "0603WAF1002T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "1k")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; J1 Tip ESD/overvoltage limiter")
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
         (field
           (name "Description") "Resistor")
         (field
@@ -2093,9 +1963,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_in_prot")
+          (name "SKiDL Tag") "r6")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -2103,25 +1973,27 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "49d99832-8423-543f-a10f-8d3b3558f550"))
+      (tstamps "7e5e571b-43c7-537e-8fea-f6faeca23ac6"))
     (comp
-      (ref "R_LED")
-      (value "2.2k")
+      (ref "R7")
+      (value "10k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C4190")
+          (name "LCSC") "C25804")
         (field
-          (name "MPN") "0603WAF2201T5E")
+          (name "MPN") "0603WAF1002T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "2.2k")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; U2B LED current sink resistor (0-4.5mA)")
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
         (field
           (name "Description") "Resistor")
         (field
@@ -2129,9 +2001,9 @@
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_led")
+          (name "SKiDL Tag") "r7")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -2139,35 +2011,37 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "24dcf2df-d4aa-518d-a565-f3974c2cba2c"))
+      (tstamps "48f48600-0460-59a7-81a9-76a1653a2412"))
     (comp
-      (ref "R_PWR_N")
-      (value "10R")
+      (ref "R8")
+      (value "20k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_1206_3216Metric")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C17903")
+          (name "LCSC") "C4184")
         (field
-          (name "MPN") "1206W4F100JT5E")
+          (name "MPN") "0603WAF2002T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "10R")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; -12V RC damping/inrush limiter")
+          (name "Silkscreen") "20k")
+        (field
+          (name "Notes") "B.Cu SMT; 20k 1% 100mW 0603 thick film (1.00x rectifier)")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_1206_3216Metric")
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_pwr_n")
+          (name "SKiDL Tag") "r8")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -2175,35 +2049,37 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "373614d4-e8cb-5ac8-b8d2-816d33bb21dc"))
+      (tstamps "fae0f426-912a-5916-89e1-58742a8229ca"))
     (comp
-      (ref "R_PWR_P")
-      (value "10R")
+      (ref "R9")
+      (value "10k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_1206_3216Metric")
+      (footprint "Resistor_SMD:R_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C17903")
+          (name "LCSC") "C25804")
         (field
-          (name "MPN") "1206W4F100JT5E")
+          (name "MPN") "0603WAF1002T5E")
         (field
           (name "Manufacturer") "UNI-ROYAL")
         (field
           (name "JLCPCB_Class") "Basic")
         (field
-          (name "Silkscreen") "10R")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "F.Cu SMT; +12V RC damping/inrush limiter")
+          (name "Silkscreen") "10k")
+        (field
+          (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_1206_3216Metric")
+          (name "Footprint") "Resistor_SMD:R_0603_1608Metric")
         (field
           (name "Datasheet"))
         (field
-          (name "SKiDL Tag") "r_pwr_p")
+          (name "SKiDL Tag") "r9")
         (field
-          (name "SKiDL Line") "envelope_follower.py:203"))
+          (name "SKiDL Line") "envelope_follower.py:201"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -2211,12 +2087,156 @@
         (names "/")
         (tstamps "/"))
       (component_classes)
-      (tstamps "970790d4-e163-5e26-a469-d8e4491eff36"))
+      (tstamps "8e9a4e06-75d3-5656-8f4a-990da67ac8a5"))
+    (comp
+      (ref "RV1")
+      (value "A100k")
+      (description "Potentiometer")
+      (footprint "Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical")
+      (fields
+        (field
+          (name "MPN") "RD901F-40-15F-A100K")
+        (field
+          (name "Manufacturer") "Taiwan Alpha")
+        (field
+          (name "JLCPCB_Class") "Manual THT")
+        (field
+          (name "Side") "F.Cu")
+        (field
+          (name "Silkscreen") "RV1 GAIN A100k")
+        (field
+          (name "Notes") "F.Cu Front-Panel Manual THT; 100k Log pot (GAIN); Pin 1=CCW, Pin 2=Wiper, Pin 3=CW")
+        (field
+          (name "Description") "Potentiometer")
+        (field
+          (name "Footprint") "Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "rv1")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:435"))
+      (libsource
+        (lib "Device")
+        (part "R_Potentiometer"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "9e52508d-09d9-521b-a181-da5dac28a662"))
+    (comp
+      (ref "RV2")
+      (value "A50k")
+      (description "Potentiometer")
+      (footprint "Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical")
+      (fields
+        (field
+          (name "MPN") "RD901F-40-15F-A50K")
+        (field
+          (name "Manufacturer") "Taiwan Alpha")
+        (field
+          (name "JLCPCB_Class") "Manual THT")
+        (field
+          (name "Side") "F.Cu")
+        (field
+          (name "Silkscreen") "RV2 ATK A50k")
+        (field
+          (name "Notes") "F.Cu Front-Panel Manual THT; 50k Log pot (ATK); Pin 1=CCW, Pin 2=Wiper, Pin 3=CW")
+        (field
+          (name "Description") "Potentiometer")
+        (field
+          (name "Footprint") "Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "rv2")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:435"))
+      (libsource
+        (lib "Device")
+        (part "R_Potentiometer"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "9eb21962-2857-54be-8e84-18dab39d974d"))
+    (comp
+      (ref "RV3")
+      (value "A1M")
+      (description "Potentiometer")
+      (footprint "Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical")
+      (fields
+        (field
+          (name "MPN") "RD901F-40-15F-A1M")
+        (field
+          (name "Manufacturer") "Taiwan Alpha")
+        (field
+          (name "JLCPCB_Class") "Manual THT")
+        (field
+          (name "Side") "F.Cu")
+        (field
+          (name "Silkscreen") "RV3 REL A1M")
+        (field
+          (name "Notes") "F.Cu Front-Panel Manual THT; 1M Log pot (Release); Pin 1=CCW, Pin 2=Wiper, Pin 3=CW")
+        (field
+          (name "Description") "Potentiometer")
+        (field
+          (name "Footprint") "Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "rv3")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:435"))
+      (libsource
+        (lib "Device")
+        (part "R_Potentiometer"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "687e7b08-a3b6-5725-9200-ff54fd0022b5"))
+    (comp
+      (ref "RV4")
+      (value "B10k")
+      (description "Potentiometer")
+      (footprint "Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical")
+      (fields
+        (field
+          (name "MPN") "RD901F-40-15F-B10K")
+        (field
+          (name "Manufacturer") "Taiwan Alpha")
+        (field
+          (name "JLCPCB_Class") "Manual THT")
+        (field
+          (name "Side") "F.Cu")
+        (field
+          (name "Silkscreen") "RV4 OFFSET B10k")
+        (field
+          (name "Notes") "F.Cu Front-Panel Manual THT; 10k Linear pot (OFFSET); Pin 1=CCW (+12V leg), Pin 2=Wiper, Pin 3=CW (-12V leg)")
+        (field
+          (name "Description") "Potentiometer")
+        (field
+          (name "Footprint") "Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "rv4")
+        (field
+          (name "SKiDL Line") "envelope_follower.py:435"))
+      (libsource
+        (lib "Device")
+        (part "R_Potentiometer"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "750482cb-2a59-5b5b-a617-997085a21ac1"))
     (comp
       (ref "TP1")
-      (value "RH-5001")
+      (value "+12V_PROT")
       (description "test point")
-      (footprint "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+      (footprint "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
       (fields
         (field
           (name "LCSC") "C5199801")
@@ -2225,21 +2245,23 @@
         (field
           (name "Manufacturer") "Ronghe")
         (field
-          (name "JLCPCB_Class") "DNP THT")
+          (name "JLCPCB_Class") "Manual THT (DNP)")
         (field
-          (name "Silkscreen") "TP1 GND")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "DNP; bare B.Cu plated THT pad (optional RH-5001 pin on B.Cu); dual-sided silkscreen; verify 1.0mm drill in C5199801 datasheet")
+          (name "Silkscreen") "TP1 +12V_PROT")
+        (field
+          (name "Notes") "DNP — Optional rear B.Cu test point (+12V_PROT); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
         (field
           (name "Description") "test point")
         (field
-          (name "Footprint") "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+          (name "Footprint") "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "tp1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:778"))
+          (name "SKiDL Line") "envelope_follower.py:464"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2254,9 +2276,9 @@
         (name "exclude_from_bom")))
     (comp
       (ref "TP2")
-      (value "RH-5001")
+      (value "-12V_PROT")
       (description "test point")
-      (footprint "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+      (footprint "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
       (fields
         (field
           (name "LCSC") "C5199801")
@@ -2265,21 +2287,23 @@
         (field
           (name "Manufacturer") "Ronghe")
         (field
-          (name "JLCPCB_Class") "DNP THT")
+          (name "JLCPCB_Class") "Manual THT (DNP)")
         (field
-          (name "Silkscreen") "TP2 +12V")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "DNP; bare B.Cu plated THT pad (optional RH-5001 pin on B.Cu); dual-sided silkscreen; verify 1.0mm drill in C5199801 datasheet")
+          (name "Silkscreen") "TP2 -12V_PROT")
+        (field
+          (name "Notes") "DNP — Optional rear B.Cu test point (-12V_PROT); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
         (field
           (name "Description") "test point")
         (field
-          (name "Footprint") "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+          (name "Footprint") "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "tp2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:778"))
+          (name "SKiDL Line") "envelope_follower.py:464"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2294,9 +2318,9 @@
         (name "exclude_from_bom")))
     (comp
       (ref "TP3")
-      (value "RH-5001")
+      (value "GND")
       (description "test point")
-      (footprint "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+      (footprint "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
       (fields
         (field
           (name "LCSC") "C5199801")
@@ -2305,21 +2329,23 @@
         (field
           (name "Manufacturer") "Ronghe")
         (field
-          (name "JLCPCB_Class") "DNP THT")
+          (name "JLCPCB_Class") "Manual THT (DNP)")
         (field
-          (name "Silkscreen") "TP3 -12V")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "DNP; bare B.Cu plated THT pad (optional RH-5001 pin on B.Cu); dual-sided silkscreen; verify 1.0mm drill in C5199801 datasheet")
+          (name "Silkscreen") "TP3 GND")
+        (field
+          (name "Notes") "DNP — Optional rear B.Cu test point (GND); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
         (field
           (name "Description") "test point")
         (field
-          (name "Footprint") "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+          (name "Footprint") "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "tp3")
         (field
-          (name "SKiDL Line") "envelope_follower.py:778"))
+          (name "SKiDL Line") "envelope_follower.py:464"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2334,9 +2360,9 @@
         (name "exclude_from_bom")))
     (comp
       (ref "TP4")
-      (value "RH-5001")
+      (value "V_GAIN")
       (description "test point")
-      (footprint "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+      (footprint "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
       (fields
         (field
           (name "LCSC") "C5199801")
@@ -2345,21 +2371,23 @@
         (field
           (name "Manufacturer") "Ronghe")
         (field
-          (name "JLCPCB_Class") "DNP THT")
+          (name "JLCPCB_Class") "Manual THT (DNP)")
         (field
-          (name "Silkscreen") "TP4 IN_BUF")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "DNP; bare B.Cu plated THT pad (optional RH-5001 pin on B.Cu); dual-sided silkscreen; verify 1.0mm drill in C5199801 datasheet")
+          (name "Silkscreen") "TP4 V_GAIN")
+        (field
+          (name "Notes") "DNP — Optional rear B.Cu test point (V_GAIN); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
         (field
           (name "Description") "test point")
         (field
-          (name "Footprint") "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+          (name "Footprint") "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "tp4")
         (field
-          (name "SKiDL Line") "envelope_follower.py:778"))
+          (name "SKiDL Line") "envelope_follower.py:464"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2374,9 +2402,9 @@
         (name "exclude_from_bom")))
     (comp
       (ref "TP5")
-      (value "RH-5001")
+      (value "V_RECT")
       (description "test point")
-      (footprint "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+      (footprint "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
       (fields
         (field
           (name "LCSC") "C5199801")
@@ -2385,21 +2413,23 @@
         (field
           (name "Manufacturer") "Ronghe")
         (field
-          (name "JLCPCB_Class") "DNP THT")
+          (name "JLCPCB_Class") "Manual THT (DNP)")
         (field
-          (name "Silkscreen") "TP5 PREAMP")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "DNP; bare B.Cu plated THT pad (optional RH-5001 pin on B.Cu); dual-sided silkscreen; verify 1.0mm drill in C5199801 datasheet")
+          (name "Silkscreen") "TP5 V_RECT")
+        (field
+          (name "Notes") "DNP — Optional rear B.Cu test point (V_RECT); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
         (field
           (name "Description") "test point")
         (field
-          (name "Footprint") "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+          (name "Footprint") "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "tp5")
         (field
-          (name "SKiDL Line") "envelope_follower.py:778"))
+          (name "SKiDL Line") "envelope_follower.py:464"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2414,9 +2444,9 @@
         (name "exclude_from_bom")))
     (comp
       (ref "TP6")
-      (value "RH-5001")
+      (value "V_ENV_BUF")
       (description "test point")
-      (footprint "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+      (footprint "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
       (fields
         (field
           (name "LCSC") "C5199801")
@@ -2425,21 +2455,23 @@
         (field
           (name "Manufacturer") "Ronghe")
         (field
-          (name "JLCPCB_Class") "DNP THT")
+          (name "JLCPCB_Class") "Manual THT (DNP)")
         (field
-          (name "Silkscreen") "TP6 RECT")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "DNP; bare B.Cu plated THT pad (optional RH-5001 pin on B.Cu); dual-sided silkscreen; verify 1.0mm drill in C5199801 datasheet")
+          (name "Silkscreen") "TP6 V_ENV_BUF")
+        (field
+          (name "Notes") "DNP — Optional rear B.Cu test point (V_ENV_BUF); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
         (field
           (name "Description") "test point")
         (field
-          (name "Footprint") "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+          (name "Footprint") "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "tp6")
         (field
-          (name "SKiDL Line") "envelope_follower.py:778"))
+          (name "SKiDL Line") "envelope_follower.py:464"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2454,9 +2486,9 @@
         (name "exclude_from_bom")))
     (comp
       (ref "TP7")
-      (value "RH-5001")
+      (value "V_OUT_BUF")
       (description "test point")
-      (footprint "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+      (footprint "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
       (fields
         (field
           (name "LCSC") "C5199801")
@@ -2465,21 +2497,23 @@
         (field
           (name "Manufacturer") "Ronghe")
         (field
-          (name "JLCPCB_Class") "DNP THT")
+          (name "JLCPCB_Class") "Manual THT (DNP)")
         (field
-          (name "Silkscreen") "TP7 OUT")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "DNP; bare B.Cu plated THT pad (optional RH-5001 pin on B.Cu); dual-sided silkscreen; verify 1.0mm drill in C5199801 datasheet")
+          (name "Silkscreen") "TP7 V_OUT_BUF")
+        (field
+          (name "Notes") "DNP — Optional rear B.Cu test point (V_OUT_BUF); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
         (field
           (name "Description") "test point")
         (field
-          (name "Footprint") "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+          (name "Footprint") "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "tp7")
         (field
-          (name "SKiDL Line") "envelope_follower.py:778"))
+          (name "SKiDL Line") "envelope_follower.py:464"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2494,9 +2528,9 @@
         (name "exclude_from_bom")))
     (comp
       (ref "TP8")
-      (value "RH-5001")
+      (value "V_INV_BUF")
       (description "test point")
-      (footprint "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+      (footprint "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
       (fields
         (field
           (name "LCSC") "C5199801")
@@ -2505,21 +2539,23 @@
         (field
           (name "Manufacturer") "Ronghe")
         (field
-          (name "JLCPCB_Class") "DNP THT")
+          (name "JLCPCB_Class") "Manual THT (DNP)")
         (field
-          (name "Silkscreen") "TP8 INV_OUT")
+          (name "Side") "B.Cu")
         (field
-          (name "Notes") "DNP; bare B.Cu plated THT pad (optional RH-5001 pin on B.Cu); dual-sided silkscreen; verify 1.0mm drill in C5199801 datasheet")
+          (name "Silkscreen") "TP8 V_INV_BUF")
+        (field
+          (name "Notes") "DNP — Optional rear B.Cu test point (V_INV_BUF); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
         (field
           (name "Description") "test point")
         (field
-          (name "Footprint") "TestPoint:TestPoint_THTPad_D2.0mm_Drill1.0mm")
+          (name "Footprint") "TestPoint:TestPoint_Keystone_5000-5004_Miniature")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "tp8")
         (field
-          (name "SKiDL Line") "envelope_follower.py:778"))
+          (name "SKiDL Line") "envelope_follower.py:464"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -2547,9 +2583,11 @@
         (field
           (name "JLCPCB_Class") "Extended")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "U1 TL074H")
         (field
-          (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses within 3-5mm of V+/V-")
+          (name "Notes") "B.Cu SMT; 40V FET-input quad op-amp; Pin 1 dot on B.SilkS")
         (field
           (name "Description") "Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14")
         (field
@@ -2559,7 +2597,7 @@
         (field
           (name "SKiDL Tag") "u1")
         (field
-          (name "SKiDL Line") "envelope_follower.py:271"))
+          (name "SKiDL Line") "envelope_follower.py:304"))
       (libsource
         (lib "Amplifier_Operational")
         (part "TL074"))
@@ -2583,9 +2621,11 @@
         (field
           (name "JLCPCB_Class") "Extended")
         (field
+          (name "Side") "B.Cu")
+        (field
           (name "Silkscreen") "U2 TL074H")
         (field
-          (name "Notes") "F.Cu SMT; Pin-1 dot on F.SilkS; place 100nF bypasses within 3-5mm of V+/V-")
+          (name "Notes") "B.Cu SMT; 40V FET-input quad op-amp; Pin 1 dot on B.SilkS")
         (field
           (name "Description") "Quad Low-Noise JFET-Input Operational Amplifiers, DIP-14/SOIC-14")
         (field
@@ -2595,7 +2635,7 @@
         (field
           (name "SKiDL Tag") "u2")
         (field
-          (name "SKiDL Line") "envelope_follower.py:289"))
+          (name "SKiDL Line") "envelope_follower.py:304"))
       (libsource
         (lib "Amplifier_Operational")
         (part "TL074"))
@@ -2607,58 +2647,22 @@
   (nets
     (net
       (code 1)
-      (name "+12V")
+      (name "+12V_FILT_IN")
       (class "Power,Default")
       (node
-        (ref "C3")
+        (ref "D7")
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "C_DEC1")
+        (ref "R28")
         (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "C_DEC3")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "D_IN")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "D_INV_OUT")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "D_OUT")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R11")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_PWR_P")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "TP2")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "4")
-        (pintype "POWER-IN"))
-      (node
-        (ref "U2")
-        (pin "4")
-        (pintype "POWER-IN")))
+        (pintype "PASSIVE")))
     (net
       (code 2)
       (name "+12V_IN")
       (class "Power,Default")
       (node
-        (ref "D_PWR_P")
+        (ref "D7")
         (pin "2")
         (pintype "PASSIVE"))
       (node
@@ -2674,67 +2678,67 @@
       (name "+12V_PROT")
       (class "Power,Default")
       (node
-        (ref "D_PWR_P")
+        (ref "C3")
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "R_PWR_P")
+        (ref "C5")
         (pin "1")
-        (pintype "PASSIVE")))
-    (net
-      (code 4)
-      (name "-12V")
-      (class "Power,Default")
+        (pintype "PASSIVE"))
       (node
-        (ref "C4")
+        (ref "C7")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D10")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "C_DEC2")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "C_DEC4")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "D_IN")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "D_INV_OUT")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "D_OUT")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R12")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_PWR_N")
+        (ref "D11")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "TP3")
+        (ref "D9")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R17")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R28")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "TP1")
         (pin "1")
         (pintype "PASSIVE"))
       (node
         (ref "U1")
-        (pin "11")
+        (pin "4")
         (pintype "POWER-IN"))
       (node
         (ref "U2")
-        (pin "11")
+        (pin "4")
         (pintype "POWER-IN")))
+    (net
+      (code 4)
+      (name "-12V_FILT_IN")
+      (class "Power,Default")
+      (node
+        (ref "D8")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R29")
+        (pin "1")
+        (pintype "PASSIVE")))
     (net
       (code 5)
       (name "-12V_IN")
       (class "Power,Default")
       (node
-        (ref "D_PWR_N")
+        (ref "D8")
         (pin "1")
         (pintype "PASSIVE"))
       (node
@@ -2750,55 +2754,71 @@
       (name "-12V_PROT")
       (class "Power,Default")
       (node
-        (ref "D_PWR_N")
+        (ref "C4")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "R_PWR_N")
-        (pin "1")
-        (pintype "PASSIVE")))
-    (net
-      (code 7)
-      (name "ATK_IN")
-      (class "Default")
-      (node
-        (ref "D3")
+        (ref "C6")
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "R_ATK_MIN")
+        (ref "C8")
         (pin "1")
         (pintype "PASSIVE"))
+      (node
+        (ref "D10")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D11")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D9")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R18")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R29")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "TP2")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "11")
+        (pintype "POWER-IN"))
       (node
         (ref "U2")
-        (pin "9")
-        (pintype "INPUT")))
+        (pin "11")
+        (pintype "POWER-IN")))
     (net
-      (code 8)
-      (name "ATK_POT_1")
+      (code 7)
+      (name "ATK_MID")
       (class "Default")
+      (node
+        (ref "R12")
+        (pin "2")
+        (pintype "PASSIVE"))
       (node
         (ref "RV2")
         (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_ATK_MIN")
-        (pin "2")
         (pintype "PASSIVE")))
     (net
-      (code 9)
-      (name "ENV_NODE")
+      (code 8)
+      (name "ENV_CAP")
       (class "Default")
       (node
         (ref "C2")
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "R10")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R20")
+        (ref "R13")
         (pin "1")
         (pintype "PASSIVE"))
       (node
@@ -2810,35 +2830,11 @@
         (pin "3")
         (pintype "PASSIVE"))
       (node
-        (ref "R_ENV_PROT")
-        (pin "1")
-        (pintype "PASSIVE")))
+        (ref "U2")
+        (pin "12")
+        (pintype "INPUT")))
     (net
-      (code 10)
-      (name "FF_MID")
-      (class "Default")
-      (node
-        (ref "R4")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R5")
-        (pin "1")
-        (pintype "PASSIVE")))
-    (net
-      (code 11)
-      (name "GAIN_POT_1")
-      (class "Default")
-      (node
-        (ref "RV1")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_GAIN_MIN")
-        (pin "2")
-        (pintype "PASSIVE")))
-    (net
-      (code 12)
+      (code 9)
       (name "GND")
       (class "Power,Default")
       (node
@@ -2854,19 +2850,19 @@
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "C_DEC1")
+        (ref "C5")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "C_DEC2")
+        (ref "C6")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "C_DEC3")
+        (ref "C7")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "C_DEC4")
+        (ref "C8")
         (pin "2")
         (pintype "PASSIVE"))
       (node
@@ -2910,7 +2906,31 @@
         (pin "8")
         (pintype "PASSIVE"))
       (node
-        (ref "R1")
+        (ref "R14")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R16")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R2")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R26")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R27")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R3")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R4")
         (pin "2")
         (pintype "PASSIVE"))
       (node
@@ -2922,20 +2942,12 @@
         (pin "3")
         (pintype "PASSIVE"))
       (node
-        (ref "R_LED")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "TP1")
+        (ref "TP3")
         (pin "1")
         (pintype "PASSIVE"))
       (node
         (ref "U1")
         (pin "10")
-        (pintype "INPUT"))
-      (node
-        (ref "U1")
-        (pin "3")
         (pintype "INPUT"))
       (node
         (ref "U1")
@@ -2946,31 +2958,7 @@
         (pin "3")
         (pintype "INPUT")))
     (net
-      (code 13)
-      (name "INV_OUT_CLAMP")
-      (class "Default")
-      (node
-        (ref "D_INV_OUT")
-        (pin "3")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R18")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R19A")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R19B")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "TP8")
-        (pin "1")
-        (pintype "PASSIVE")))
-    (net
-      (code 14)
+      (code 10)
       (name "INV_OUT_TIP")
       (class "Default")
       (node
@@ -2978,63 +2966,87 @@
         (pin "T")
         (pintype "PASSIVE"))
       (node
-        (ref "R19B")
+        (ref "R24")
         (pin "2")
         (pintype "PASSIVE")))
     (net
-      (code 15)
-      (name "IN_AC")
+      (code 11)
+      (name "INV_SUM")
       (class "Default")
       (node
-        (ref "C1")
+        (ref "R22")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "D_IN")
+        (ref "R23")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "2")
+        (pintype "INPUT")))
+    (net
+      (code 12)
+      (name "IN_CLAMP")
+      (class "Default")
+      (node
+        (ref "C1")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D9")
         (pin "3")
         (pintype "PASSIVE"))
       (node
         (ref "R1")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_IN_BUF")
-        (pin "1")
-        (pintype "PASSIVE")))
-    (net
-      (code 16)
-      (name "IN_AC_PRE")
-      (class "Default")
-      (node
-        (ref "C1")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_IN_PROT")
         (pin "2")
         (pintype "PASSIVE")))
     (net
-      (code 17)
-      (name "IN_BUF")
+      (code 13)
+      (name "IN_GAIN_INV")
+      (class "Default")
+      (node
+        (ref "C9")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R4")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R5")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "2")
+        (pintype "INPUT")))
+    (net
+      (code 14)
+      (name "IN_POT_BOT")
       (class "Default")
       (node
         (ref "R2")
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "TP4")
+        (ref "RV1")
         (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 15)
+      (name "IN_POT_TOP")
+      (class "Default")
+      (node
+        (ref "C1")
+        (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "U2")
-        (pin "13")
-        (pintype "INPUT"))
-      (node
-        (ref "U2")
-        (pin "14")
-        (pintype "OUTPUT")))
+        (ref "RV1")
+        (pin "3")
+        (pintype "PASSIVE")))
     (net
-      (code 18)
+      (code 16)
       (name "IN_TIP")
       (class "Default")
       (node
@@ -3042,23 +3054,55 @@
         (pin "T")
         (pintype "PASSIVE"))
       (node
-        (ref "R_IN_PROT")
+        (ref "R1")
         (pin "1")
         (pintype "PASSIVE")))
     (net
+      (code 17)
+      (name "IN_WIPER")
+      (class "Default")
+      (node
+        (ref "R3")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "RV1")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "3")
+        (pintype "INPUT")))
+    (net
+      (code 18)
+      (name "LED_REF_IN")
+      (class "Default")
+      (node
+        (ref "R25")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R26")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "5")
+        (pintype "INPUT")))
+    (net
       (code 19)
-      (name "LED_K")
+      (name "LED_SENSE")
       (class "Default")
       (node
         (ref "D4")
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "D_LED_CLAMP")
+        (ref "D6")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "R_LED")
+        (ref "R27")
         (pin "1")
         (pintype "PASSIVE"))
       (node
@@ -3070,7 +3114,7 @@
       (name "OFF_BOT")
       (class "Default")
       (node
-        (ref "R12")
+        (ref "R18")
         (pin "2")
         (pintype "PASSIVE"))
       (node
@@ -3082,7 +3126,7 @@
       (name "OFF_TOP")
       (class "Default")
       (node
-        (ref "R11")
+        (ref "R17")
         (pin "2")
         (pintype "PASSIVE"))
       (node
@@ -3094,7 +3138,7 @@
       (name "OFF_WIPER")
       (class "Default")
       (node
-        (ref "R13")
+        (ref "R19")
         (pin "1")
         (pintype "PASSIVE"))
       (node
@@ -3103,34 +3147,38 @@
         (pintype "PASSIVE")))
     (net
       (code 23)
-      (name "OUT_CLAMP")
+      (name "OUT_INV_NODE")
       (class "Default")
       (node
-        (ref "D_OUT")
-        (pin "3")
+        (ref "R19")
+        (pin "2")
         (pintype "PASSIVE"))
+      (node
+        (ref "R20")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "13")
+        (pintype "INPUT")))
+    (net
+      (code 24)
+      (name "OUT_NONINV")
+      (class "Default")
       (node
         (ref "R15")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "R16A")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R16B")
+        (ref "R16")
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "R17")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "TP7")
-        (pin "1")
-        (pintype "PASSIVE")))
+        (ref "U1")
+        (pin "12")
+        (pintype "INPUT")))
     (net
-      (code 24)
+      (code 25)
       (name "OUT_TIP")
       (class "Default")
       (node
@@ -3138,63 +3186,67 @@
         (pin "T")
         (pintype "PASSIVE"))
       (node
-        (ref "R16B")
+        (ref "R21")
         (pin "2")
         (pintype "PASSIVE")))
-    (net
-      (code 25)
-      (name "PREAMP_OUT")
-      (class "Default")
-      (node
-        (ref "C_HF")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R3")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R4")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "RV1")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "RV1")
-        (pin "3")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_GAIN_FAIL")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "TP5")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "1")
-        (pintype "OUTPUT")))
     (net
       (code 26)
-      (name "RECT_FB_MID")
+      (name "PEAK_INV")
       (class "Default")
       (node
-        (ref "R8A")
+        (ref "C10")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D5")
         (pin "2")
         (pintype "PASSIVE"))
       (node
-        (ref "R8B")
+        (ref "R11")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "9")
+        (pintype "INPUT")))
+    (net
+      (code 27)
+      (name "PEAK_OP_OUT")
+      (class "Default")
+      (node
+        (ref "C10")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D3")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D5")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "8")
+        (pintype "OUTPUT")))
+    (net
+      (code 28)
+      (name "RECT_DIODE_OUT")
+      (class "Default")
+      (node
+        (ref "D3")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R12")
         (pin "1")
         (pintype "PASSIVE")))
     (net
-      (code 27)
-      (name "RECT_HW")
+      (code 29)
+      (name "RECT_INV")
       (class "Default")
       (node
-        (ref "D1_D2")
+        (ref "D1")
         (pin "1")
         (pintype "PASSIVE"))
       (node
@@ -3204,17 +3256,213 @@
       (node
         (ref "R7")
         (pin "1")
-        (pintype "PASSIVE")))
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "6")
+        (pintype "INPUT")))
     (net
-      (code 28)
-      (name "RECT_OUT")
+      (code 30)
+      (name "RECT_MID")
       (class "Default")
       (node
-        (ref "R8B")
+        (ref "D2")
         (pin "2")
         (pintype "PASSIVE"))
       (node
+        (ref "R7")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R9")
+        (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 31)
+      (name "RECT_OP_OUT")
+      (class "Default")
+      (node
+        (ref "D1")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D2")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "7")
+        (pintype "OUTPUT")))
+    (net
+      (code 32)
+      (name "REL_MID")
+      (class "Default")
+      (node
+        (ref "R13")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R14")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "RV3")
+        (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 33)
+      (name "SUM_INV")
+      (class "Default")
+      (node
+        (ref "R10")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R8")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R9")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "9")
+        (pintype "INPUT")))
+    (net
+      (code 34)
+      (name "V_ENV_BUF")
+      (class "Default")
+      (node
+        (ref "R11")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R15")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R25")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
         (ref "TP6")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "13")
+        (pintype "INPUT"))
+      (node
+        (ref "U2")
+        (pin "14")
+        (pintype "OUTPUT")))
+    (net
+      (code 35)
+      (name "V_GAIN")
+      (class "Default")
+      (node
+        (ref "C9")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R5")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R6")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R8")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "TP4")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "1")
+        (pintype "OUTPUT")))
+    (net
+      (code 36)
+      (name "V_INV_BUF")
+      (class "Default")
+      (node
+        (ref "D11")
+        (pin "3")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R23")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R24")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "TP8")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "1")
+        (pintype "OUTPUT")))
+    (net
+      (code 37)
+      (name "V_LED_DRV")
+      (class "Default")
+      (node
+        (ref "D4")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "D6")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U2")
+        (pin "7")
+        (pintype "OUTPUT")))
+    (net
+      (code 38)
+      (name "V_OUT_BUF")
+      (class "Default")
+      (node
+        (ref "D10")
+        (pin "3")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R20")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R21")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R22")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "TP7")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "14")
+        (pintype "OUTPUT")))
+    (net
+      (code 39)
+      (name "V_RECT")
+      (class "Default")
+      (node
+        (ref "R10")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "TP5")
         (pin "1")
         (pintype "PASSIVE"))
       (node
@@ -3224,228 +3472,4 @@
       (node
         (ref "U2")
         (pin "10")
-        (pintype "INPUT")))
-    (net
-      (code 29)
-      (name "REL_POT_TOP")
-      (class "Default")
-      (node
-        (ref "R10")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "RV3")
-        (pin "1")
-        (pintype "PASSIVE")))
-    (net
-      (code 30)
-      (name "U1A_INV")
-      (class "Default")
-      (node
-        (ref "C_HF")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R2")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_GAIN_FAIL")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R_GAIN_MIN")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "2")
-        (pintype "INPUT")))
-    (net
-      (code 31)
-      (name "U1B_INV")
-      (class "Default")
-      (node
-        (ref "D1_D2")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R3")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R6")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "6")
-        (pintype "INPUT")))
-    (net
-      (code 32)
-      (name "U1B_OUT")
-      (class "Default")
-      (node
-        (ref "D1_D2")
-        (pin "3")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "7")
-        (pintype "OUTPUT")))
-    (net
-      (code 33)
-      (name "U1C_INV")
-      (class "Default")
-      (node
-        (ref "R5")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R7")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R8A")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "9")
-        (pintype "INPUT")))
-    (net
-      (code 34)
-      (name "U1D_IN")
-      (class "Default")
-      (node
-        (ref "R_ENV_PROT")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "12")
-        (pintype "INPUT")))
-    (net
-      (code 35)
-      (name "U1D_INV")
-      (class "Default")
-      (node
-        (ref "C_OUT1")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R13")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R15")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "13")
-        (pintype "INPUT")))
-    (net
-      (code 36)
-      (name "U1D_OUT")
-      (class "Default")
-      (node
-        (ref "C_OUT1")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R16A")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U1")
-        (pin "14")
-        (pintype "OUTPUT")))
-    (net
-      (code 37)
-      (name "U2A_INV")
-      (class "Default")
-      (node
-        (ref "C_OUT2")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R17")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R18")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U2")
-        (pin "2")
-        (pintype "INPUT")))
-    (net
-      (code 38)
-      (name "U2A_OUT")
-      (class "Default")
-      (node
-        (ref "C_OUT2")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "R19A")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U2")
-        (pin "1")
-        (pintype "OUTPUT")))
-    (net
-      (code 39)
-      (name "U2B_IN")
-      (class "Default")
-      (node
-        (ref "R20")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U2")
-        (pin "5")
-        (pintype "INPUT")))
-    (net
-      (code 40)
-      (name "U2B_OUT")
-      (class "Default")
-      (node
-        (ref "D4")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "D_LED_CLAMP")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U2")
-        (pin "7")
-        (pintype "OUTPUT")))
-    (net
-      (code 41)
-      (name "U2C_OUT")
-      (class "Default")
-      (node
-        (ref "D3")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U2")
-        (pin "8")
-        (pintype "OUTPUT")))
-    (net
-      (code 42)
-      (name "U2D_IN")
-      (class "Default")
-      (node
-        (ref "R_IN_BUF")
-        (pin "2")
-        (pintype "PASSIVE"))
-      (node
-        (ref "U2")
-        (pin "12")
         (pintype "INPUT")))))

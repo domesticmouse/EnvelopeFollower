@@ -1,11 +1,11 @@
 {
   "version": 1,
   "project": "EnvelopeFollower.kicad_pro",
-  "current": "2026-11-21_0642",
+  "current": "2026-11-21_2019",
   "runs": {
-    "2026-11-21_0032": {
+    "2026-11-21_1922": {
       "source_hashes": {
-        "EnvelopeFollower.kicad_pcb": "sha256:4e0ecce8348490a2a732af9954c605193819d48bb5af1c2dddddeb5126003904"
+        "EnvelopeFollower.kicad_pcb": "sha256:e29bb144cef9738092ae102bdae025c05d83ea2861c0e52d0a0233b736cc00dd"
       },
       "outputs": {
         "pcb": "pcb.json"
@@ -13,12 +13,12 @@
       "scripts": {
         "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
       },
-      "generated": "2026-11-21T00:32:44+11:00",
+      "generated": "2026-11-21T19:33:26+11:00",
       "pinned": false
     },
-    "2026-11-21_0043": {
+    "2026-11-21_2019": {
       "source_hashes": {
-        "EnvelopeFollower.kicad_pcb": "sha256:7522534ba024b9a8aa6bf6d86bf6e656291dae8fbf49fad4bb8b43774e6f4018"
+        "EnvelopeFollower.kicad_pcb": "sha256:45c1796e333e825b83729014ae8ef52597b569b0358a1aa69993b77b4e8b20b5"
       },
       "outputs": {
         "pcb": "pcb.json"
@@ -26,72 +26,7 @@
       "scripts": {
         "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
       },
-      "generated": "2026-11-21T00:43:11+11:00",
-      "pinned": false
-    },
-    "2026-11-21_0048": {
-      "source_hashes": {
-        "EnvelopeFollower.kicad_pcb": "sha256:1b928a691fb2292f27c8486de442776a8aefe3a470d886629d58288af9054805"
-      },
-      "outputs": {
-        "pcb": "pcb.json"
-      },
-      "scripts": {
-        "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
-      },
-      "generated": "2026-11-21T00:54:20+11:00",
-      "pinned": false
-    },
-    "2026-11-21_0529": {
-      "source_hashes": {
-        "EnvelopeFollower.kicad_pcb": "sha256:355f0875716d2cd097ad2fb272dd782f4d8d872624204ec44294b8e5843f3e6d"
-      },
-      "outputs": {
-        "pcb": "pcb.json"
-      },
-      "scripts": {
-        "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
-      },
-      "generated": "2026-11-21T05:29:09+11:00",
-      "pinned": false
-    },
-    "2026-11-21_0536": {
-      "source_hashes": {
-        "EnvelopeFollower.kicad_pcb": "sha256:9ae59318588e800a4a0bd64bf847d340e91396708b3688623396d3fd7186e208"
-      },
-      "outputs": {
-        "pcb": "pcb.json"
-      },
-      "scripts": {
-        "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
-      },
-      "generated": "2026-11-21T05:36:55+11:00",
-      "pinned": false
-    },
-    "2026-11-21_0544": {
-      "source_hashes": {
-        "EnvelopeFollower.kicad_pcb": "sha256:2e885b8d64bd3d199c3b292e40060695f20095d89a16b1e00fbc39e53ff986b6"
-      },
-      "outputs": {
-        "pcb": "pcb.json"
-      },
-      "scripts": {
-        "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
-      },
-      "generated": "2026-11-21T05:47:03+11:00",
-      "pinned": false
-    },
-    "2026-11-21_0642": {
-      "source_hashes": {
-        "EnvelopeFollower.kicad_pcb": "sha256:7fd61090fada0b2258ee64a9ddc7f7e1a3b8f2618a83a77d9fc906eda95e8343"
-      },
-      "outputs": {
-        "pcb": "pcb.json"
-      },
-      "scripts": {
-        "pcb": "analyze_pcb.py EnvelopeFollower.kicad_pcb"
-      },
-      "generated": "2026-11-21T07:11:08+11:00",
+      "generated": "2026-11-21T20:19:18+11:00",
       "pinned": false
     }
   }
