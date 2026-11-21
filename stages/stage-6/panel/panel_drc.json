@@ -1,0 +1,188 @@
+{
+    "$schema": "https://schemas.kicad.org/drc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-11-22T06:28:03",
+    "ignored_checks": [
+        {
+            "description": "Footprint has no courtyard defined",
+            "key": "missing_courtyard"
+        },
+        {
+            "description": "Track endpoint not centered on via",
+            "key": "track_not_centered_on_via"
+        },
+        {
+            "description": "Tuning profile track geometries",
+            "key": "tuning_profile_track_geometries"
+        },
+        {
+            "description": "Footprint doesn't match symbol's footprint filters",
+            "key": "footprint_filters_mismatch"
+        },
+        {
+            "description": "Footprint component type doesn't match footprint pads",
+            "key": "footprint_type_mismatch"
+        }
+    ],
+    "included_severities": [
+        "error",
+        "warning",
+        "exclusion"
+    ],
+    "kicad_version": "10.0.7",
+    "schematic_parity": [],
+    "source": "EnvelopeFollower_Panel.kicad_pcb",
+    "unconnected_items": [],
+    "violations": [
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint RV3",
+                    "pos": {
+                        "x": 8.0,
+                        "y": 45.0
+                    },
+                    "uuid": "100e5f78-5911-5aff-beae-696e28d3aa9c"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint H1",
+                    "pos": {
+                        "x": 7.5,
+                        "y": 3.0
+                    },
+                    "uuid": "3381a349-e3cc-5f62-9ef1-020185566e78"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint J1",
+                    "pos": {
+                        "x": 8.0,
+                        "y": 65.0
+                    },
+                    "uuid": "36d2450f-1c1a-57fa-aaad-3712bdc5b86b"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint RV1",
+                    "pos": {
+                        "x": 8.0,
+                        "y": 25.0
+                    },
+                    "uuid": "3815539c-2852-52c9-b6fd-dac7f3284b5f"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint H2",
+                    "pos": {
+                        "x": 7.5,
+                        "y": 125.5
+                    },
+                    "uuid": "8a9a1291-f366-5e19-9a6c-8c0724c6acba"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint J2",
+                    "pos": {
+                        "x": 8.0,
+                        "y": 85.0
+                    },
+                    "uuid": "b39a13e1-01a9-589b-938f-e993b1defbbc"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint RV2",
+                    "pos": {
+                        "x": 22.0,
+                        "y": 25.0
+                    },
+                    "uuid": "b98dc2dc-0fe9-5ecd-9fcf-6b24421e1988"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint D4",
+                    "pos": {
+                        "x": 22.0,
+                        "y": 65.0
+                    },
+                    "uuid": "ca4190c1-b933-55e4-bfb1-144724da4bd2"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint RV4",
+                    "pos": {
+                        "x": 22.0,
+                        "y": 45.0
+                    },
+                    "uuid": "d84de1a6-43f5-5f38-a07d-f51b6a8e7872"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        },
+        {
+            "description": "The current configuration does not include the footprint library 'Eurorack_Panel'",
+            "items": [
+                {
+                    "description": "Footprint J3",
+                    "pos": {
+                        "x": 22.0,
+                        "y": 85.0
+                    },
+                    "uuid": "f422f290-2569-5b47-bb4c-3a351bcfe0ad"
+                }
+            ],
+            "severity": "warning",
+            "type": "lib_footprint_issues"
+        }
+    ]
+}

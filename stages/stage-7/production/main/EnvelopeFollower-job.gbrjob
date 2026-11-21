@@ -5,13 +5,13 @@
       "Application": "Pcbnew",
       "Version": "10.0.7"
     },
-    "CreationDate": "2026-11-21T21:34:53+11:00"
+    "CreationDate": "2026-11-22T06:35:58+11:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "EnvelopeFollower",
       "GUID": "456e7665-6c6f-4706-9546-6f6c6c6f7765",
-      "Revision": "Rev 1.0"
+      "Revision": "REV 1.0"
     },
     "Size": {
       "X": 30.1,

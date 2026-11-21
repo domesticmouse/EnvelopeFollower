@@ -2,12 +2,12 @@
 <export version="D">
   <design>
     <source>/Users/brett/Documents/GitHub/EnvelopeFollower/stages/stage-4/envelope_follower.py</source>
-    <date>11/21/2026 06:03 PM</date>
+    <date>11/22/2026 05:11 AM</date>
     <tool>SKiDL (3.0.0)</tool>
   </design>
   <components>
     <comp ref="U1">
-      <value>"TL074H"</value>
+      <value>"TL074HIDR"</value>
       <footprint>Package_SO:SOIC-14_3.9x8.7mm_P1.27mm</footprint>
       <fields>
         (field (name "LCSC") "C2878713")
@@ -15,13 +15,13 @@
         (field (name "Manufacturer") "Texas Instruments")
         (field (name "JLCPCB_Class") "Extended")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "U1 TL074H")
-        (field (name "Notes") "B.Cu SMT; 40V FET-input quad op-amp; Pin 1 dot on B.SilkS")
+        (field (name "Silkscreen") "TL074H")
+        (field (name "Notes") "TI CMOS/FET-input quad op-amp, zero phase reversal; Alt: TL074CDR C12594")
       </fields>
       <libsource lib="Amplifier_Operational" part=""TL074""/>
     </comp>
     <comp ref="U2">
-      <value>"TL074H"</value>
+      <value>"TL074HIDR"</value>
       <footprint>Package_SO:SOIC-14_3.9x8.7mm_P1.27mm</footprint>
       <fields>
         (field (name "LCSC") "C2878713")
@@ -29,69 +29,13 @@
         (field (name "Manufacturer") "Texas Instruments")
         (field (name "JLCPCB_Class") "Extended")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "U2 TL074H")
-        (field (name "Notes") "B.Cu SMT; 40V FET-input quad op-amp; Pin 1 dot on B.SilkS")
+        (field (name "Silkscreen") "TL074H")
+        (field (name "Notes") "TI CMOS/FET-input quad op-amp, zero phase reversal; Alt: TL074CDR C12594")
       </fields>
       <libsource lib="Amplifier_Operational" part=""TL074""/>
     </comp>
-    <comp ref="C5">
-      <value>"100nF 50V"</value>
-      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C14663")
-        (field (name "MPN") "CC0603KRX7R9BB104")
-        (field (name "Manufacturer") "YAGEO")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100nF")
-        (field (name "Notes") "B.Cu SMT; 100nF 50V X7R 10% 0603 local IC decoupling (<5mm to U1/U2)")
-      </fields>
-      <libsource lib="Device" part=""C""/>
-    </comp>
-    <comp ref="C6">
-      <value>"100nF 50V"</value>
-      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C14663")
-        (field (name "MPN") "CC0603KRX7R9BB104")
-        (field (name "Manufacturer") "YAGEO")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100nF")
-        (field (name "Notes") "B.Cu SMT; 100nF 50V X7R 10% 0603 local IC decoupling (<5mm to U1/U2)")
-      </fields>
-      <libsource lib="Device" part=""C""/>
-    </comp>
-    <comp ref="C7">
-      <value>"100nF 50V"</value>
-      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C14663")
-        (field (name "MPN") "CC0603KRX7R9BB104")
-        (field (name "Manufacturer") "YAGEO")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100nF")
-        (field (name "Notes") "B.Cu SMT; 100nF 50V X7R 10% 0603 local IC decoupling (<5mm to U1/U2)")
-      </fields>
-      <libsource lib="Device" part=""C""/>
-    </comp>
-    <comp ref="C8">
-      <value>"100nF 50V"</value>
-      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C14663")
-        (field (name "MPN") "CC0603KRX7R9BB104")
-        (field (name "Manufacturer") "YAGEO")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100nF")
-        (field (name "Notes") "B.Cu SMT; 100nF 50V X7R 10% 0603 local IC decoupling (<5mm to U1/U2)")
-      </fields>
-      <libsource lib="Device" part=""C""/>
-    </comp>
     <comp ref="J4">
-      <value>"PWR_2x5"</value>
+      <value>"Eurorack_Power_2x5"</value>
       <footprint>Connector_IDC:IDC-Header_2x05_P2.54mm_Vertical</footprint>
       <fields>
         (field (name "LCSC") "C53207560")
@@ -99,94 +43,122 @@
         (field (name "Manufacturer") "JXTCONN")
         (field (name "JLCPCB_Class") "Manual THT")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "J4 PWR")
-        (field (name "Notes") "B.Cu Rear Manual THT; Doepfer A-100 2x5 keyed IDC header (Pins 1-2=-12V_IN RED, 3-8=GND, 9-10=+12V_IN)")
+        (field (name "Silkscreen") "PWR")
+        (field (name "Notes") "Rear B.Cu shrouded 2x5 IDC header; 1-2=-12V_IN (RED), 3-8=GND, 9-10=+12V_IN")
       </fields>
       <libsource lib="Connector_Generic" part=""Conn_02x05_Odd_Even""/>
     </comp>
-    <comp ref="D7">
-      <value>"1N5819WS"</value>
-      <footprint>Diode_SMD:D_SOD-323</footprint>
+    <comp ref="D5">
+      <value>"B5819W"</value>
+      <footprint>Diode_SMD:D_SOD-123</footprint>
       <fields>
-        (field (name "LCSC") "C191023")
-        (field (name "MPN") "1N5819WS")
-        (field (name "Manufacturer") "Guangdong Hottech")
+        (field (name "LCSC") "C8598")
+        (field (name "MPN") "B5819W SL")
+        (field (name "Manufacturer") "Jiangsu Changjing")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D7 1N5819WS")
-        (field (name "Notes") "B.Cu SMT; 40V 1A Schottky reverse-polarity protection; Pad 1 = K (cathode bar on B.SilkS); Alt: C8598 (B5819W SOD-123 Basic)")
+        (field (name "Silkscreen") "B5819W")
+        (field (name "Notes") "40V 1A Schottky (1=K, 2=A); Alt: SOD-323 1N5819WS C191023")
       </fields>
-      <libsource lib="Diode" part=""1N5819WS""/>
+      <libsource lib="Device" part=""D_Schottky""/>
     </comp>
-    <comp ref="D8">
-      <value>"1N5819WS"</value>
-      <footprint>Diode_SMD:D_SOD-323</footprint>
+    <comp ref="D6">
+      <value>"B5819W"</value>
+      <footprint>Diode_SMD:D_SOD-123</footprint>
       <fields>
-        (field (name "LCSC") "C191023")
-        (field (name "MPN") "1N5819WS")
-        (field (name "Manufacturer") "Guangdong Hottech")
+        (field (name "LCSC") "C8598")
+        (field (name "MPN") "B5819W SL")
+        (field (name "Manufacturer") "Jiangsu Changjing")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D8 1N5819WS")
-        (field (name "Notes") "B.Cu SMT; 40V 1A Schottky reverse-polarity protection; Pad 1 = K (cathode bar on B.SilkS); Alt: C8598 (B5819W SOD-123 Basic)")
+        (field (name "Silkscreen") "B5819W")
+        (field (name "Notes") "40V 1A Schottky (1=K, 2=A); Alt: SOD-323 1N5819WS C191023")
       </fields>
-      <libsource lib="Diode" part=""1N5819WS""/>
-    </comp>
-    <comp ref="R28">
-      <value>"10R"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C22859")
-        (field (name "MPN") "0603WAF100JT5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "10R")
-        (field (name "Notes") "B.Cu SMT; 10R 1% 100mW 0603 RC rail damping")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="R29">
-      <value>"10R"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C22859")
-        (field (name "MPN") "0603WAF100JT5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "10R")
-        (field (name "Notes") "B.Cu SMT; 10R 1% 100mW 0603 RC rail damping")
-      </fields>
-      <libsource lib="Device" part=""R""/>
+      <libsource lib="Device" part=""D_Schottky""/>
     </comp>
     <comp ref="C3">
-      <value>"47uF 35V"</value>
+      <value>"22uF 50V"</value>
       <footprint>Capacitor_SMD:CP_Elec_6.3x5.4</footprint>
       <fields>
-        (field (name "LCSC") "C2836440")
-        (field (name "MPN") "RVT47UF35V67RV0039")
+        (field (name "LCSC") "C2836438")
+        (field (name "MPN") "RVT22UF50V67RV0028")
         (field (name "Manufacturer") "KNSCHA")
         (field (name "JLCPCB_Class") "Extended")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "47uF")
-        (field (name "Notes") "B.Cu SMT; +12V_PROT bulk storage (+ -> +12V_PROT, - -> GND); mandatory +/- polarity on B.SilkS; Alt: C2836438 (22uF 50V)")
+        (field (name "Silkscreen") "22uF")
+        (field (name "Notes") "50V SMD electrolytic D6.3xL5.4mm; Alt: 47uF 35V C970678; Pin 1(+)=+12V, Pin 2(-)=GND")
       </fields>
       <libsource lib="Device" part=""C_Polarized""/>
     </comp>
     <comp ref="C4">
-      <value>"47uF 35V"</value>
+      <value>"22uF 50V"</value>
       <footprint>Capacitor_SMD:CP_Elec_6.3x5.4</footprint>
       <fields>
-        (field (name "LCSC") "C2836440")
-        (field (name "MPN") "RVT47UF35V67RV0039")
+        (field (name "LCSC") "C2836438")
+        (field (name "MPN") "RVT22UF50V67RV0028")
         (field (name "Manufacturer") "KNSCHA")
         (field (name "JLCPCB_Class") "Extended")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "47uF")
-        (field (name "Notes") "B.Cu SMT; -12V_PROT bulk storage (+ -> GND, - -> -12V_PROT); mandatory +/- polarity on B.SilkS; Alt: C2836438 (22uF 50V)")
+        (field (name "Silkscreen") "22uF")
+        (field (name "Notes") "50V SMD electrolytic D6.3xL5.4mm; Alt: 47uF 35V C970678; CRITICAL -12V polarity: Pin 1(+)=GND, Pin 2(-)=-12V")
       </fields>
       <libsource lib="Device" part=""C_Polarized""/>
+    </comp>
+    <comp ref="C5">
+      <value>"100nF"</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C14663")
+        (field (name "MPN") "CC0603KRX7R9BB104")
+        (field (name "Manufacturer") "YAGEO")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "100nF")
+        (field (name "Notes") "0603 50V X7R 10% local op-amp bypass; U1.4 +12V bypass")
+      </fields>
+      <libsource lib="Device" part=""C""/>
+    </comp>
+    <comp ref="C6">
+      <value>"100nF"</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C14663")
+        (field (name "MPN") "CC0603KRX7R9BB104")
+        (field (name "Manufacturer") "YAGEO")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "100nF")
+        (field (name "Notes") "0603 50V X7R 10% local op-amp bypass; U1.11 -12V bypass")
+      </fields>
+      <libsource lib="Device" part=""C""/>
+    </comp>
+    <comp ref="C7">
+      <value>"100nF"</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C14663")
+        (field (name "MPN") "CC0603KRX7R9BB104")
+        (field (name "Manufacturer") "YAGEO")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "100nF")
+        (field (name "Notes") "0603 50V X7R 10% local op-amp bypass; U2.4 +12V bypass")
+      </fields>
+      <libsource lib="Device" part=""C""/>
+    </comp>
+    <comp ref="C8">
+      <value>"100nF"</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C14663")
+        (field (name "MPN") "CC0603KRX7R9BB104")
+        (field (name "Manufacturer") "YAGEO")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "100nF")
+        (field (name "Notes") "0603 50V X7R 10% local op-amp bypass; U2.11 -12V bypass")
+      </fields>
+      <libsource lib="Device" part=""C""/>
     </comp>
     <comp ref="J1">
       <value>"IN"</value>
@@ -196,12 +168,54 @@
         (field (name "Manufacturer") "QingPu")
         (field (name "JLCPCB_Class") "Manual THT")
         (field (name "Side") "F.Cu")
-        (field (name "Silkscreen") "J1 IN")
-        (field (name "Notes") "F.Cu Front-Panel Manual THT; 3.5mm Mono Switched Jack (Thonkiconn); TN->GND")
+        (field (name "Silkscreen") "IN")
+        (field (name "Notes") "IN jack; T=IN_TIP, TN=GND, S=GND (Consigned THT)")
       </fields>
       <libsource lib="Connector_Audio" part=""AudioJack2_SwitchT""/>
     </comp>
+    <comp ref="R26">
+      <value>"1k 1W"</value>
+      <footprint>Resistor_SMD:R_2512_6332Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C54315")
+        (field (name "MPN") "25121WF1001T4E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Extended")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1k_1W")
+        (field (name "Notes") "2512 1W 1% fault/surge limiter; Alt: 1210 0.5W C52444")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="C1">
+      <value>"1uF 63V"</value>
+      <footprint>Capacitor_THT:C_Rect_L7.2mm_W6.0mm_P5.00mm</footprint>
+      <fields>
+        (field (name "LCSC") "C328852")
+        (field (name "MPN") "C241J105J2SA201")
+        (field (name "Manufacturer") "XIAMEN FARATRONIC")
+        (field (name "JLCPCB_Class") "Manual THT")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1uF")
+        (field (name "Notes") "Rear B.Cu THT film box cap P=5.0mm; Alt: C3975271 or C92673; Input AC coupling (1.58 Hz HPF)")
+      </fields>
+      <libsource lib="Device" part=""C""/>
+    </comp>
     <comp ref="R1">
+      <value>"100k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C25803")
+        (field (name "MPN") "0603WAF1003T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "100k")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="R27">
       <value>"10k"</value>
       <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
       <fields>
@@ -211,52 +225,39 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
     <comp ref="D9">
-      <value>"BAT54S"</value>
+      <value>"BAV99"</value>
       <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
       <fields>
-        (field (name "LCSC") "C47546")
-        (field (name "MPN") "BAT54S,215")
+        (field (name "LCSC") "C2500")
+        (field (name "MPN") "BAV99,215")
         (field (name "Manufacturer") "Nexperia")
-        (field (name "JLCPCB_Class") "Extended")
+        (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D9 BAT54S")
-        (field (name "Notes") "B.Cu SMT; Pin 1=A (-12V_PROT), Pin 2=K (+12V_PROT), Pin 3=COM; Alt: C19726 (onsemi), C12765 (LRC)")
+        (field (name "Silkscreen") "BAV99")
+        (field (name "Notes") "Physical SOT-23 pinout: 1=A1(-12V), 2=K2(+12V), 3=COM(signal); KiCad symbol names 1/3 inverted")
       </fields>
-      <libsource lib="Diode" part=""BAT54S""/>
-    </comp>
-    <comp ref="C1">
-      <value>"1uF 63V"</value>
-      <footprint>Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2</footprint>
-      <fields>
-        (field (name "LCSC") "C328852")
-        (field (name "MPN") "C241J105J2SA201")
-        (field (name "Manufacturer") "Xiamen Faratronic")
-        (field (name "JLCPCB_Class") "Manual THT")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "1uF")
-        (field (name "Notes") "B.Cu Rear Manual THT; AC input coupling ahead of RV1; P=5.0mm box film; Alt: C3975271 (KNSCHA), C92673 (WIMA)")
-      </fields>
-      <libsource lib="Device" part=""C""/>
-    </comp>
-    <comp ref="RV1">
-      <value>"A100k"</value>
-      <footprint>Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical</footprint>
-      <fields>
-        (field (name "MPN") "RD901F-40-15F-A100K")
-        (field (name "Manufacturer") "Taiwan Alpha")
-        (field (name "JLCPCB_Class") "Manual THT")
-        (field (name "Side") "F.Cu")
-        (field (name "Silkscreen") "RV1 GAIN A100k")
-        (field (name "Notes") "F.Cu Front-Panel Manual THT; 100k Log pot (GAIN); Pin 1=CCW, Pin 2=Wiper, Pin 3=CW")
-      </fields>
-      <libsource lib="Device" part=""R_Potentiometer""/>
+      <libsource lib="Diode" part=""BAV99""/>
     </comp>
     <comp ref="R2">
+      <value>"10k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C25804")
+        (field (name "MPN") "0603WAF1002T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "10k")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="R24">
       <value>"4.7k"</value>
       <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
       <fields>
@@ -266,21 +267,48 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "4.7k")
-        (field (name "Notes") "B.Cu SMT; 4.7k 1% 100mW 0603 GAIN floor")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
+    <comp ref="RV1">
+      <value>"A100k"</value>
+      <footprint>Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical</footprint>
+      <fields>
+        (field (name "MPN") "RD901F-40-00D")
+        (field (name "Manufacturer") "Alpha")
+        (field (name "JLCPCB_Class") "Manual THT")
+        (field (name "Side") "F.Cu")
+        (field (name "Silkscreen") "GAIN")
+        (field (name "Notes") "1=GAIN_MID, 2+3=V_AMP; CW=higher gain; Alt: Alps RK09K (Consigned THT)")
+      </fields>
+      <libsource lib="Device" part=""R_Potentiometer""/>
+    </comp>
+    <comp ref="C9">
+      <value>"22pF"</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C1653")
+        (field (name "MPN") "CL10C220JB8NNNC")
+        (field (name "Manufacturer") "Samsung Electro-Mechanics")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "22pF")
+        (field (name "Notes") "0603 50V C0G 5% ultrasonic compensation; U1A ultrasonic compensation")
+      </fields>
+      <libsource lib="Device" part=""C""/>
+    </comp>
     <comp ref="R3">
-      <value>"1M"</value>
+      <value>"10k"</value>
       <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
       <fields>
-        (field (name "LCSC") "C22935")
-        (field (name "MPN") "0603WAF1004T5E")
+        (field (name "LCSC") "C25804")
+        (field (name "MPN") "0603WAF1002T5E")
         (field (name "Manufacturer") "UNI-ROYAL")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "1M")
-        (field (name "Notes") "B.Cu SMT; 1M 1% 100mW 0603 U1A+ open-wiper pull-down")
+        (field (name "Silkscreen") "10k")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
@@ -294,37 +322,23 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
     <comp ref="R5">
-      <value>"100k"</value>
+      <value>"10k"</value>
       <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
       <fields>
-        (field (name "LCSC") "C25803")
-        (field (name "MPN") "0603WAF1003T5E")
+        (field (name "LCSC") "C25804")
+        (field (name "MPN") "0603WAF1002T5E")
         (field (name "Manufacturer") "UNI-ROYAL")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100k")
-        (field (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
+        (field (name "Silkscreen") "10k")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="C9">
-      <value>"22pF 50V"</value>
-      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C1653")
-        (field (name "MPN") "CL10C220JB8NNNC")
-        (field (name "Manufacturer") "Samsung Electro-Mechanics")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "22pF")
-        (field (name "Notes") "B.Cu SMT; 22pF 50V C0G 5% 0603 U1A HF compensation (72kHz)")
-      </fields>
-      <libsource lib="Device" part=""C""/>
     </comp>
     <comp ref="R6">
       <value>"10k"</value>
@@ -336,7 +350,7 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
@@ -350,7 +364,7 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
@@ -364,9 +378,119 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "20k")
-        (field (name "Notes") "B.Cu SMT; 20k 1% 100mW 0603 thick film (1.00x rectifier)")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="D1">
+      <value>"1N4148W"</value>
+      <footprint>Diode_SMD:D_SOD-123</footprint>
+      <fields>
+        (field (name "LCSC") "C81598")
+        (field (name "MPN") "1N4148W")
+        (field (name "Manufacturer") "ST (Semtech)")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1N4148W")
+        (field (name "Notes") "SOD-123 fast diode (1=K, 2=A); Alt: SOD-323 1N4148WS C2128")
+      </fields>
+      <libsource lib="Diode" part=""1N4148W""/>
+    </comp>
+    <comp ref="D2">
+      <value>"1N4148W"</value>
+      <footprint>Diode_SMD:D_SOD-123</footprint>
+      <fields>
+        (field (name "LCSC") "C81598")
+        (field (name "MPN") "1N4148W")
+        (field (name "Manufacturer") "ST (Semtech)")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1N4148W")
+        (field (name "Notes") "SOD-123 fast diode (1=K, 2=A); Alt: SOD-323 1N4148WS C2128")
+      </fields>
+      <libsource lib="Diode" part=""1N4148W""/>
+    </comp>
+    <comp ref="D3">
+      <value>"1N4148W"</value>
+      <footprint>Diode_SMD:D_SOD-123</footprint>
+      <fields>
+        (field (name "LCSC") "C81598")
+        (field (name "MPN") "1N4148W")
+        (field (name "Manufacturer") "ST (Semtech)")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1N4148W")
+        (field (name "Notes") "SOD-123 fast diode (1=K, 2=A); Alt: SOD-323 1N4148WS C2128")
+      </fields>
+      <libsource lib="Diode" part=""1N4148W""/>
+    </comp>
+    <comp ref="R25">
+      <value>"330R"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C23138")
+        (field (name "MPN") "0603WAF3300T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "330R")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="RV2">
+      <value>"A50k"</value>
+      <footprint>Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical</footprint>
+      <fields>
+        (field (name "MPN") "RD901F-40-00D")
+        (field (name "Manufacturer") "Alpha")
+        (field (name "JLCPCB_Class") "Manual THT")
+        (field (name "Side") "F.Cu")
+        (field (name "Silkscreen") "ATK")
+        (field (name "Notes") "1=ATK_POT_IN, 2+3=ENV_CAP; CW=slower attack; Alt: Alps RK09K (Consigned THT)")
+      </fields>
+      <libsource lib="Device" part=""R_Potentiometer""/>
+    </comp>
+    <comp ref="C2">
+      <value>"1uF 63V"</value>
+      <footprint>Capacitor_THT:C_Rect_L7.2mm_W6.0mm_P5.00mm</footprint>
+      <fields>
+        (field (name "LCSC") "C328852")
+        (field (name "MPN") "C241J105J2SA201")
+        (field (name "Manufacturer") "XIAMEN FARATRONIC")
+        (field (name "JLCPCB_Class") "Manual THT")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1uF")
+        (field (name "Notes") "Rear B.Cu THT film box cap P=5.0mm; Alt: C3975271 or C92673; Envelope storage timing cap")
+      </fields>
+      <libsource lib="Device" part=""C""/>
+    </comp>
+    <comp ref="R10">
+      <value>"10k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C25804")
+        (field (name "MPN") "0603WAF1002T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "10k")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="RV3">
+      <value>"A1M"</value>
+      <footprint>Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical</footprint>
+      <fields>
+        (field (name "MPN") "RD901F-40-00D")
+        (field (name "Manufacturer") "Alpha")
+        (field (name "JLCPCB_Class") "Manual THT")
+        (field (name "Side") "F.Cu")
+        (field (name "Silkscreen") "REL")
+        (field (name "Notes") "1=REL_MID, 2+3=GND; CW=longer release; Alt: Alps RK09K (Consigned THT)")
+      </fields>
+      <libsource lib="Device" part=""R_Potentiometer""/>
     </comp>
     <comp ref="R9">
       <value>"10k"</value>
@@ -378,329 +502,11 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="R10">
-      <value>"20k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C4184")
-        (field (name "MPN") "0603WAF2002T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "20k")
-        (field (name "Notes") "B.Cu SMT; 20k 1% 100mW 0603 thick film (1.00x rectifier)")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="D1">
-      <value>"1N4148WS"</value>
-      <footprint>Diode_SMD:D_SOD-323</footprint>
-      <fields>
-        (field (name "LCSC") "C2128")
-        (field (name "MPN") "1N4148WS")
-        (field (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D1 1N4148WS")
-        (field (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
-      </fields>
-      <libsource lib="Diode" part=""1N4148WS""/>
-    </comp>
-    <comp ref="D2">
-      <value>"1N4148WS"</value>
-      <footprint>Diode_SMD:D_SOD-323</footprint>
-      <fields>
-        (field (name "LCSC") "C2128")
-        (field (name "MPN") "1N4148WS")
-        (field (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D2 1N4148WS")
-        (field (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
-      </fields>
-      <libsource lib="Diode" part=""1N4148WS""/>
-    </comp>
-    <comp ref="D3">
-      <value>"1N4148WS"</value>
-      <footprint>Diode_SMD:D_SOD-323</footprint>
-      <fields>
-        (field (name "LCSC") "C2128")
-        (field (name "MPN") "1N4148WS")
-        (field (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D3 1N4148WS")
-        (field (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
-      </fields>
-      <libsource lib="Diode" part=""1N4148WS""/>
-    </comp>
-    <comp ref="D5">
-      <value>"1N4148WS"</value>
-      <footprint>Diode_SMD:D_SOD-323</footprint>
-      <fields>
-        (field (name "LCSC") "C2128")
-        (field (name "MPN") "1N4148WS")
-        (field (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D5 1N4148WS")
-        (field (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
-      </fields>
-      <libsource lib="Diode" part=""1N4148WS""/>
-    </comp>
-    <comp ref="R11">
-      <value>"200k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25811")
-        (field (name "MPN") "0603WAF2003T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "200k")
-        (field (name "Notes") "B.Cu SMT; 200k 1% 100mW 0603 U2C peak-detector feedback")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="C10">
-      <value>"100pF 50V"</value>
-      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C14858")
-        (field (name "MPN") "CL10C101JB8NNNC")
-        (field (name "Manufacturer") "Samsung Electro-Mechanics")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100pF")
-        (field (name "Notes") "B.Cu SMT; 100pF 50V C0G 5% 0603 U2C peak-detector loop comp (>70deg PM)")
-      </fields>
-      <libsource lib="Device" part=""C""/>
-    </comp>
-    <comp ref="R12">
-      <value>"150R"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C22808")
-        (field (name "MPN") "0603WAF1500T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "150R")
-        (field (name "Notes") "B.Cu SMT; 150R 1% 100mW 0603 minimum attack protection")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="RV2">
-      <value>"A50k"</value>
-      <footprint>Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical</footprint>
-      <fields>
-        (field (name "MPN") "RD901F-40-15F-A50K")
-        (field (name "Manufacturer") "Taiwan Alpha")
-        (field (name "JLCPCB_Class") "Manual THT")
-        (field (name "Side") "F.Cu")
-        (field (name "Silkscreen") "RV2 ATK A50k")
-        (field (name "Notes") "F.Cu Front-Panel Manual THT; 50k Log pot (ATK); Pin 1=CCW, Pin 2=Wiper, Pin 3=CW")
-      </fields>
-      <libsource lib="Device" part=""R_Potentiometer""/>
-    </comp>
-    <comp ref="C2">
-      <value>"1uF 63V"</value>
-      <footprint>Capacitor_THT:C_Rect_L7.2mm_W5.5mm_P5.00mm_FKS2_FKP2_MKS2_MKP2</footprint>
-      <fields>
-        (field (name "LCSC") "C328852")
-        (field (name "MPN") "C241J105J2SA201")
-        (field (name "Manufacturer") "Xiamen Faratronic")
-        (field (name "JLCPCB_Class") "Manual THT")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "1uF")
-        (field (name "Notes") "B.Cu Rear Manual THT; Envelope hold timing cap (ENV_CAP); P=5.0mm box film; Alt: C3975271 (KNSCHA), C92673 (WIMA)")
-      </fields>
-      <libsource lib="Device" part=""C""/>
-    </comp>
-    <comp ref="R13">
-      <value>"10k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25804")
-        (field (name "MPN") "0603WAF1002T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="RV3">
-      <value>"A1M"</value>
-      <footprint>Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical</footprint>
-      <fields>
-        (field (name "MPN") "RD901F-40-15F-A1M")
-        (field (name "Manufacturer") "Taiwan Alpha")
-        (field (name "JLCPCB_Class") "Manual THT")
-        (field (name "Side") "F.Cu")
-        (field (name "Silkscreen") "RV3 REL A1M")
-        (field (name "Notes") "F.Cu Front-Panel Manual THT; 1M Log pot (Release); Pin 1=CCW, Pin 2=Wiper, Pin 3=CW")
-      </fields>
-      <libsource lib="Device" part=""R_Potentiometer""/>
-    </comp>
-    <comp ref="R14">
-      <value>"4.7M"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C23163")
-        (field (name "MPN") "0603WAF4704T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Preferred Extended")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "4.7M")
-        (field (name "Notes") "B.Cu SMT; 4.7M 1% 100mW 0603 Release open-wiper safety bleed")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="R15">
-      <value>"100k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25803")
-        (field (name "MPN") "0603WAF1003T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100k")
-        (field (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="R16">
-      <value>"100k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25803")
-        (field (name "MPN") "0603WAF1003T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100k")
-        (field (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="R17">
-      <value>"6.8k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C23212")
-        (field (name "MPN") "0603WAF6801T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "6.8k")
-        (field (name "Notes") "B.Cu SMT; 6.8k 1% 100mW 0603 thick film (OFFSET divider)")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="R18">
-      <value>"6.8k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C23212")
-        (field (name "MPN") "0603WAF6801T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "6.8k")
-        (field (name "Notes") "B.Cu SMT; 6.8k 1% 100mW 0603 thick film (OFFSET divider)")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="RV4">
-      <value>"B10k"</value>
-      <footprint>Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical</footprint>
-      <fields>
-        (field (name "MPN") "RD901F-40-15F-B10K")
-        (field (name "Manufacturer") "Taiwan Alpha")
-        (field (name "JLCPCB_Class") "Manual THT")
-        (field (name "Side") "F.Cu")
-        (field (name "Silkscreen") "RV4 OFFSET B10k")
-        (field (name "Notes") "F.Cu Front-Panel Manual THT; 10k Linear pot (OFFSET); Pin 1=CCW (+12V leg), Pin 2=Wiper, Pin 3=CW (-12V leg)")
-      </fields>
-      <libsource lib="Device" part=""R_Potentiometer""/>
-    </comp>
-    <comp ref="R19">
-      <value>"100k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25803")
-        (field (name "MPN") "0603WAF1003T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100k")
-        (field (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
     <comp ref="R20">
-      <value>"100k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25803")
-        (field (name "MPN") "0603WAF1003T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "100k")
-        (field (name "Notes") "B.Cu SMT; 100k 1% 100mW 0603 thick film")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="D10">
-      <value>"BAT54S"</value>
-      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
-      <fields>
-        (field (name "LCSC") "C47546")
-        (field (name "MPN") "BAT54S,215")
-        (field (name "Manufacturer") "Nexperia")
-        (field (name "JLCPCB_Class") "Extended")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D10 BAT54S")
-        (field (name "Notes") "B.Cu SMT; Pin 1=A (-12V_PROT), Pin 2=K (+12V_PROT), Pin 3=COM; Alt: C19726 (onsemi), C12765 (LRC)")
-      </fields>
-      <libsource lib="Diode" part=""BAT54S""/>
-    </comp>
-    <comp ref="R21">
-      <value>"1k 1W"</value>
-      <footprint>Resistor_SMD:R_2512_6332Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C54315")
-        (field (name "MPN") "25121WF1001T4E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Extended")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "1k")
-        (field (name "Notes") "B.Cu SMT; 1k 1% 1W 2512 fault-rated output build-out; keep C54315")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="J2">
-      <value>"OUT"</value>
-      <footprint>Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles</footprint>
-      <fields>
-        (field (name "MPN") "WQP-PJ398SM")
-        (field (name "Manufacturer") "QingPu")
-        (field (name "JLCPCB_Class") "Manual THT")
-        (field (name "Side") "F.Cu")
-        (field (name "Silkscreen") "J2 OUT")
-        (field (name "Notes") "F.Cu Front-Panel Manual THT; 3.5mm Mono Switched Jack (Thonkiconn); TN=NC")
-      </fields>
-      <libsource lib="Connector_Audio" part=""AudioJack2_SwitchT""/>
-    </comp>
-    <comp ref="R22">
       <value>"10k"</value>
       <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
       <fields>
@@ -710,94 +516,11 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
-    <comp ref="R23">
-      <value>"10k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25804")
-        (field (name "MPN") "0603WAF1002T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="D11">
-      <value>"BAT54S"</value>
-      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
-      <fields>
-        (field (name "LCSC") "C47546")
-        (field (name "MPN") "BAT54S,215")
-        (field (name "Manufacturer") "Nexperia")
-        (field (name "JLCPCB_Class") "Extended")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D11 BAT54S")
-        (field (name "Notes") "B.Cu SMT; Pin 1=A (-12V_PROT), Pin 2=K (+12V_PROT), Pin 3=COM; Alt: C19726 (onsemi), C12765 (LRC)")
-      </fields>
-      <libsource lib="Diode" part=""BAT54S""/>
-    </comp>
-    <comp ref="R24">
-      <value>"1k 1W"</value>
-      <footprint>Resistor_SMD:R_2512_6332Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C54315")
-        (field (name "MPN") "25121WF1001T4E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Extended")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "1k")
-        (field (name "Notes") "B.Cu SMT; 1k 1% 1W 2512 fault-rated output build-out; keep C54315")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="J3">
-      <value>"INV_OUT"</value>
-      <footprint>Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles</footprint>
-      <fields>
-        (field (name "MPN") "WQP-PJ398SM")
-        (field (name "Manufacturer") "QingPu")
-        (field (name "JLCPCB_Class") "Manual THT")
-        (field (name "Side") "F.Cu")
-        (field (name "Silkscreen") "J3 INV_OUT")
-        (field (name "Notes") "F.Cu Front-Panel Manual THT; 3.5mm Mono Switched Jack (Thonkiconn); TN=NC")
-      </fields>
-      <libsource lib="Connector_Audio" part=""AudioJack2_SwitchT""/>
-    </comp>
-    <comp ref="R25">
-      <value>"10k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25804")
-        (field (name "MPN") "0603WAF1002T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="R26">
-      <value>"10k"</value>
-      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
-      <fields>
-        (field (name "LCSC") "C25804")
-        (field (name "MPN") "0603WAF1002T5E")
-        (field (name "Manufacturer") "UNI-ROYAL")
-        (field (name "JLCPCB_Class") "Basic")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "10k")
-        (field (name "Notes") "B.Cu SMT; 10k 1% 100mW 0603 thick film")
-      </fields>
-      <libsource lib="Device" part=""R""/>
-    </comp>
-    <comp ref="R27">
+    <comp ref="R11">
       <value>"1k"</value>
       <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
       <fields>
@@ -807,397 +530,590 @@
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
         (field (name "Silkscreen") "1k")
-        (field (name "Notes") "B.Cu SMT; 1k 1% 100mW 0603 LED constant-current sense")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
       <libsource lib="Device" part=""R""/>
     </comp>
-    <comp ref="D6">
-      <value>"1N4148WS"</value>
-      <footprint>Diode_SMD:D_SOD-323</footprint>
+    <comp ref="R12">
+      <value>"1k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
       <fields>
-        (field (name "LCSC") "C2128")
-        (field (name "MPN") "1N4148WS")
-        (field (name "Manufacturer") "Jiangsu Changjing (JSCJ)")
+        (field (name "LCSC") "C21190")
+        (field (name "MPN") "0603WAF1001T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
         (field (name "JLCPCB_Class") "Basic")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "D6 1N4148WS")
-        (field (name "Notes") "B.Cu SMT; Pad 1 = K (0.25mm cathode bar on B.SilkS); Alt: C81598 (1N4148W SOD-123 Basic)")
+        (field (name "Silkscreen") "1k")
+        (field (name "Notes") "0603 1% 100mW thick film")
       </fields>
-      <libsource lib="Diode" part=""1N4148WS""/>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="RV4">
+      <value>"B10k"</value>
+      <footprint>Potentiometer_THT:Potentiometer_Alpha_RD901F-40-00D_Single_Vertical</footprint>
+      <fields>
+        (field (name "MPN") "RD901F-40-00D")
+        (field (name "Manufacturer") "Alpha")
+        (field (name "JLCPCB_Class") "Manual THT")
+        (field (name "Side") "F.Cu")
+        (field (name "Silkscreen") "OFFSET")
+        (field (name "Notes") "1=OFFSET_TOP(+12V), 2=WIPER, 3=OFFSET_BOT(-12V); Alt: Alps RK09K (Consigned THT)")
+      </fields>
+      <libsource lib="Device" part=""R_Potentiometer""/>
+    </comp>
+    <comp ref="R13">
+      <value>"22k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C31850")
+        (field (name "MPN") "0603WAF2202T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "22k")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="R15">
+      <value>"10k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C25804")
+        (field (name "MPN") "0603WAF1002T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "10k")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="C10">
+      <value>"47pF"</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C1671")
+        (field (name "MPN") "CL10C470JB8NNNC")
+        (field (name "Manufacturer") "Samsung Electro-Mechanics")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "47pF")
+        (field (name "Notes") "0603 50V C0G 5% op-amp stabilization; U1D output stage stabilization")
+      </fields>
+      <libsource lib="Device" part=""C""/>
+    </comp>
+    <comp ref="R16">
+      <value>"1k 1W"</value>
+      <footprint>Resistor_SMD:R_2512_6332Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C54315")
+        (field (name "MPN") "25121WF1001T4E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Extended")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1k_1W")
+        (field (name "Notes") "2512 1W 1% fault/surge limiter; Alt: 1210 0.5W C52444")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="D7">
+      <value>"BAV99"</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <fields>
+        (field (name "LCSC") "C2500")
+        (field (name "MPN") "BAV99,215")
+        (field (name "Manufacturer") "Nexperia")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "BAV99")
+        (field (name "Notes") "Physical SOT-23 pinout: 1=A1(-12V), 2=K2(+12V), 3=COM(signal); KiCad symbol names 1/3 inverted")
+      </fields>
+      <libsource lib="Diode" part=""BAV99""/>
+    </comp>
+    <comp ref="J2">
+      <value>"OUT"</value>
+      <footprint>Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles</footprint>
+      <fields>
+        (field (name "MPN") "WQP-PJ398SM")
+        (field (name "Manufacturer") "QingPu")
+        (field (name "JLCPCB_Class") "Manual THT")
+        (field (name "Side") "F.Cu")
+        (field (name "Silkscreen") "OUT")
+        (field (name "Notes") "OUT jack; T=OUT_TIP, TN=NC (isolated!), S=GND (Consigned THT)")
+      </fields>
+      <libsource lib="Connector_Audio" part=""AudioJack2_SwitchT""/>
+    </comp>
+    <comp ref="R17">
+      <value>"10k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C25804")
+        (field (name "MPN") "0603WAF1002T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "10k")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="R18">
+      <value>"10k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C25804")
+        (field (name "MPN") "0603WAF1002T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "10k")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="C11">
+      <value>"47pF"</value>
+      <footprint>Capacitor_SMD:C_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C1671")
+        (field (name "MPN") "CL10C470JB8NNNC")
+        (field (name "Manufacturer") "Samsung Electro-Mechanics")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "47pF")
+        (field (name "Notes") "0603 50V C0G 5% op-amp stabilization; U2A inverter stabilization")
+      </fields>
+      <libsource lib="Device" part=""C""/>
+    </comp>
+    <comp ref="R19">
+      <value>"1k 1W"</value>
+      <footprint>Resistor_SMD:R_2512_6332Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C54315")
+        (field (name "MPN") "25121WF1001T4E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Extended")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1k_1W")
+        (field (name "Notes") "2512 1W 1% fault/surge limiter; Alt: 1210 0.5W C52444")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
+    <comp ref="D8">
+      <value>"BAV99"</value>
+      <footprint>Package_TO_SOT_SMD:SOT-23</footprint>
+      <fields>
+        (field (name "LCSC") "C2500")
+        (field (name "MPN") "BAV99,215")
+        (field (name "Manufacturer") "Nexperia")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "BAV99")
+        (field (name "Notes") "Physical SOT-23 pinout: 1=A1(-12V), 2=K2(+12V), 3=COM(signal); KiCad symbol names 1/3 inverted")
+      </fields>
+      <libsource lib="Diode" part=""BAV99""/>
+    </comp>
+    <comp ref="J3">
+      <value>"INV_OUT"</value>
+      <footprint>Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles</footprint>
+      <fields>
+        (field (name "MPN") "WQP-PJ398SM")
+        (field (name "Manufacturer") "QingPu")
+        (field (name "JLCPCB_Class") "Manual THT")
+        (field (name "Side") "F.Cu")
+        (field (name "Silkscreen") "INV_OUT")
+        (field (name "Notes") "INV_OUT jack; T=INV_OUT_TIP, TN=NC, S=GND (Consigned THT)")
+      </fields>
+      <libsource lib="Connector_Audio" part=""AudioJack2_SwitchT""/>
     </comp>
     <comp ref="D4">
-      <value>"3mm Green LED"</value>
+      <value>"LED_3mm_YG"</value>
       <footprint>LED_THT:LED_D3.0mm</footprint>
       <fields>
         (field (name "LCSC") "C85161")
         (field (name "MPN") "204-10SYGD/S530-E3")
-        (field (name "Manufacturer") "Everlight")
+        (field (name "Manufacturer") "Everlight Elec")
         (field (name "JLCPCB_Class") "Manual THT")
         (field (name "Side") "F.Cu")
-        (field (name "Silkscreen") "D4 ENV")
-        (field (name "Notes") "F.Cu Front-Panel Manual THT; Pin 1 rect = Cathode (K), Pin 2 round = Anode (A); Alt LCSC: C84774 (Red), C85160 (Yellow)")
+        (field (name "Silkscreen") "ENV")
+        (field (name "Notes") "3mm Yellow-Green diffused LED (1=K, 2=A); F.Cu panel-aligned")
       </fields>
       <libsource lib="Device" part=""LED""/>
     </comp>
+    <comp ref="D10">
+      <value>"1N4148W"</value>
+      <footprint>Diode_SMD:D_SOD-123</footprint>
+      <fields>
+        (field (name "LCSC") "C81598")
+        (field (name "MPN") "1N4148W")
+        (field (name "Manufacturer") "ST (Semtech)")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "1N4148W")
+        (field (name "Notes") "SOD-123 fast diode (1=K, 2=A); Alt: SOD-323 1N4148WS C2128")
+      </fields>
+      <libsource lib="Diode" part=""1N4148W""/>
+    </comp>
+    <comp ref="R21">
+      <value>"3.3k"</value>
+      <footprint>Resistor_SMD:R_0603_1608Metric</footprint>
+      <fields>
+        (field (name "LCSC") "C22978")
+        (field (name "MPN") "0603WAF3301T5E")
+        (field (name "Manufacturer") "UNI-ROYAL")
+        (field (name "JLCPCB_Class") "Basic")
+        (field (name "Side") "B.Cu")
+        (field (name "Silkscreen") "3.3k")
+        (field (name "Notes") "0603 1% 100mW thick film")
+      </fields>
+      <libsource lib="Device" part=""R""/>
+    </comp>
     <comp ref="TP1">
-      <value>"+12V_PROT"</value>
-      <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
-      <fields>
-        (field (name "LCSC") "C5199801")
-        (field (name "MPN") "RH-5001")
-        (field (name "Manufacturer") "Ronghe")
-        (field (name "JLCPCB_Class") "Manual THT (DNP)")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "TP1 +12V_PROT")
-        (field (name "Notes") "DNP — Optional rear B.Cu test point (+12V_PROT); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
-      </fields>
-      <libsource lib="Connector" part=""TestPoint""/>
-    </comp>
-    <comp ref="TP2">
-      <value>"-12V_PROT"</value>
-      <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
-      <fields>
-        (field (name "LCSC") "C5199801")
-        (field (name "MPN") "RH-5001")
-        (field (name "Manufacturer") "Ronghe")
-        (field (name "JLCPCB_Class") "Manual THT (DNP)")
-        (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "TP2 -12V_PROT")
-        (field (name "Notes") "DNP — Optional rear B.Cu test point (-12V_PROT); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
-      </fields>
-      <libsource lib="Connector" part=""TestPoint""/>
-    </comp>
-    <comp ref="TP3">
       <value>"GND"</value>
       <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
       <fields>
         (field (name "LCSC") "C5199801")
         (field (name "MPN") "RH-5001")
-        (field (name "Manufacturer") "Ronghe")
-        (field (name "JLCPCB_Class") "Manual THT (DNP)")
+        (field (name "Manufacturer") "ronghe")
+        (field (name "JLCPCB_Class") "DNP THT")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "TP3 GND")
-        (field (name "Notes") "DNP — Optional rear B.Cu test point (GND); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
+        (field (name "Notes") "DNP optional rear test point (1.0mm drill / 2.0mm pad, RH-5001)")
+        (field (name "Silkscreen") "GND")
+      </fields>
+      <libsource lib="Connector" part=""TestPoint""/>
+    </comp>
+    <comp ref="TP2">
+      <value>"+12V"</value>
+      <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
+      <fields>
+        (field (name "LCSC") "C5199801")
+        (field (name "MPN") "RH-5001")
+        (field (name "Manufacturer") "ronghe")
+        (field (name "JLCPCB_Class") "DNP THT")
+        (field (name "Side") "B.Cu")
+        (field (name "Notes") "DNP optional rear test point (1.0mm drill / 2.0mm pad, RH-5001)")
+        (field (name "Silkscreen") "+12V")
+      </fields>
+      <libsource lib="Connector" part=""TestPoint""/>
+    </comp>
+    <comp ref="TP3">
+      <value>"-12V"</value>
+      <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
+      <fields>
+        (field (name "LCSC") "C5199801")
+        (field (name "MPN") "RH-5001")
+        (field (name "Manufacturer") "ronghe")
+        (field (name "JLCPCB_Class") "DNP THT")
+        (field (name "Side") "B.Cu")
+        (field (name "Notes") "DNP optional rear test point (1.0mm drill / 2.0mm pad, RH-5001)")
+        (field (name "Silkscreen") "-12V")
       </fields>
       <libsource lib="Connector" part=""TestPoint""/>
     </comp>
     <comp ref="TP4">
-      <value>"V_GAIN"</value>
+      <value>"IN_BUF"</value>
       <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
       <fields>
         (field (name "LCSC") "C5199801")
         (field (name "MPN") "RH-5001")
-        (field (name "Manufacturer") "Ronghe")
-        (field (name "JLCPCB_Class") "Manual THT (DNP)")
+        (field (name "Manufacturer") "ronghe")
+        (field (name "JLCPCB_Class") "DNP THT")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "TP4 V_GAIN")
-        (field (name "Notes") "DNP — Optional rear B.Cu test point (V_GAIN); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
+        (field (name "Notes") "DNP optional rear test point (1.0mm drill / 2.0mm pad, RH-5001)")
+        (field (name "Silkscreen") "IN_BUF")
       </fields>
       <libsource lib="Connector" part=""TestPoint""/>
     </comp>
     <comp ref="TP5">
-      <value>"V_RECT"</value>
+      <value>"V_AMP"</value>
       <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
       <fields>
         (field (name "LCSC") "C5199801")
         (field (name "MPN") "RH-5001")
-        (field (name "Manufacturer") "Ronghe")
-        (field (name "JLCPCB_Class") "Manual THT (DNP)")
+        (field (name "Manufacturer") "ronghe")
+        (field (name "JLCPCB_Class") "DNP THT")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "TP5 V_RECT")
-        (field (name "Notes") "DNP — Optional rear B.Cu test point (V_RECT); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
+        (field (name "Notes") "DNP optional rear test point (1.0mm drill / 2.0mm pad, RH-5001)")
+        (field (name "Silkscreen") "V_AMP")
       </fields>
       <libsource lib="Connector" part=""TestPoint""/>
     </comp>
     <comp ref="TP6">
-      <value>"V_ENV_BUF"</value>
+      <value>"V_FWR"</value>
       <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
       <fields>
         (field (name "LCSC") "C5199801")
         (field (name "MPN") "RH-5001")
-        (field (name "Manufacturer") "Ronghe")
-        (field (name "JLCPCB_Class") "Manual THT (DNP)")
+        (field (name "Manufacturer") "ronghe")
+        (field (name "JLCPCB_Class") "DNP THT")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "TP6 V_ENV_BUF")
-        (field (name "Notes") "DNP — Optional rear B.Cu test point (V_ENV_BUF); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
+        (field (name "Notes") "DNP optional rear test point (1.0mm drill / 2.0mm pad, RH-5001)")
+        (field (name "Silkscreen") "V_FWR")
       </fields>
       <libsource lib="Connector" part=""TestPoint""/>
     </comp>
     <comp ref="TP7">
-      <value>"V_OUT_BUF"</value>
+      <value>"ENV_CAP"</value>
       <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
       <fields>
         (field (name "LCSC") "C5199801")
         (field (name "MPN") "RH-5001")
-        (field (name "Manufacturer") "Ronghe")
-        (field (name "JLCPCB_Class") "Manual THT (DNP)")
+        (field (name "Manufacturer") "ronghe")
+        (field (name "JLCPCB_Class") "DNP THT")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "TP7 V_OUT_BUF")
-        (field (name "Notes") "DNP — Optional rear B.Cu test point (V_OUT_BUF); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
+        (field (name "Notes") "DNP optional rear test point (1.0mm drill / 2.0mm pad, RH-5001)")
+        (field (name "Silkscreen") "ENV_CAP")
       </fields>
       <libsource lib="Connector" part=""TestPoint""/>
     </comp>
     <comp ref="TP8">
-      <value>"V_INV_BUF"</value>
+      <value>"V_OUT_PRE"</value>
       <footprint>TestPoint:TestPoint_Keystone_5000-5004_Miniature</footprint>
       <fields>
         (field (name "LCSC") "C5199801")
         (field (name "MPN") "RH-5001")
-        (field (name "Manufacturer") "Ronghe")
-        (field (name "JLCPCB_Class") "Manual THT (DNP)")
+        (field (name "Manufacturer") "ronghe")
+        (field (name "JLCPCB_Class") "DNP THT")
         (field (name "Side") "B.Cu")
-        (field (name "Silkscreen") "TP8 V_INV_BUF")
-        (field (name "Notes") "DNP — Optional rear B.Cu test point (V_INV_BUF); Ronghe RH-5001 (C5199801), bare 1.0mm plated hole if unpopulated")
+        (field (name "Notes") "DNP optional rear test point (1.0mm drill / 2.0mm pad, RH-5001)")
+        (field (name "Silkscreen") "V_OUT_PRE")
       </fields>
       <libsource lib="Connector" part=""TestPoint""/>
     </comp>
   </components>
   <nets>
     <net code="0" name="+12V_IN">
-      <node ref="D7" pin="2"/>
       <node ref="J4" pin="10"/>
       <node ref="J4" pin="9"/>
+      <node ref="D5" pin="2"/>
     </net>
     <net code="1" name="-12V_IN">
-      <node ref="D8" pin="1"/>
       <node ref="J4" pin="2"/>
+      <node ref="D6" pin="1"/>
       <node ref="J4" pin="1"/>
     </net>
-    <net code="2" name="+12V_FILT_IN">
-      <node ref="D7" pin="1"/>
-      <node ref="R28" pin="1"/>
-    </net>
-    <net code="3" name="-12V_FILT_IN">
-      <node ref="D8" pin="2"/>
-      <node ref="R29" pin="1"/>
-    </net>
-    <net code="4" name="+12V_PROT">
+    <net code="2" name="+12V">
       <node ref="C7" pin="1"/>
-      <node ref="R17" pin="1"/>
-      <node ref="U1" pin="4"/>
-      <node ref="C3" pin="1"/>
-      <node ref="C5" pin="1"/>
-      <node ref="D11" pin="2"/>
-      <node ref="D10" pin="2"/>
-      <node ref="R28" pin="2"/>
-      <node ref="U2" pin="4"/>
       <node ref="D9" pin="2"/>
-      <node ref="TP1" pin="1"/>
-    </net>
-    <net code="5" name="-12V_PROT">
-      <node ref="D10" pin="1"/>
-      <node ref="U2" pin="11"/>
-      <node ref="D9" pin="1"/>
-      <node ref="C4" pin="2"/>
-      <node ref="U1" pin="11"/>
-      <node ref="R29" pin="2"/>
-      <node ref="C6" pin="1"/>
-      <node ref="D11" pin="1"/>
-      <node ref="R18" pin="1"/>
+      <node ref="C5" pin="1"/>
+      <node ref="U1" pin="4"/>
       <node ref="TP2" pin="1"/>
+      <node ref="D7" pin="2"/>
+      <node ref="C3" pin="1"/>
+      <node ref="D5" pin="1"/>
+      <node ref="R11" pin="1"/>
+      <node ref="D8" pin="2"/>
+      <node ref="U2" pin="4"/>
+    </net>
+    <net code="3" name="-12V">
+      <node ref="C6" pin="1"/>
+      <node ref="R12" pin="2"/>
+      <node ref="U2" pin="11"/>
+      <node ref="D8" pin="1"/>
+      <node ref="U1" pin="11"/>
+      <node ref="D9" pin="1"/>
+      <node ref="TP3" pin="1"/>
+      <node ref="C4" pin="2"/>
+      <node ref="D7" pin="1"/>
+      <node ref="D6" pin="2"/>
       <node ref="C8" pin="1"/>
     </net>
-    <net code="6" name="GND">
-      <node ref="C6" pin="2"/>
-      <node ref="J3" pin="S"/>
-      <node ref="J4" pin="6"/>
-      <node ref="J1" pin="TN"/>
-      <node ref="R14" pin="2"/>
-      <node ref="J4" pin="7"/>
-      <node ref="TP3" pin="1"/>
-      <node ref="R2" pin="2"/>
-      <node ref="J4" pin="8"/>
-      <node ref="C2" pin="2"/>
-      <node ref="C7" pin="2"/>
-      <node ref="C3" pin="2"/>
-      <node ref="J4" pin="5"/>
+    <net code="4" name="GND">
       <node ref="U2" pin="3"/>
-      <node ref="R3" pin="2"/>
-      <node ref="C4" pin="1"/>
+      <node ref="J4" pin="7"/>
       <node ref="U1" pin="10"/>
-      <node ref="C8" pin="2"/>
-      <node ref="J2" pin="S"/>
-      <node ref="R16" pin="2"/>
-      <node ref="C5" pin="2"/>
-      <node ref="R26" pin="2"/>
-      <node ref="R4" pin="2"/>
-      <node ref="J4" pin="3"/>
-      <node ref="RV3" pin="2"/>
-      <node ref="J4" pin="4"/>
       <node ref="J1" pin="S"/>
-      <node ref="RV3" pin="3"/>
-      <node ref="R27" pin="2"/>
-      <node ref="U1" pin="5"/>
-    </net>
-    <net code="7" name="IN_TIP">
-      <node ref="R1" pin="1"/>
-      <node ref="J1" pin="T"/>
-    </net>
-    <net code="8" name="IN_CLAMP">
+      <node ref="C5" pin="2"/>
+      <node ref="J4" pin="8"/>
+      <node ref="J3" pin="S"/>
+      <node ref="C2" pin="2"/>
       <node ref="R1" pin="2"/>
+      <node ref="U1" pin="3"/>
+      <node ref="J1" pin="TN"/>
+      <node ref="C6" pin="2"/>
+      <node ref="R21" pin="2"/>
+      <node ref="TP1" pin="1"/>
+      <node ref="C3" pin="2"/>
+      <node ref="U1" pin="5"/>
+      <node ref="J4" pin="3"/>
+      <node ref="J2" pin="S"/>
+      <node ref="C4" pin="1"/>
+      <node ref="C7" pin="2"/>
+      <node ref="J4" pin="4"/>
+      <node ref="RV3" pin="2"/>
+      <node ref="J4" pin="5"/>
+      <node ref="C8" pin="2"/>
+      <node ref="RV3" pin="3"/>
+      <node ref="J4" pin="6"/>
+    </net>
+    <net code="5" name="IN_TIP">
+      <node ref="J1" pin="T"/>
+      <node ref="R26" pin="1"/>
+    </net>
+    <net code="6" name="IN_SURGE">
       <node ref="C1" pin="1"/>
-      <node ref="D9" pin="3"/>
+      <node ref="R26" pin="2"/>
     </net>
-    <net code="9" name="IN_POT_TOP">
+    <net code="7" name="AC_IN">
+      <node ref="R1" pin="1"/>
       <node ref="C1" pin="2"/>
-      <node ref="RV1" pin="3"/>
+      <node ref="R27" pin="1"/>
     </net>
-    <net code="10" name="IN_POT_BOT">
+    <net code="8" name="U2C_IN_P">
+      <node ref="D9" pin="3"/>
+      <node ref="R27" pin="2"/>
+      <node ref="U2" pin="10"/>
+    </net>
+    <net code="9" name="IN_BUF">
+      <node ref="U2" pin="9"/>
+      <node ref="U2" pin="8"/>
       <node ref="R2" pin="1"/>
-      <node ref="RV1" pin="1"/>
+      <node ref="TP4" pin="1"/>
     </net>
-    <net code="11" name="IN_WIPER">
+    <net code="10" name="U1A_IN_M">
+      <node ref="R24" pin="1"/>
+      <node ref="R2" pin="2"/>
+      <node ref="U1" pin="2"/>
+      <node ref="C9" pin="1"/>
+    </net>
+    <net code="11" name="GAIN_MID">
+      <node ref="RV1" pin="1"/>
+      <node ref="R24" pin="2"/>
+    </net>
+    <net code="12" name="V_AMP">
+      <node ref="C9" pin="2"/>
+      <node ref="RV1" pin="3"/>
+      <node ref="U1" pin="1"/>
+      <node ref="TP5" pin="1"/>
+      <node ref="R6" pin="1"/>
       <node ref="R3" pin="1"/>
       <node ref="RV1" pin="2"/>
-      <node ref="U1" pin="3"/>
     </net>
-    <net code="12" name="IN_GAIN_INV">
-      <node ref="C9" pin="1"/>
-      <node ref="R5" pin="1"/>
-      <node ref="U1" pin="2"/>
+    <net code="13" name="U1B_IN_M">
+      <node ref="R3" pin="2"/>
       <node ref="R4" pin="1"/>
-    </net>
-    <net code="13" name="V_GAIN">
-      <node ref="R8" pin="1"/>
-      <node ref="R6" pin="1"/>
-      <node ref="U1" pin="1"/>
-      <node ref="TP4" pin="1"/>
-      <node ref="C9" pin="2"/>
-      <node ref="R5" pin="2"/>
-    </net>
-    <net code="14" name="RECT_INV">
-      <node ref="D1" pin="1"/>
       <node ref="U1" pin="6"/>
+      <node ref="D1" pin="1"/>
+    </net>
+    <net code="14" name="U1B_OUT">
+      <node ref="D2" pin="1"/>
+      <node ref="D1" pin="2"/>
+      <node ref="U1" pin="7"/>
+    </net>
+    <net code="15" name="V_RECT">
+      <node ref="R5" pin="1"/>
+      <node ref="D2" pin="2"/>
+      <node ref="R4" pin="2"/>
+    </net>
+    <net code="16" name="FF_MID">
       <node ref="R7" pin="1"/>
       <node ref="R6" pin="2"/>
     </net>
-    <net code="15" name="RECT_OP_OUT">
-      <node ref="U1" pin="7"/>
-      <node ref="D2" pin="1"/>
-      <node ref="D1" pin="2"/>
-    </net>
-    <net code="16" name="RECT_MID">
-      <node ref="R9" pin="1"/>
+    <net code="17" name="U1C_IN_M">
+      <node ref="R8" pin="1"/>
       <node ref="R7" pin="2"/>
-      <node ref="D2" pin="2"/>
-    </net>
-    <net code="17" name="SUM_INV">
-      <node ref="R8" pin="2"/>
-      <node ref="R9" pin="2"/>
-      <node ref="R10" pin="1"/>
       <node ref="U1" pin="9"/>
+      <node ref="R5" pin="2"/>
     </net>
-    <net code="18" name="V_RECT">
-      <node ref="U1" pin="8"/>
-      <node ref="R10" pin="2"/>
-      <node ref="U2" pin="10"/>
-      <node ref="TP5" pin="1"/>
-    </net>
-    <net code="19" name="PEAK_INV">
-      <node ref="U2" pin="9"/>
-      <node ref="C10" pin="1"/>
-      <node ref="R11" pin="2"/>
-      <node ref="D5" pin="2"/>
-    </net>
-    <net code="20" name="PEAK_OP_OUT">
-      <node ref="C10" pin="2"/>
-      <node ref="U2" pin="8"/>
-      <node ref="D3" pin="2"/>
-      <node ref="D5" pin="1"/>
-    </net>
-    <net code="21" name="RECT_DIODE_OUT">
-      <node ref="R12" pin="1"/>
-      <node ref="D3" pin="1"/>
-    </net>
-    <net code="22" name="ATK_MID">
-      <node ref="RV2" pin="1"/>
-      <node ref="R12" pin="2"/>
-    </net>
-    <net code="23" name="ENV_CAP">
-      <node ref="U2" pin="12"/>
-      <node ref="RV2" pin="3"/>
-      <node ref="R13" pin="1"/>
-      <node ref="C2" pin="1"/>
-      <node ref="RV2" pin="2"/>
-    </net>
-    <net code="24" name="REL_MID">
-      <node ref="R13" pin="2"/>
-      <node ref="R14" pin="1"/>
-      <node ref="RV3" pin="1"/>
-    </net>
-    <net code="25" name="V_ENV_BUF">
-      <node ref="R15" pin="1"/>
-      <node ref="U2" pin="14"/>
-      <node ref="R25" pin="1"/>
+    <net code="18" name="V_FWR">
       <node ref="TP6" pin="1"/>
-      <node ref="R11" pin="1"/>
+      <node ref="U1" pin="8"/>
+      <node ref="U2" pin="12"/>
+      <node ref="R8" pin="2"/>
+    </net>
+    <net code="19" name="U2D_OUT">
+      <node ref="D3" pin="2"/>
+      <node ref="U2" pin="14"/>
+    </net>
+    <net code="20" name="ATK_IN">
+      <node ref="R25" pin="1"/>
+      <node ref="D3" pin="1"/>
       <node ref="U2" pin="13"/>
     </net>
-    <net code="26" name="OUT_NONINV">
-      <node ref="R16" pin="1"/>
-      <node ref="R15" pin="2"/>
-      <node ref="U1" pin="12"/>
-    </net>
-    <net code="27" name="OFF_TOP">
-      <node ref="RV4" pin="1"/>
-      <node ref="R17" pin="2"/>
-    </net>
-    <net code="28" name="OFF_BOT">
-      <node ref="RV4" pin="3"/>
-      <node ref="R18" pin="2"/>
-    </net>
-    <net code="29" name="OFF_WIPER">
-      <node ref="RV4" pin="2"/>
-      <node ref="R19" pin="1"/>
-    </net>
-    <net code="30" name="OUT_INV_NODE">
-      <node ref="U1" pin="13"/>
-      <node ref="R20" pin="1"/>
-      <node ref="R19" pin="2"/>
-    </net>
-    <net code="31" name="V_OUT_BUF">
-      <node ref="D10" pin="3"/>
-      <node ref="R21" pin="1"/>
-      <node ref="TP7" pin="1"/>
-      <node ref="U1" pin="14"/>
-      <node ref="R20" pin="2"/>
-      <node ref="R22" pin="1"/>
-    </net>
-    <net code="32" name="OUT_TIP">
-      <node ref="J2" pin="T"/>
-      <node ref="R21" pin="2"/>
-    </net>
-    <net code="33" name="INV_SUM">
-      <node ref="R23" pin="1"/>
-      <node ref="R22" pin="2"/>
-      <node ref="U2" pin="2"/>
-    </net>
-    <net code="34" name="V_INV_BUF">
-      <node ref="U2" pin="1"/>
-      <node ref="R24" pin="1"/>
-      <node ref="R23" pin="2"/>
-      <node ref="TP8" pin="1"/>
-      <node ref="D11" pin="3"/>
-    </net>
-    <net code="35" name="INV_OUT_TIP">
-      <node ref="J3" pin="T"/>
-      <node ref="R24" pin="2"/>
-    </net>
-    <net code="36" name="LED_REF_IN">
-      <node ref="R26" pin="1"/>
-      <node ref="U2" pin="5"/>
+    <net code="21" name="ATK_POT_IN">
+      <node ref="RV2" pin="1"/>
       <node ref="R25" pin="2"/>
     </net>
-    <net code="37" name="LED_SENSE">
-      <node ref="D6" pin="2"/>
-      <node ref="R27" pin="1"/>
-      <node ref="U2" pin="6"/>
-      <node ref="D4" pin="1"/>
+    <net code="22" name="ENV_CAP">
+      <node ref="RV2" pin="3"/>
+      <node ref="R10" pin="1"/>
+      <node ref="TP7" pin="1"/>
+      <node ref="C2" pin="1"/>
+      <node ref="RV2" pin="2"/>
+      <node ref="R20" pin="1"/>
+      <node ref="R9" pin="1"/>
     </net>
-    <net code="38" name="V_LED_DRV">
-      <node ref="D6" pin="1"/>
+    <net code="23" name="REL_MID">
+      <node ref="R10" pin="2"/>
+      <node ref="RV3" pin="1"/>
+    </net>
+    <net code="24" name="U1D_IN_P">
+      <node ref="U1" pin="12"/>
+      <node ref="R9" pin="2"/>
+    </net>
+    <net code="25" name="OFFSET_TOP">
+      <node ref="RV4" pin="1"/>
+      <node ref="R11" pin="2"/>
+    </net>
+    <net code="26" name="OFFSET_BOT">
+      <node ref="RV4" pin="3"/>
+      <node ref="R12" pin="1"/>
+    </net>
+    <net code="27" name="OFFSET_WIPER">
+      <node ref="R13" pin="1"/>
+      <node ref="RV4" pin="2"/>
+    </net>
+    <net code="28" name="U1D_IN_M">
+      <node ref="R13" pin="2"/>
+      <node ref="C10" pin="1"/>
+      <node ref="R15" pin="1"/>
+      <node ref="U1" pin="13"/>
+    </net>
+    <net code="29" name="V_OUT_PRE">
+      <node ref="TP8" pin="1"/>
+      <node ref="C10" pin="2"/>
+      <node ref="R15" pin="2"/>
+      <node ref="R17" pin="1"/>
+      <node ref="U1" pin="14"/>
+      <node ref="D7" pin="3"/>
+      <node ref="R16" pin="1"/>
+    </net>
+    <net code="30" name="OUT_TIP">
+      <node ref="R16" pin="2"/>
+      <node ref="J2" pin="T"/>
+    </net>
+    <net code="31" name="U2A_IN_M">
+      <node ref="R18" pin="1"/>
+      <node ref="R17" pin="2"/>
+      <node ref="C11" pin="1"/>
+      <node ref="U2" pin="2"/>
+    </net>
+    <net code="32" name="V_INV_PRE">
+      <node ref="R18" pin="2"/>
+      <node ref="U2" pin="1"/>
+      <node ref="D8" pin="3"/>
+      <node ref="R19" pin="1"/>
+      <node ref="C11" pin="2"/>
+    </net>
+    <net code="33" name="INV_OUT_TIP">
+      <node ref="R19" pin="2"/>
+      <node ref="J3" pin="T"/>
+    </net>
+    <net code="34" name="U2B_IN_P">
+      <node ref="R20" pin="2"/>
+      <node ref="U2" pin="5"/>
+    </net>
+    <net code="35" name="LED_A">
       <node ref="U2" pin="7"/>
+      <node ref="D10" pin="1"/>
       <node ref="D4" pin="2"/>
+    </net>
+    <net code="36" name="LED_K">
+      <node ref="R21" pin="1"/>
+      <node ref="U2" pin="6"/>
+      <node ref="D10" pin="2"/>
+      <node ref="D4" pin="1"/>
     </net>
   </nets>
 </export>

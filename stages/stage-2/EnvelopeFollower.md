@@ -1,330 +1,259 @@
-# Envelope Follower — Circuit Description & Build Specification
+# Envelope Follower — Circuit Description & Build Guide
 
-Extracted from [EnvelopeFollower.webp](./EnvelopeFollower.webp) (dated `2022-01-18 22:58`).
+Extracted from [EnvelopeFollower.webp](./EnvelopeFollower.webp) (title: *Envelope Follower*, dated `2022-01-18 22:58`).
 
-> **Note on Reference Designators & Net Names:** The source schematic is hand-drawn without printed reference designators (`R1`, `C1`, `U1`, etc.) or internal net names. Consistent designators and net names are assigned throughout this document so every connection can be built unambiguously on a breadboard, perfboard, or schematic/PCB tool (e.g., KiCad / SKiDL). All component values, polarities, and circuit notes match the source schematic verbatim; practical build recommendations not drawn on the schematic (such as `100 nF` IC decoupling capacitors and component voltage/power ratings) are explicitly marked as **Build Notes**.
+> **Note on Reference Designators:** The source schematic specifies component values, diode/IC part numbers, jack names, and front-panel control labels, without printed reference designators (`R1`, `C1`, etc.). Standard reference designators (`R1`–`R23`, `C1`–`C4`, `D1`–`D4`, `RV1`–`RV4`, `U1`–`U2`, `J1`–`J4`) are assigned consistently throughout this document to provide an unambiguous Bill of Materials and point-to-point netlist.
 
 ---
 
-## 1. Overview & Electrical Summary
+## 1. Circuit Overview & Specifications
 
-This circuit is a dual-rail (`±12 V`) Eurorack-style analog **Envelope Follower** that converts an AC audio or modulation input signal (`IN`) into a smooth positive control voltage (`OUT`) and an inverted control voltage (`INV_OUT`), with adjustable input gain (`GAIN`), attack time (`ATK`), release time (`Release`), DC output offset (`OFFSET`), and an envelope activity `LED`.
-
-### Key Specifications (Derived from Schematic Values)
+This circuit is a **Eurorack-compatible analog envelope follower** operating on a **±12 V dual supply**. It AC-couples an audio/modulation input signal, amplifies it via a variable-gain inverting stage, performs precision full-wave rectification, extracts an attack/release control voltage envelope, applies gain and bipolar DC offset trim, and outputs both normal (`OUT`) and polarity-inverted (`INV_OUT`) envelope voltages along with an active level-indicator `LED`.
 
 | Parameter | Value / Behavior | Notes |
 |---|---|---|
-| **Supply Rails** | `+12 V`, `GND`, `-12 V` | Labeled `+12V in`, `GND`, `-12V in` (`Vcc+ = +12V`, `Vcc- = -12V`) |
-| **Op-Amps** | `6` op-amp units (`TL074` or `TL072`) | Recommended: `1 × TL074` (quad) + `1 × TL072` (dual), or `3 × TL072` |
-| **Input Coupling & Impedance** | AC-coupled (`4.7 µF`), `~9.9 kΩ` AC input impedance | High-pass cutoff `f_c ≈ 3.4 Hz` (`1M \|\| 10k` into `U1A` virtual ground) |
-| **Input Gain (`GAIN`, `100k`)** | Inverting gain `0` to `-10×` (`-∞` to `+20 dB` magnitude) | `|A_v| = R_GAIN / 10 kΩ` (`0 Ω` to `100 kΩ`) |
-| **Rectifier** | Positive-going precision full-wave rectifier | `V_rect = +1.1 × |V_gain|` (`22k / 20k`), followed by `1N4148` peak diode (`~0.6 V` forward drop) |
-| **Attack Time Constant (`ATK`, `50k`)** | `~0 ms` to `50 ms` (`τ_atk ≈ R_ATK × 1 µF`) | Instantaneous slewing at `0 Ω` up to `50 ms` at `50 kΩ` |
-| **Release Time Constant (`Release`, `1M`)** | `11 ms` to `~1.01 s` (`τ_rel = (11 kΩ + R_REL) × 1 µF`) | Discharge path is `1 kΩ + 10 kΩ + R_REL` to `GND` |
-| **Output Gain & Offset (`OFFSET`, `100k`)** | `V_OUT ≈ 2.25 × V_env` (at center) to `2.52 × V_env ∓ 5.22 V` | **Inverting offset polarity:** wiper toward `+12V` shifts `OUT` negative; wiper toward `-12V` shifts `OUT` positive |
-| **Outputs** | `OUT` and `INV_OUT` (`-V_OUT`), `1 kΩ` series output impedance | Clamped near TL07x rail limits (`≈ ±10.5 V` to `±11 V` on `±12 V`) |
-| **LED Indicator** | Buffered envelope follower with `-2.79 V` cathode bias | `LED` driven via `U2B` follower + `22k`; cathode biased via `10k` to `GND` / `33k` to `-12V` |
+| **Supply Rails** | `±12 V` (`+12V in`, `GND`, `-12V in`) | Dual-rail op-amp supply (`Vcc+ = +12V`, `Vcc- = -12V`) |
+| **Active ICs** | 6 op-amp channels (`TL074` or `TL072`) | `1× TL074` + `1× TL072` (or `3× TL072`) |
+| **Input (`IN`)** | AC-coupled, $f_c \approx 3.4\text{ Hz}$ | Input impedance $\approx 9.9\text{ k}\Omega$ AC (`1 MΩ || 10 kΩ` to virtual ground) |
+| **Input Gain (`GAIN`)** | $0\times$ to $-10\times$ (`-∞` to `+20 dB`, inverting) | `100 kΩ` rheostat over `10 kΩ` input resistor |
+| **Rectifier** | Precision full-wave rectifier + peak diode | $V_{\text{FWR}} = +1.1\,|V_{\text{amp}}|$, followed by `1N4148` (`D3`, `~0.6 V` drop) |
+| **Attack (`ATK`)** | $\tau_{\text{atk}} \approx 0\text{ ms}$ to $50\text{ ms}$ | `50 kΩ` pot into `1 µF` cap (`C2`) |
+| **Release (`Release`)** | $\tau_{\text{rel}} \approx 11\text{ ms}$ to $1.01\text{ s}$ | `1 kΩ + 10 kΩ + 0..1 MΩ` discharging `1 µF` cap (`C2`) |
+| **Output Gain & Offset (`OFFSET`)** | Gain $2.25\times\text{–}2.52\times$; DC offset $\approx \pm 5.2\text{ V}$ | Output gain varies slightly with `OFFSET` wiper impedance |
+| **Outputs** | `OUT` and `INV_OUT` ($-V_{\text{OUT}}$) | Each protected by a `1 kΩ` series output resistor |
+| **Visual Indicator** | Buffered `LED` driven from envelope node | Cathode pre-biased to $\approx -2.79\text{ V}$ via `10 kΩ` / `33 kΩ` divider |
 
----
+### High-Level Signal Flow
 
-## 2. Signal Flow Diagram
-
-```text
-  IN (Jack)
-     │
-  [4.7 µF]──[1M to GND]──[10k]──▶( U1A: Inverting Gain, 0..-10x via GAIN 100k )
-                                        │
-                    ┌───────────────────┴──────────────────────┐
-                    ▼                                          ▼
-         [10k]──( U1B: Half-Wave Rectifier )          [10k]──[10k] (= 20k)
-                 w/ D1, D2 (1N4148) & 10k fb                   │
-                    │                                          │
-                    └───────────────[10k]──────────────────────┴──▶( U1C: Inverting Summer, 22k fb )
-                                                                          │
-                                                                   [D3: 1N4148 (A→K)]
-                                                                          │
-                                                                    [ATK: 50k pot]
-                                                                          │
-                                                    ┌─────────────────────┤
-                                                [1 µF to GND]            [1k]
-                                                                          │  (ENV_RAW / "LED" net)
-                              ┌───────────────────────────────────────────┼──────────────────────┐
-                              ▼                                           ▼                      ▼
-                     [10k + Release 1M]                     ( U1D: Output Amp + OFFSET )     [10k]
-                              │                                  │              │                │
-                             GND                               [1k]           [10k]        ( U2B: Follower )
-                                                                 │              │                │
-                                                            OUT (Jack)   ( U2A: Inv -1x )      [22k]
-                                                                                │                │
-                                                                              [1k]         [LED (D4: A→K)]
-                                                                                │                │
-                                                                         INV_OUT (Jack)  [10k to GND / 33k to -12V]
+```mermaid
+flowchart LR
+    IN["IN Jack"] --> AC["AC Coupling + Gain<br/>C1 4.7uF, R1 1M, R2 10k<br/>U1A + GAIN 100k"]
+    AC --> FWR["Precision Full-Wave Rectifier<br/>U1B + D1/D2 1N4148<br/>U1C Sum + D3 1N4148"]
+    FWR --> AR["Attack / Release Detector<br/>ATK 50k, C2 1uF<br/>R9 1k, R10 10k, Release 1M"]
+    AR --> OUTBUF["Gain & DC Offset Stage<br/>U1D + OFFSET 100k"]
+    OUTBUF --> OUT["R16 1k -> OUT Jack"]
+    OUTBUF --> INV["Unity Inverter<br/>U2A + R17/R18 10k"]
+    INV --> INVOUT["R19 1k -> INV_OUT Jack"]
+    AR --> LEDDRV["LED Buffer & Bias<br/>R20 10k, U2B, R21 22k<br/>D4 LED, R22 10k, R23 33k"]
 ```
 
 ---
 
-## 3. Bill of Materials (BOM)
+## 2. Bill of Materials (BOM)
 
-### 3.1 Integrated Circuits (6 Op-Amp Units Total)
+### 2.1 Summary BOM (Grouped by Value)
 
-The schematic specifies: **"All op-amp: TL074 or TL072, Vcc+ is +12V, Vcc- is -12V."**
+| Qty | Reference(s) | Value | Component Type | Key Notes |
+|---:|---|---|---|---|
+| 3 | `R9`, `R16`, `R19` | `1 kΩ` | Resistor | 1/4 W metal film (or 0603/0805 SMD), 1% |
+| 16 | `R2`–`R7`, `R10`–`R15`, `R17`, `R18`, `R20`, `R22` | `10 kΩ` | Resistor | 1% recommended for rectifier & inverter symmetry |
+| 2 | `R8`, `R21` | `22 kΩ` | Resistor | 1% (R8 sets rectifier gain = 1.1×) |
+| 1 | `R23` | `33 kΩ` | Resistor | 1% or 5% |
+| 1 | `R1` | `1 MΩ` | Resistor | Input DC pull-down |
+| 1 | `RV2` | `50 kΩ` | Potentiometer (`ATK`) | Single-gang, wired as rheostat |
+| 2 | `RV1`, `RV4` | `100 kΩ` | Potentiometer (`GAIN`, `OFFSET`) | `RV1` wired as rheostat; `RV4` wired as voltage divider |
+| 1 | `RV3` | `1 MΩ` | Potentiometer (`Release`) | Single-gang, wired as rheostat |
+| 1 | `C2` | `1 µF` | Capacitor (non-polarized) | Film or X7R MLCC (drawn unpolarized; ≥ 25 V) |
+| 1 | `C1` | `4.7 µF` | Capacitor (non-polarized) | Film, bipolar electrolytic, or MLCC (drawn unpolarized; ≥ 25 V) |
+| 2 | `C3`, `C4` | `4.7 µF` | Capacitor (polarized electrolytic) | Power rail bulk filtering; ≥ 25 V (35 V preferred) |
+| 3 | `D1`, `D2`, `D3` | `1N4148` | Fast switching diode | Signal rectification & peak hold |
+| 1 | `D4` | `LED` | Indicator LED | High-brightness 3 mm or 5 mm LED recommended (see Section 3.6) |
+| 1 | `U1` | `TL074` | Quad JFET-input op-amp | DIP-14 or SOIC-14 (or replace `U1` + `U2` with `3× TL072`) |
+| 1 | `U2` | `TL072` | Dual JFET-input op-amp | DIP-8 or SOIC-8 |
+| 3 | `J1`, `J2`, `J3` | 3.5 mm Mono | Panel audio/CV jack | Tip = signal, Sleeve = `GND` (e.g., Thonkiconn WQP-PJ398SM) |
+| 1 | `J4` | Power Input | `+12V in` / `GND` / `-12V in` | Typically a 10-pin (2×5) Eurorack IDC power header |
 
-Because the circuit uses exactly **6 op-amp units**, the cleanest zero-waste package options are:
-- **Option A (used in Pin Map below):** `1 × TL074` (quad, 14-pin DIP/SOIC) + `1 × TL072` (dual, 8-pin DIP/SOIC) — `0` spare units.
-- **Option B (all duals):** `3 × TL072` — `0` spare units.
-- **Option C (all quads):** `2 × TL074` — `2` unused units (must be terminated as unity-gain followers with `+` tied to `GND` and `-` tied to output; never leave unused inputs floating).
+### 2.2 Itemized Component List
 
-| Ref | Qty | Value | Description | Package Notes |
+| Ref | Value | Type / Part | Stage | Polarity / Pin Orientation |
 |---|---|---|---|---|
-| `U1` | 1 | `TL074` | Quad JFET-input op-amp (`U1A`–`U1D`) | DIP-14 (breadboard/THT) or SOIC-14 (SMD) |
-| `U2` | 1 | `TL072` | Dual JFET-input op-amp (`U2A`–`U2B`) | DIP-8 (breadboard/THT) or SOIC-8 (SMD) |
+| `R1` | `1 MΩ` | Resistor | Input | Non-polarized |
+| `R2` | `10 kΩ` | Resistor | Input Gain | Non-polarized |
+| `R3` | `10 kΩ` | Resistor | Half-Wave Rectifier | Non-polarized |
+| `R4` | `10 kΩ` | Resistor | Half-Wave Rectifier | Non-polarized |
+| `R5` | `10 kΩ` | Resistor | Full-Wave Summing | Non-polarized |
+| `R6` | `10 kΩ` | Resistor | Rectifier Feed-Forward #1 | Non-polarized (in series with `R7`) |
+| `R7` | `10 kΩ` | Resistor | Rectifier Feed-Forward #2 | Non-polarized (in series with `R6`) |
+| `R8` | `22 kΩ` | Resistor | Full-Wave Summing Feedback | Non-polarized |
+| `R9` | `1 kΩ` | Resistor | Envelope Detector Isolation | Non-polarized |
+| `R10` | `10 kΩ` | Resistor | Release Minimum Resistor | Non-polarized |
+| `R11` | `10 kΩ` | Resistor | Offset Divider (+12V end) | Non-polarized |
+| `R12` | `10 kΩ` | Resistor | Offset Divider (-12V end) | Non-polarized |
+| `R13` | `10 kΩ` | Resistor | Offset Summing Resistor | Non-polarized |
+| `R14` | `10 kΩ` | Resistor | Output Stage Ground Ref | Non-polarized |
+| `R15` | `10 kΩ` | Resistor | Output Stage Feedback | Non-polarized |
+| `R16` | `1 kΩ` | Resistor | `OUT` Protection | Non-polarized |
+| `R17` | `10 kΩ` | Resistor | `INV_OUT` Input | Non-polarized |
+| `R18` | `10 kΩ` | Resistor | `INV_OUT` Feedback | Non-polarized |
+| `R19` | `1 kΩ` | Resistor | `INV_OUT` Protection | Non-polarized |
+| `R20` | `10 kΩ` | Resistor | `LED` Buffer Input | Non-polarized |
+| `R21` | `22 kΩ` | Resistor | `LED` Current Limiter | Non-polarized |
+| `R22` | `10 kΩ` | Resistor | `LED` Cathode Bias (to `GND`) | Non-polarized |
+| `R23` | `33 kΩ` | Resistor | `LED` Cathode Bias (to `-12V`) | Non-polarized |
+| `C1` | `4.7 µF` | Non-polarized Cap | Input AC Coupling | Non-polarized in schematic |
+| `C2` | `1 µF` | Non-polarized Cap | Envelope Storage | Non-polarized in schematic (`ENV_CAP` stays $\ge 0\text{ V}$) |
+| `C3` | `4.7 µF` | Electrolytic Cap | `+12V` Power Filter | **`+` to `+12V`**, **`-` to `GND`** |
+| `C4` | `4.7 µF` | Electrolytic Cap | `-12V` Power Filter | **`+` to `GND`**, **`-` to `-12V`** |
+| `D1` | `1N4148` | Signal Diode | Rectifier Clamp | **Anode = `U1B` out (pin 7)**, **Cathode = `U1B` `-` (pin 6)** |
+| `D2` | `1N4148` | Signal Diode | Rectifier Output | **Anode = `V_RECT` (`R4`/`R5`)**, **Cathode = `U1B` out (pin 7)** |
+| `D3` | `1N4148` | Signal Diode | Attack Steering / Peak Hold | **Anode = `U1C` out (pin 8)**, **Cathode = `RV2` (`ATK`)** |
+| `D4` | `LED` | Light-Emitting Diode | Level Indicator | **Anode = `R21`**, **Cathode = `R22`/`R23` (`LED_K`)** |
+| `RV1` | `100 kΩ` | Potentiometer (`GAIN`) | Input Gain | Rheostat: Pin 1 (`U1A` `-`), Pins 2+3 (`U1A` out) |
+| `RV2` | `50 kΩ` | Potentiometer (`ATK`) | Attack Time | Rheostat: `D3` cathode to one outer pin, wiper+other outer pin to `C2`/`R9` |
+| `RV3` | `1 MΩ` | Potentiometer (`Release`) | Release Time | Rheostat: `R10` to one outer pin, wiper+other outer pin to `GND` |
+| `RV4` | `100 kΩ` | Potentiometer (`OFFSET`) | Output DC Offset | Divider: outer pins to `R11`/`R12`, wiper to `R13` |
+| `U1` | `TL074` | Quad Op-Amp | `U1A`–`U1D` | Pin 4 = `+12V`, Pin 11 = `-12V` |
+| `U2` | `TL072` | Dual Op-Amp | `U2A`–`U2B` | Pin 8 = `+12V`, Pin 4 = `-12V` |
+| `J1` | `IN` | 3.5 mm Jack | Audio/CV Input | Tip = `IN_TIP`, Sleeve = `GND` |
+| `J2` | `OUT` | 3.5 mm Jack | Positive Envelope Out | Tip = `OUT_TIP`, Sleeve = `GND` |
+| `J3` | `INV_OUT` | 3.5 mm Jack | Inverted Envelope Out | Tip = `INV_OUT_TIP`, Sleeve = `GND` |
+| `J4` | Power | `+12V in` / `GND` / `-12V in` | Power Input | External bipolar supply |
 
-### 3.2 Diodes & Indicator LED
+### 2.3 IC Pinout Reference (`TL074` & `TL072`)
 
-| Ref | Qty | Value | Schematic Orientation | Role |
-|---|---|---|---|---|
-| `D1` | 1 | `1N4148` | Cathode (`K`) to `U1B` `-` input; Anode (`A`) to `U1B` output | Rectifier clamping feedback diode |
-| `D2` | 1 | `1N4148` | Cathode (`K`) to `U1B` output; Anode (`A`) to `R4`/`R7` junction | Rectifier series output diode |
-| `D3` | 1 | `1N4148` | Anode (`A`) to `U1C` output; Cathode (`K`) to `RV2` (`ATK`) | Peak-charging isolation diode |
-| `D4` | 1 | `LED` | Anode (`A`) to `R21` (`22k`); Cathode (`K`) to `R22`/`R23` node | Envelope indicator LED (3 mm or 5 mm; see Section 6.5) |
+Only `U2B` (`LED` buffer) explicitly shows `+12V` and `-12V` power pins on the schematic diagram; the diagram note (`All op-amp: TL074 or TL072 / Vcc+ is +12V. / Vcc- is -12V.`) applies to all 6 channels.
 
-### 3.3 Resistors (23 Total)
+- **`U1` (`TL074`, DIP-14 / SOIC-14):**
+  - `U1A`: `Out = 1`, `- = 2`, `+ = 3` (Input Variable Gain)
+  - `U1B`: `+ = 5`, `- = 6`, `Out = 7` (Precision Half-Wave Rectifier)
+  - `U1C`: `Out = 8`, `- = 9`, `+ = 10` (Full-Wave Summing Inverter)
+  - `U1D`: `+ = 12`, `- = 13`, `Out = 14` (Output Buffer / Gain + Offset)
+  - Power: `Vcc+ (+12V) = 4`, `Vcc- (-12V) = 11`
+- **`U2` (`TL072`, DIP-8 / SOIC-8):**
+  - `U2A`: `Out = 1`, `- = 2`, `+ = 3` (`INV_OUT` Unity Inverter)
+  - `U2B`: `+ = 5`, `- = 6`, `Out = 7` (`LED` Driver Buffer)
+  - Power: `Vcc+ (+12V) = 8`, `Vcc- (-12V) = 4`
 
-*Build Note:* `1/4 W` metal-film (`1%`) through-hole or `0603`/`0805` (`1%`) SMD resistors are suitable across the entire circuit (power dissipation per resistor is `< 10 mW` everywhere). Using `1%` tolerance is especially helpful in the precision rectifier (`R3`–`R8`) and inverter (`R17`, `R18`) for clean half-wave symmetry and accurate `-1×` inversion.
+*(Alternative: All 6 stages can be implemented using **three `TL072`** dual op-amp packages if you prefer stocking a single op-amp part number.)*
 
-#### Summary by Value
+---
 
-| Value | Qty | Reference Designators |
+## 3. Stage-by-Stage Functional Description
+
+### 3.1 Power Supply Filtering (`+12V in`, `GND`, `-12V in`)
+- `+12V in` feeds the `+12V` rail and is bypassed to `GND` by `C3` (`4.7 µF` electrolytic, `+` to `+12V`, `-` to `GND`).
+- `-12V in` feeds the `-12V` rail and is bypassed to `GND` by `C4` (`4.7 µF` electrolytic, **`+` to `GND`, `-` to `-12V`** because `0 V > -12 V`).
+- **Practical build note (not drawn in source):** Add `100 nF` ceramic decoupling capacitors close to each IC's `Vcc+` and `Vcc-` pins to `GND`, and if using a standard 10-pin (2×5) Eurorack power header (`-12V` on pins 1–2, `GND` on pins 3–8, `+12V` on pins 9–10), consider adding series Schottky protection diodes (e.g., `1N5819`) or resettable PTC fuses to guard against reversed ribbon cables.
+
+### 3.2 Input Coupling & Variable Gain Stage (`IN`, `U1A`, `GAIN`)
+- The input jack `J1` (`IN`) feeds `C1` (`4.7 µF`, non-polarized) to block any input DC offset.
+- After `C1`, `R1` (`1 MΩ`) ties the node to `GND` (preventing floating charge when unplugged), while `R2` (`10 kΩ`) feeds the inverting (`-`) input of `U1A` (`U1A` `+` is tied to `GND`).
+- Because `U1A` `-` is a virtual ground (`0 V`), the AC input impedance above the high-pass cutoff is $Z_{\text{in}} \approx R_1 \parallel R_2 \approx 9.9\text{ k}\Omega$, giving a `-3 dB` low-frequency corner at:
+  $$f_c = \frac{1}{2\pi \cdot (R_1 \parallel R_2) \cdot C_1} \approx \frac{1}{2\pi \cdot 9901\,\Omega \cdot 4.7\,\mu\text{F}} \approx 3.42\text{ Hz}$$
+- `RV1` (`100 kΩ`, labeled `GAIN`) is wired as a 2-terminal variable feedback resistor across `U1A` (`-` to `Out`). The inverting stage gain is:
+  $$A_{v1} = -\frac{R_{\text{GAIN}}}{R_2} = -\frac{0\text{ to }100\,\text{k}\Omega}{10\,\text{k}\Omega} = 0\times\text{ to }-10\times\quad (-\infty\text{ to }+20\text{ dB})$$
+- **Potentiometer wiring (`RV1`):** Connect **Pin 1 (CCW)** to `U1A` `-` (pin 2) and tie **Pin 2 (Wiper) + Pin 3 (CW)** together to `U1A` `Out` (pin 1). Turning `GAIN` clockwise increases gain from `0×` to `-10×`.
+
+### 3.3 Precision Full-Wave Rectifier (`U1B`, `U1C`, `D1`, `D2`, `D3`)
+The output of `U1A` ($V_1$) drives a classic two-op-amp inverting summing precision full-wave rectifier:
+1. **Half-Wave Precision Rectifier (`U1B`):**
+   - `U1B` `+` (pin 5) is tied to `GND`. `R3` (`10 kΩ`) connects $V_1$ to `U1B` `-` (pin 6).
+   - `D1` (`1N4148`) clamps the feedback loop for negative-output half-cycles: **Anode = `U1B` `Out` (pin 7)**, **Cathode = `U1B` `-` (pin 6)**.
+   - `D2` (`1N4148`) rectifies into node `V_RECT`: **Anode = `V_RECT`**, **Cathode = `U1B` `Out` (pin 7)**.
+   - `R4` (`10 kΩ`) feeds back from `V_RECT` to `U1B` `-` (pin 6).
+   - **Operation:**
+     - When $V_1 > 0$: `U1B` output swings negative, `D1` is reverse-biased (OFF), `D2` conducts, and `U1B` forces $V_{\text{RECT}} = -V_1 < 0$.
+     - When $V_1 < 0$: `U1B` output swings positive ($\approx +0.6\text{ V}$), `D1` conducts to hold `U1B` `-` at virtual ground, `D2` is reverse-biased (OFF), and $V_{\text{RECT}} = 0\text{ V}$ (pulled to virtual ground of `U1C` via `R5`).
+2. **Full-Wave Summing Inverter (`U1C`):**
+   - `U1C` `+` (pin 10) is tied to `GND`.
+   - `U1C` `-` (pin 9) sums $V_1$ through two `10 kΩ` resistors in series (`R6 + R7 = 20 kΩ`) and $V_{\text{RECT}}$ through `R5` (`10 kΩ`), with `R8` (`22 kΩ`) in feedback:
+     $$V_3 = -22\,\text{k}\Omega \left(\frac{V_1}{20\,\text{k}\Omega} + \frac{V_{\text{RECT}}}{10\,\text{k}\Omega}\right)$$
+   - When $V_1 > 0$ ($V_{\text{RECT}} = -V_1$): $V_3 = -22\,\text{k}\Omega \left(\frac{V_1}{20\,\text{k}\Omega} - \frac{V_1}{10\,\text{k}\Omega}\right) = +1.1\,V_1 > 0$.
+   - When $V_1 < 0$ ($V_{\text{RECT}} = 0$): $V_3 = -22\,\text{k}\Omega \left(\frac{V_1}{20\,\text{k}\Omega}\right) = -1.1\,V_1 > 0$.
+   - Thus **`U1C` always produces a positive full-wave rectified voltage**: $V_3 = +1.1\,|V_1|$.
+   - *(Why `R6` + `R7` are two `10 kΩ` resistors in series: this builds the required `20 kΩ` `2:1` summing resistor using the BOM's single `10 kΩ` resistor value.)*
+3. **Envelope Isolation Diode (`D3`):**
+   - `D3` (`1N4148`) connects `U1C` `Out` (pin 8) to `RV2` (`ATK`): **Anode = `U1C` `Out` (pin 8)**, **Cathode = `RV2` (`ATK`)**.
+   - `D3` allows positive peaks from `U1C` to charge `C2` (`1 µF`) through `ATK`, while blocking reverse discharge back into `U1C` when $V_3$ falls. Because `D3` sits outside `U1C`'s feedback loop, it introduces a `~0.6 V` forward threshold before `C2` begins charging (compensated by `GAIN` and `OFFSET`).
+
+### 3.4 Attack & Release Envelope Detector (`ATK`, `C2`, `R9`, `R10`, `Release`)
+- **Attack charging path:** `D3` cathode $\rightarrow$ `RV2` (`50 kΩ` `ATK` pot wired as a rheostat) $\rightarrow$ `ENV_CAP` (`C2` = `1 µF` to `GND`).
+  - Attack time constant: $\tau_{\text{atk}} \approx R_{\text{ATK}} \cdot C_2 = (0\text{ to }50\,\text{k}\Omega) \cdot 1\,\mu\text{F} = 0\text{ ms to }50\text{ ms}$ (plus small diode dynamic resistance).
+  - **Potentiometer wiring (`RV2`):** The diagram ties the wiper to the `C2` side. Wire **Pin 1 (CCW) + Pin 2 (Wiper)** to `ENV_CAP` (`C2`/`R9`) and **Pin 3 (CW)** to `D3` cathode if you want **clockwise rotation = longer/slower attack time** (or wire Pin 1 to `D3` cathode and Pins 2+3 to `ENV_CAP` for clockwise = faster attack).
+- **Isolation & Release discharging path:** `ENV_CAP` connects through `R9` (`1 kΩ`) to `ENV_NODE`, which feeds:
+  - `U1D` `+` (pin 12, high-Z JFET input)
+  - `LED` net $\rightarrow$ `R20` (`10 kΩ`) $\rightarrow$ `U2B` `+` (pin 5, high-Z JFET input)
+  - `R10` (`10 kΩ`) in series with `RV3` (`1 MΩ`, labeled `Release`) to `GND`.
+  - Release time constant: $\tau_{\text{rel}} = (R_9 + R_{10} + R_{\text{Release}}) \cdot C_2 = (11\,\text{k}\Omega\text{ to }1.011\,\text{M}\Omega) \cdot 1\,\mu\text{F} \approx 11\text{ ms to }1.011\text{ s}$.
+  - At minimum release (`0 Ω`), `R9` (`1 kΩ`) and `R10` (`10 kΩ`) form a slight `11 / 12 ≈ 0.917` divider on the envelope voltage; above ~100 ms release this drop is `< 1%`.
+  - **Potentiometer wiring (`RV3`):** Connect **Pin 3 (CW)** to `R10`, and tie **Pin 1 (CCW) + Pin 2 (Wiper)** to `GND` so turning `Release` **clockwise increases decay/release time** (`11 ms` $\rightarrow$ `1.01 s`).
+
+### 3.5 DC Offset, Gain & Outputs (`OFFSET`, `U1D`, `OUT`, `U2A`, `INV_OUT`)
+- **Offset voltage divider (`R11`, `RV4`, `R12`):**
+  - `R11` (`10 kΩ`) from `+12V`, `RV4` (`100 kΩ` `OFFSET` pot), and `R12` (`10 kΩ`) to `-12V` form a `120 kΩ` string across `24 V`, giving an unloaded wiper span of **$-10\text{ V}$ to $+10\text{ V}$** and a wiper Thevenin resistance $R_{\text{th}}(\alpha)$ ranging from $9.17\text{ k}\Omega$ (at ends) to $30\text{ k}\Omega$ (at center).
+- **Non-Inverting Summing/Gain Output Stage (`U1D`):**
+  - `U1D` `+` (pin 12) receives $V_{\text{env}}$ from `ENV_NODE`.
+  - `U1D` `-` (pin 13) connects to `R15` (`10 kΩ` feedback to `U1D` `Out`), `R14` (`10 kΩ` to `GND`), and `R13` (`10 kΩ` from `RV4` wiper).
+  - Exact transfer function (including pot source resistance $R_{\text{th}}(\alpha)$):
+    $$V_{\text{U1D}} = V_{\text{env}}\left(2 + \frac{10\,\text{k}\Omega}{10\,\text{k}\Omega + R_{\text{th}}(\alpha)}\right) - V_{\text{th}}(\alpha)\left(\frac{10\,\text{k}\Omega}{10\,\text{k}\Omega + R_{\text{th}}(\alpha)}\right)$$
+    - At `OFFSET` center ($V_{\text{th}} = 0\text{ V}$, $R_{\text{th}} = 30\,\text{k}\Omega$): **$0\text{ V}$ offset**, gain $= 2.25\times$.
+    - At `OFFSET` extremes ($V_{\text{th}} = \pm 10\text{ V}$, $R_{\text{th}} = 9.17\,\text{k}\Omega$): **$\mp 5.22\text{ V}$ DC offset**, gain $= 2.52\times$ (clipping near `±10.5 V` TL07x headroom).
+  - **Potentiometer wiring (`RV4`):** Because the wiper feeds the **inverting** input of `U1D`, wire **Pin 1 (CCW) to `R11` (`+12V` side)** and **Pin 3 (CW) to `R12` (`-12V` side)** if you want **clockwise rotation to shift `OUT` positive** (swap Pins 1 and 3 if you want CW to shift `OUT` negative / `INV_OUT` positive).
+- **Main Output (`OUT`) & Inverted Output (`INV_OUT`):**
+  - `U1D` `Out` (pin 14) drives `J2` (`OUT` tip) through `R16` (`1 kΩ`).
+  - `U1D` `Out` also drives `U2A` (`R17 = 10 kΩ` to `U2A` `-` pin 2, `R18 = 10 kΩ` feedback to `U2A` `Out` pin 1, `U2A` `+` pin 3 to `GND`), a $-1\times$ unity-gain inverter, feeding `J3` (`INV_OUT` tip) through `R19` (`1 kΩ`).
+
+### 3.6 Buffered LED Level Indicator (`U2B`, `D4`)
+- `ENV_NODE` connects via the `LED` net flag and `R20` (`10 kΩ`) to `U2B` `+` (pin 5), wired as a unity-gain voltage follower (`U2B` `-` pin 6 tied directly to `U2B` `Out` pin 7).
+- `U2B` `Out` drives `D4` (`LED`) anode through `R21` (`22 kΩ`).
+- `D4` cathode connects to node `LED_K`, biased by `R22` (`10 kΩ` to `GND`) and `R23` (`33 kΩ` to `-12V`):
+  $$V_{\text{th,K}} = -12\,\text{V} \cdot \frac{10\,\text{k}\Omega}{10\,\text{k}\Omega + 33\,\text{k}\Omega} \approx -2.79\text{ V}, \qquad R_{\text{th,K}} = 10\,\text{k}\Omega \parallel 33\,\text{k}\Omega \approx 7.67\,\text{k}\Omega$$
+- **LED behavior:** The `-2.79 V` cathode bias cancels typical LED forward voltage (`~2.0–2.8 V`) so the LED begins glowing immediately as `ENV_NODE` rises above `0 V`:
+  - With a blue/white/emerald-green LED ($V_F \approx 2.8\text{ V}$), idle current at `0 V` is `~0 µA` (fully dark when idle).
+  - With a standard red/amber LED ($V_F \approx 1.8\text{–}2.0\text{ V}$), idle bias is `~27–33 µA` (very faint or off), rising to `~0.19 mA` at $V_{\text{env}} = +5\text{ V}$ and `~0.36 mA` at $V_{\text{env}} = +10\text{ V}$ across `R21 + R_th,K ≈ 29.7 kΩ`. Use a **high-efficiency / high-brightness LED** so it remains clearly visible at sub-milliamp currents (or reduce `R21` if using an older low-efficiency diffused LED).
+
+---
+
+## 4. Complete Point-to-Point Netlist
+
+Every electrical node in the schematic is listed below with its exact connected component pins:
+
+| Net Name | Connected Component Pins | Function |
 |---|---|---|
-| `1 kΩ` | 3 | `R9`, `R16`, `R19` |
-| `10 kΩ` | 16 | `R2`, `R3`, `R4`, `R5`, `R6`, `R7`, `R10`, `R11`, `R12`, `R13`, `R14`, `R15`, `R17`, `R18`, `R20`, `R22` |
-| `22 kΩ` | 2 | `R8`, `R21` |
-| `33 kΩ` | 1 | `R23` |
-| `1 MΩ` | 1 | `R1` |
-
-#### Detailed Resistor List
-
-| Ref | Value | Circuit Stage | Connections (Net 1 ↔ Net 2) |
-|---|---|---|---|
-| `R1` | `1 MΩ` | Input Stage | `IN_AC` ↔ `GND` |
-| `R2` | `10 kΩ` | Input Gain (`U1A`) | `IN_AC` ↔ `IN_SUM` (`U1A` `-`) |
-| `R3` | `10 kΩ` | Rectifier (`U1B`) | `V_GAIN` (`U1A` out) ↔ `RECT_INV` (`U1B` `-`) |
-| `R4` | `10 kΩ` | Rectifier (`U1B`) | `RECT_INV` (`U1B` `-`) ↔ `RECT_MID` (`D2.A` / `R7`) |
-| `R5` | `10 kΩ` | Rectifier (`U1C` `20k` branch) | `V_GAIN` (`U1A` out) ↔ `RECT_FF_MID` |
-| `R6` | `10 kΩ` | Rectifier (`U1C` `20k` branch) | `RECT_FF_MID` ↔ `SUM_INV` (`U1C` `-`) |
-| `R7` | `10 kΩ` | Rectifier (`U1C` summing) | `RECT_MID` (`D2.A` / `R4`) ↔ `SUM_INV` (`U1C` `-`) |
-| `R8` | `22 kΩ` | Rectifier (`U1C` feedback) | `SUM_INV` (`U1C` `-`) ↔ `V_RECT` (`U1C` out) |
-| `R9` | `1 kΩ` | Envelope Detector | `ENV_CAP` (`RV2` / `C2`) ↔ `ENV_RAW` |
-| `R10` | `10 kΩ` | Release Path | `ENV_RAW` ↔ `REL_MID` (`RV3` top) |
-| `R11` | `10 kΩ` | Offset Divider | `+12V` ↔ `OFF_TOP` (`RV4` top) |
-| `R12` | `10 kΩ` | Offset Divider | `-12V` ↔ `OFF_BOT` (`RV4` bottom) |
-| `R13` | `10 kΩ` | Output Stage (`U1D`) | `OFF_WIPER` (`RV4` wiper) ↔ `OUT_INV_NODE` (`U1D` `-`) |
-| `R14` | `10 kΩ` | Output Stage (`U1D`) | `OUT_INV_NODE` (`U1D` `-`) ↔ `GND` |
-| `R15` | `10 kΩ` | Output Stage (`U1D`) | `OUT_INV_NODE` (`U1D` `-`) ↔ `V_OUT_BUF` (`U1D` out) |
-| `R16` | `1 kΩ` | Output (`OUT`) | `V_OUT_BUF` (`U1D` out) ↔ `OUT_TIP` (`J2` Tip) |
-| `R17` | `10 kΩ` | Inverted Output (`U2A`) | `V_OUT_BUF` (`U1D` out) ↔ `INV_SUM` (`U2A` `-`) |
-| `R18` | `10 kΩ` | Inverted Output (`U2A`) | `INV_SUM` (`U2A` `-`) ↔ `V_INV_BUF` (`U2A` out) |
-| `R19` | `1 kΩ` | Inverted Output (`INV_OUT`) | `V_INV_BUF` (`U2A` out) ↔ `INV_OUT_TIP` (`J3` Tip) |
-| `R20` | `10 kΩ` | LED Buffer (`U2B`) | `ENV_RAW` (`LED` net) ↔ `LED_BUF_IN` (`U2B` `+`) |
-| `R21` | `22 kΩ` | LED Driver | `V_LED_DRV` (`U2B` out) ↔ `LED_A` (`D4` Anode) |
-| `R22` | `10 kΩ` | LED Cathode Bias | `LED_BIAS` (`D4` Cathode) ↔ `GND` |
-| `R23` | `33 kΩ` | LED Cathode Bias | `LED_BIAS` (`D4` Cathode) ↔ `-12V` |
-
-### 3.4 Capacitors (4 Drawn on Schematic + Recommended Decoupling)
-
-| Ref | Qty | Value | Type / Polarity on Schematic | Connections | Build Spec Recommendation |
-|---|---|---|---|---|---|
-| `C1` | 1 | `4.7 µF` | Non-polarized symbol | `IN_TIP` ↔ `IN_AC` | Film or bipolar/non-polarized electrolytic (`≥ 25 V`; audio AC coupling) |
-| `C2` | 1 | `1 µF` | Non-polarized symbol | `ENV_CAP` ↔ `GND` | Film (polyester/polypropylene) or C0G/X7R ceramic (`≥ 25 V`; envelope timing cap) |
-| `C3` | 1 | `4.7 µF` | Polarized electrolytic (`+` / hatched) | `+` to `+12V`, `-` to `GND` | Aluminum electrolytic (`≥ 25 V`, e.g., `25 V` or `35 V`) |
-| `C4` | 1 | `4.7 µF` | Polarized electrolytic (`+` / hatched) | `+` to `GND`, `-` to `-12V` | Aluminum electrolytic (`≥ 25 V`, e.g., `25 V` or `35 V`) |
-| *`C5`–`C8`* | *4 (Build Note)* | *`100 nF`* | *Not drawn in source schematic* | *`+12V`/`-12V` to `GND` at `U1` & `U2`* | *Recommended ceramic X7R (`≥ 25 V`) local IC supply decoupling* |
-
-### 3.5 Potentiometers (4 Total, Linear Taper `B`)
-
-| Ref | Label | Value | Wiring Configuration | Schematic Terminal Mapping |
-|---|---|---|---|---|
-| `RV1` | `GAIN` | `100 kΩ` | 2-terminal variable resistor (rheostat) | Terminal 1 (`CCW`) → `IN_SUM`; Terminal 2 (`Wiper`) + Terminal 3 (`CW`) tied → `V_GAIN` |
-| `RV2` | `ATK` | `50 kΩ` | 2-terminal variable resistor (rheostat) | Terminal 1 (`CCW`) → `RECT_DIODE_OUT`; Terminal 2 (`Wiper`) + Terminal 3 (`CW`) tied → `ENV_CAP` |
-| `RV3` | `Release` | `1 MΩ` | 2-terminal variable resistor (rheostat) | Terminal 1 (`CCW`) → `REL_MID` (`R10`); Terminal 2 (`Wiper`) + Terminal 3 (`CW`) tied → `GND` |
-| `RV4` | `OFFSET` | `100 kΩ` | 3-terminal potentiometer | Top (`1`) → `OFF_TOP` (`R11` to `+12V`); Bottom (`3`) → `OFF_BOT` (`R12` to `-12V`); Wiper (`2`) → `OFF_WIPER` (`R13`) *(see Section 6.4 for CW polarity)* |
-
-### 3.6 Jacks & Power Connector
-
-| Ref | Label | Type | Connections |
-|---|---|---|---|
-| `J1` | `IN` | 3.5 mm mono jack (2-pin shown) | Tip → `IN_TIP` (`C1`), Sleeve → `GND` *(if using a 3-pin switched jack like PJ398SM, leave switch pin `TN` open or ground it)* |
-| `J2` | `OUT` | 3.5 mm mono jack (2-pin shown) | Tip ← `OUT_TIP` (`R16`), Sleeve → `GND` |
-| `J3` | `INV_OUT` | 3.5 mm mono jack (2-pin shown) | Tip ← `INV_OUT_TIP` (`R19`), Sleeve → `GND` |
-| `J4` | `PWR` | 3-rail power port (`+12V in`, `GND`, `-12V in`) | `+12V`, `GND`, `-12V` (e.g., standard 10-pin 2×5 Eurorack IDC header) |
+| `+12V` | `J4.+12V_in`, `C3.+`, `R11.1`, `U1.4` (`Vcc+`), `U2.8` (`Vcc+`) | Positive 12 V supply rail |
+| `-12V` | `J4.-12V_in`, `C4.-`, `R12.2`, `R23.2`, `U1.11` (`Vcc-`), `U2.4` (`Vcc-`) | Negative 12 V supply rail |
+| `GND` | `J4.GND`, `C3.-`, `C4.+`, `J1.Sleeve`, `J2.Sleeve`, `J3.Sleeve`, `R1.2`, `U1.3` (`U1A+`), `U1.5` (`U1B+`), `U1.10` (`U1C+`), `C2.2`, `RV3.1`, `RV3.2`, `R14.2`, `U2.3` (`U2A+`), `R22.2` | Reference ground (0 V) |
+| `IN_TIP` | `J1.Tip`, `C1.1` | External audio/CV input |
+| `AC_IN` | `C1.2`, `R1.1`, `R2.1` | AC-coupled input node |
+| `U1A_IN_M` | `R2.2`, `RV1.1`, `U1.2` (`U1A-`) | Gain stage virtual ground |
+| `V_AMP` | `U1.1` (`U1A_Out`), `RV1.2`, `RV1.3`, `R3.1`, `R6.1` | Amplified inverted signal |
+| `U1B_IN_M` | `R3.2`, `R4.1`, `D1.K`, `U1.6` (`U1B-`) | Half-wave rectifier summing node |
+| `U1B_OUT` | `U1.7` (`U1B_Out`), `D1.A`, `D2.K` | Rectifier op-amp output |
+| `V_RECT` | `D2.A`, `R4.2`, `R5.1` | Half-wave rectified output (`-V_AMP` when `V_AMP > 0`, else `0 V`) |
+| `FF_MID` | `R6.2`, `R7.1` | Midpoint of series `10k + 10k` feed-forward resistor |
+| `U1C_IN_M` | `R5.2`, `R7.2`, `R8.1`, `U1.9` (`U1C-`) | Full-wave summing node |
+| `V_FWR` | `U1.8` (`U1C_Out`), `R8.2`, `D3.A` | Positive full-wave rectified output (`+1.1 * |V_AMP|`) |
+| `ATK_IN` | `D3.K`, `RV2.3` | Peak-rectified input to attack pot |
+| `ENV_CAP` | `RV2.1`, `RV2.2`, `C2.1`, `R9.1` | Attack-filtered envelope capacitor node |
+| `ENV_NODE` (`LED`) | `R9.2`, `R10.1`, `U1.12` (`U1D+`), `R20.1` | Unbuffered envelope CV & `LED` tap |
+| `REL_MID` | `R10.2`, `RV3.3` | Junction between `10 kΩ` minimum resistor and `Release` pot |
+| `OFFSET_TOP` | `R11.2`, `RV4.1` | `+10 V` end of `OFFSET` pot |
+| `OFFSET_BOT` | `R12.1`, `RV4.3` | `-10 V` end of `OFFSET` pot |
+| `OFFSET_WIPER` | `RV4.2`, `R13.1` | Adjustable offset voltage tap (`±10 V`) |
+| `U1D_IN_M` | `R13.2`, `R14.1`, `R15.1`, `U1.13` (`U1D-`) | Output stage inverting summing node |
+| `V_OUT_PRE` | `U1.14` (`U1D_Out`), `R15.2`, `R16.1`, `R17.1` | Buffered/offset positive envelope output |
+| `OUT_TIP` | `R16.2`, `J2.Tip` | `OUT` panel jack signal |
+| `U2A_IN_M` | `R17.2`, `R18.1`, `U2.2` (`U2A-`) | Output inverter summing node |
+| `V_INV_PRE` | `U2.1` (`U2A_Out`), `R18.2`, `R19.1` | Inverted envelope output |
+| `INV_OUT_TIP` | `R19.2`, `J3.Tip` | `INV_OUT` panel jack signal |
+| `U2B_IN_P` | `R20.2`, `U2.5` (`U2B+`) | `LED` buffer non-inverting input |
+| `U2B_OUT` | `U2.7` (`U2B_Out`), `U2.6` (`U2B-`), `R21.1` | `LED` buffer output |
+| `LED_A` | `R21.2`, `D4.A` | `LED` anode |
+| `LED_K` | `D4.K`, `R22.1`, `R23.1` | `LED` cathode (`~ -2.79 V` bias node) |
 
 ---
 
-## 4. Stage-by-Stage Circuit Description
+## 5. Practical Build & Bring-Up Checklist
 
-### 4.1 Power Input & Bulk Filtering (`J4`, `C3`, `C4`)
-- Three power input flags (`+12V in`, `GND`, `-12V in`) feed the global `+12V`, `GND`, and `-12V` rails.
-- Two polarized `4.7 µF` electrolytic bulk capacitors decouple the rails to ground:
-  - `C3`: `+` terminal to `+12V`, `-` terminal to `GND`.
-  - `C4`: `+` terminal to `GND`, `-` terminal to `-12V` *(note polarity: `GND` is more positive than `-12V`)*.
-- **Op-Amp Supply Connections:** Per the schematic note, all 6 op-amps are `TL074` or `TL072` devices powered by `Vcc+ = +12V` and `Vcc- = -12V`. Power pins are explicitly drawn on `U2B` (the LED buffer) and implied for `U1A`–`U1D` and `U2A`.
-
-### 4.2 Stage 1 — AC Input Coupling & Gain (`J1`, `C1`, `R1`, `R2`, `RV1`, `U1A`)
-- **Topology:** AC-coupled inverting amplifier.
-- **Connections:**
-  - `J1` Tip feeds `C1` (`4.7 µF`), blocking any DC offset on the incoming signal. `J1` Sleeve connects to `GND`.
-  - After `C1`, `R1` (`1 MΩ`) references the node to `GND`, and `R2` (`10 kΩ`) feeds the inverting input (`-`) of `U1A`.
-  - `U1A` non-inverting input (`+`) connects directly to `GND`.
-  - `RV1` (`100 kΩ`, `GAIN`) is wired as a feedback rheostat from `U1A` `-` input to `U1A` output (with wiper tied to the output-side terminal).
-- **Transfer Function:**
-  $$V_{\text{gain}} = -\frac{R_{\text{GAIN}}}{10\,\text{k}\Omega} \cdot V_{\text{in,AC}}, \qquad \left|\frac{V_{\text{gain}}}{V_{\text{in,AC}}}\right| \in [0,\; 10]\;(0\text{ to }+20\text{ dB})$$
-- **Input Impedance & Cutoff:** Because `U1A` `-` sits at virtual ground, `Z_in ≈ R1 || R2 = 1 MΩ || 10 kΩ ≈ 9.90 kΩ`, giving a high-pass `-3 dB` cutoff of `f_c = 1 / (2π · 9.90 kΩ · 4.7 µF) ≈ 3.42 Hz`.
-
-### 4.3 Stage 2 — Precision Full-Wave Rectifier (`R3`–`R8`, `D1`, `D2`, `U1B`, `U1C`)
-- **Topology:** Classic two-op-amp inverting precision full-wave rectifier producing a **positive-going** rectified waveform.
-- **Half-Wave Stage (`U1B`):**
-  - `R3` (`10 kΩ`) connects `V_GAIN` to `U1B` `-` input (`RECT_INV`), with `U1B` `+` grounded.
-  - `D1` (`1N4148`) connects from `U1B` output (`Anode`) to `U1B` `-` input (`Cathode`).
-  - `D2` (`1N4148`) connects from `RECT_MID` (`Anode`) to `U1B` output (`Cathode`).
-  - `R4` (`10 kΩ`) provides feedback from `RECT_MID` back to `U1B` `-` input.
-- **Summing Stage (`U1C`):**
-  - Two series `10 kΩ` resistors (`R5` + `R6` = `20 kΩ`) feed `V_GAIN` directly to `U1C` `-` input (`SUM_INV`).
-  - `R7` (`10 kΩ`) feeds `RECT_MID` into `U1C` `-` input (`SUM_INV`).
-  - `U1C` `+` input is grounded; `R8` (`22 kΩ`) provides feedback from `U1C` output to `U1C` `-` input.
-- **Circuit Operation:**
-  - When `V_GAIN > 0`: `U1B` output swings negative, reverse-biasing `D1` and forward-biasing `D2`. Thus `V(RECT_MID) = -(10k/10k)·V_GAIN = -V_GAIN`. `U1C` sums `V_GAIN / 20k + (-V_GAIN) / 10k = -V_GAIN / 20k`, yielding `V_RECT = -22k · (-V_GAIN / 20k) = +1.1 · V_GAIN`.
-  - When `V_GAIN < 0`: `U1B` output swings positive (`~+0.6 V`), forward-biasing `D1` and reverse-biasing `D2`. `R4` and `R7` tie `RECT_MID` between two `0 V` virtual grounds, so `V(RECT_MID) = 0 V`. `U1C` sums `V_GAIN / 20k + 0`, yielding `V_RECT = -22k · (V_GAIN / 20k) = -1.1 · V_GAIN = +1.1 · |V_GAIN|`.
-  - Overall rectifier output: $V_{\text{RECT}} = +1.1\,\left|V_{\text{GAIN}}\right| \ge 0$.
-
-### 4.4 Stage 3 — Attack / Release Envelope Detector (`D3`, `RV2`, `C2`, `R9`, `R10`, `RV3`)
-- **Topology:** Unidirectional peak-charging diode followed by separate attack (`RV2`) and release (`R9` + `R10` + `RV3`) RC paths around `C2` (`1 µF`).
-- **Connections:**
-  - `D3` (`1N4148`) conducts when `V_RECT > V(ENV_CAP) + V_f` (`Anode` at `U1C` output, `Cathode` toward `RV2`). When `V_RECT` drops below the stored voltage, `D3` reverse-biases and prevents `C2` from discharging back into `U1C`.
-  - `RV2` (`50 kΩ`, `ATK`) is wired as a rheostat from `D3` cathode to `ENV_CAP` (`C2` positive/top plate to `GND`).
-  - `R9` (`1 kΩ`) connects `ENV_CAP` to the output/sensing node `ENV_RAW` (also tagged with the `LED` net flag).
-  - From `ENV_RAW`, `R10` (`10 kΩ`) goes in series with `RV3` (`1 MΩ`, `Release`, wired as a rheostat) to `GND`.
-- **Time Constants:**
-  - **Attack:** $\tau_{\text{atk}} \approx R_{\text{ATK}} \cdot C_2 \in [\approx 0\text{ ms},\; 50\text{ ms}]$ (when $R_{\text{REL}} \gg R_{\text{ATK}}$; see Section 6.3 for interaction when `Release` is near minimum).
-  - **Release:** $\tau_{\text{rel}} = (R_9 + R_{10} + R_{\text{REL}}) \cdot C_2 = (11\,\text{k}\Omega + R_{\text{REL}}) \cdot 1\,\mu\text{F} \in [11\text{ ms},\; 1.011\text{ s}]$.
-
-### 4.5 Stage 4 — Output Gain, DC Offset & Inverted Output (`U1D`, `RV4`, `R11`–`R19`, `U2A`, `J2`, `J3`)
-- **Non-Inverting Output & Offset Stage (`U1D`):**
-  - `ENV_RAW` connects directly to `U1D` `+` input.
-  - `RV4` (`100 kΩ`, `OFFSET`) sits between `R11` (`10 kΩ` to `+12V`) and `R12` (`10 kΩ` to `-12V`), producing an unloaded wiper Thevenin voltage $V_{\text{th}} \in [-10\text{ V},\; +10\text{ V}]$ with Thevenin source resistance $R_{\text{pot,th}} \in [9.17\text{ k}\Omega,\; 30\text{ k}\Omega]$ (maximum at midpoint).
-  - `R13` (`10 kΩ`) feeds the `OFFSET` wiper into `U1D` `-` input (`OUT_INV_NODE`), which also connects to `GND` via `R14` (`10 kΩ`) and to `U1D` output via `R15` (`10 kΩ`).
-  - Defining $R_{\text{off}} = 10\text{ k}\Omega + R_{\text{pot,th}}$ ($40\text{ k}\Omega$ at midpoint; $19.17\text{ k}\Omega$ at extremes):
-    $$V_{\text{OUT\_BUF}} = \left(2 + \frac{10\text{ k}\Omega}{R_{\text{off}}}\right) V_{\text{ENV\_RAW}} - \left(\frac{10\text{ k}\Omega}{R_{\text{off}}}\right) V_{\text{th}}$$
-    - **Center (`OFFSET` = 50%):** $V_{\text{OUT\_BUF}} = 2.25 \cdot V_{\text{ENV\_RAW}}$ (`0 V` DC offset).
-    - **Top extreme (`+12V` side):** $V_{\text{OUT\_BUF}} \approx 2.52 \cdot V_{\text{ENV\_RAW}} - 5.22\text{ V}$.
-    - **Bottom extreme (`-12V` side):** $V_{\text{OUT\_BUF}} \approx 2.52 \cdot V_{\text{ENV\_RAW}} + 5.22\text{ V}$.
-  - `R16` (`1 kΩ`) feeds `V_OUT_BUF` to `J2` (`OUT`) Tip (`J2` Sleeve → `GND`).
-- **Inverted Output Stage (`U2A`):**
-  - `R17` (`10 kΩ`) feeds `V_OUT_BUF` into `U2A` `-` input (`U2A` `+` → `GND`), with `R18` (`10 kΩ`) feedback:
-    $$V_{\text{INV\_BUF}} = -\frac{10\text{ k}\Omega}{10\text{ k}\Omega}\, V_{\text{OUT\_BUF}} = -V_{\text{OUT\_BUF}}$$
-  - `R19` (`1 kΩ`) feeds `V_INV_BUF` to `J3` (`INV_OUT`) Tip (`J3` Sleeve → `GND`).
-
-### 4.6 Stage 5 — LED Indicator Buffer & Negative Bias (`R20`–`R23`, `U2B`, `D4`)
-- **Connections:**
-  - The net labeled `LED` connects `ENV_RAW` through `R20` (`10 kΩ`) into `U2B` `+` input (`LED_BUF_IN`).
-  - `U2B` is configured as a unity-gain voltage follower (`U2B` `-` connected directly to `U2B` output), preventing the LED current from loading the envelope timing network (`C2` / `Release`).
-  - `U2B` output (`V_LED_DRV = V_ENV_RAW`) drives `R21` (`22 kΩ`) → `D4` (`LED`, `Anode` on `R21` side, `Cathode` on divider side).
-  - `D4` cathode connects to `LED_BIAS`, set by `R22` (`10 kΩ` to `GND`) and `R23` (`33 kΩ` to `-12V`).
-- **Bias Analysis:**
-  - Open-circuit cathode bias voltage: $V_{\text{bias}} = -12\text{ V} \times \frac{10\text{ k}\Omega}{10\text{ k}\Omega + 33\text{ k}\Omega} = -2.79\text{ V}$, with Thevenin impedance $R_{\text{th}} = 10\text{ k}\Omega \parallel 33\text{ k}\Omega = 7.67\text{ k}\Omega$.
-  - This negative bias shifts the LED turn-on knee down by `~2.79 V`, allowing even small positive envelope voltages above `0 V` to overcome `V_f` and illuminate the LED linearly (especially suited for green/blue/white LEDs with `V_f ≈ 2.8–3.0 V`).
-  - LED current: $I_{\text{LED}} \approx \dfrac{V_{\text{ENV\_RAW}} + 2.79\text{ V} - V_f}{22\text{ k}\Omega + 7.67\text{ k}\Omega} = \dfrac{V_{\text{ENV\_RAW}} + 2.79\text{ V} - V_f}{29.67\text{ k}\Omega}$.
-
----
-
-## 5. Complete Pin-for-Pin Netlist & IC Pin Mapping
-
-### 5.1 Op-Amp IC Pin Assignment (`U1 = TL074`, `U2 = TL072`)
-
-| IC & Unit | Function | `+` Input Pin (Net) | `-` Input Pin (Net) | Output Pin (Net) | Supply Pins |
-|---|---|---|---|---|---|
-| `U1A` (`TL074`) | Input Gain (`-0..-10×`) | Pin `3` (`GND`) | Pin `2` (`IN_SUM`) | Pin `1` (`V_GAIN`) | Pin `4` (`+12V`), Pin `11` (`-12V`) |
-| `U1B` (`TL074`) | Precision Rectifier 1 | Pin `5` (`GND`) | Pin `6` (`RECT_INV`) | Pin `7` (`RECT_OP_OUT`) | Shared on `U1` |
-| `U1C` (`TL074`) | Precision Rectifier 2 | Pin `10` (`GND`) | Pin `9` (`SUM_INV`) | Pin `8` (`V_RECT`) | Shared on `U1` |
-| `U1D` (`TL074`) | Output Gain & Offset | Pin `12` (`ENV_RAW`) | Pin `13` (`OUT_INV_NODE`) | Pin `14` (`V_OUT_BUF`) | Shared on `U1` |
-| `U2A` (`TL072`) | Inverted Output (`-1×`) | Pin `3` (`GND`) | Pin `2` (`INV_SUM`) | Pin `1` (`V_INV_BUF`) | Pin `8` (`+12V`), Pin `4` (`-12V`) |
-| `U2B` (`TL072`) | LED Buffer (`+1×`) | Pin `5` (`LED_BUF_IN`) | Pin `6` (`V_LED_DRV`) | Pin `7` (`V_LED_DRV`) | Shared on `U2` |
-
-*(If building with `3 × TL072` instead of `1 × TL074 + 1 × TL072`, note that `TL072` Pin `4` is `Vcc-` and Pin `8` is `Vcc+`, whereas `TL074` Pin `4` is `Vcc+` and Pin `11` is `Vcc-`.)*
-
-### 5.2 Complete Net-by-Net Connectivity Table
-
-Every component terminal in the circuit (`105` total pins) is listed below:
-
-| Net Name | Connected Component Pins |
-|---|---|
-| **`+12V`** | `J4.+12V`, `C3.+`, `R11.1`, `U1.4` (`Vcc+`), `U2.8` (`Vcc+`) |
-| **`-12V`** | `J4.-12V`, `C4.-`, `R12.1`, `R23.1`, `U1.11` (`Vcc-`), `U2.4` (`Vcc-`) |
-| **`GND`** | `J4.GND`, `C3.-`, `C4.+`, `J1.Sleeve`, `R1.2`, `U1.3` (`U1A+`), `U1.5` (`U1B+`), `U1.10` (`U1C+`), `C2.2`, `RV3.2` (`Wiper`), `RV3.3` (`CW`), `R14.2`, `U2.3` (`U2A+`), `J2.Sleeve`, `J3.Sleeve`, `R22.2` |
-| **`IN_TIP`** | `J1.Tip`, `C1.1` |
-| **`IN_AC`** | `C1.2`, `R1.1`, `R2.1` |
-| **`IN_SUM`** | `R2.2`, `U1.2` (`U1A-`), `RV1.1` (`GAIN`) |
-| **`V_GAIN`** | `U1.1` (`U1A OUT`), `RV1.2` (`Wiper`), `RV1.3`, `R3.1`, `R5.1` |
-| **`RECT_INV`** | `R3.2`, `U1.6` (`U1B-`), `R4.1`, `D1.K` |
-| **`RECT_OP_OUT`** | `U1.7` (`U1B OUT`), `D1.A`, `D2.K` |
-| **`RECT_MID`** | `D2.A`, `R4.2`, `R7.1` |
-| **`RECT_FF_MID`** | `R5.2`, `R6.1` |
-| **`SUM_INV`** | `R6.2`, `R7.2`, `U1.9` (`U1C-`), `R8.1` |
-| **`V_RECT`** | `U1.8` (`U1C OUT`), `R8.2`, `D3.A` |
-| **`RECT_DIODE_OUT`** | `D3.K`, `RV2.1` (`ATK`) |
-| **`ENV_CAP`** | `RV2.2` (`Wiper`), `RV2.3`, `C2.1`, `R9.1` |
-| **`ENV_RAW`** *(schematic label: `LED`)* | `R9.2`, `R10.1`, `U1.12` (`U1D+`), `R20.1` |
-| **`REL_MID`** | `R10.2`, `RV3.1` (`Release`) |
-| **`OFF_TOP`** | `R11.2`, `RV4.1` (`OFFSET`) |
-| **`OFF_BOT`** | `R12.2`, `RV4.3` (`OFFSET`) |
-| **`OFF_WIPER`** | `RV4.2` (`Wiper`), `R13.1` |
-| **`OUT_INV_NODE`** | `R13.2`, `R14.1`, `R15.1`, `U1.13` (`U1D-`) |
-| **`V_OUT_BUF`** | `U1.14` (`U1D OUT`), `R15.2`, `R16.1`, `R17.1` |
-| **`OUT_TIP`** | `R16.2`, `J2.Tip` |
-| **`INV_SUM`** | `R17.2`, `R18.1`, `U2.2` (`U2A-`) |
-| **`V_INV_BUF`** | `U2.1` (`U2A OUT`), `R18.2`, `R19.1` |
-| **`INV_OUT_TIP`** | `R19.2`, `J3.Tip` |
-| **`LED_BUF_IN`** | `R20.2`, `U2.5` (`U2B+`) |
-| **`V_LED_DRV`** | `U2.6` (`U2B-`), `U2.7` (`U2B OUT`), `R21.1` |
-| **`LED_A`** | `R21.2`, `D4.A` |
-| **`LED_BIAS`** | `D4.K`, `R22.1`, `R23.2` |
-
----
-
-## 6. Practical Build & Verification Notes
-
-### 6.1 Additions Recommended for Reliable Hardware Builds (Not Drawn in Source)
-1. **Local IC Decoupling (`C5`–`C8`):** Add a `100 nF` (`0.1 µF`, ≥ 25 V X7R ceramic) capacitor from `+12V` to `GND` and from `-12V` to `GND` directly at the power pins of **each** op-amp IC (`U1` and `U2`) to prevent oscillation/noise.
-2. **Power Reverse-Polarity / Inrush Protection:** If building for Eurorack with a standard 2×5 IDC header (`J4`), consider adding series Schottky diodes (e.g., `1N5819`) or `10 Ω` current-limiting resistors on `+12V in` and `-12V in` upstream of `C3`/`C4` to protect `U1` and `U2` against reversed power cables.
-3. **Capacitor Selection (`C1`, `C2`):** Both `C1` (`4.7 µF`) and `C2` (`1 µF`) are drawn as non-polarized capacitors. Avoid standard polarized electrolytic capacitors for `C2` (leakage current degrades long `Release` times) and for `C1` (AC signal swings both positive and negative around `0 V`). Film or ceramic X7R (≥ 25 V) for `1 µF` (`C2`) and film or bipolar electrolytic (`BP`/`NP`) for `4.7 µF` (`C1`) are ideal.
-
-### 6.2 Input Impedance & Signal Levels
-- Because `R2` (`10 kΩ`) terminates into `U1A`'s virtual ground, the input impedance is `~9.9 kΩ`. This works cleanly with modular/synth line and Eurorack outputs (`~1 kΩ` source impedance), and `GAIN` up to `10×` accommodates quiet line-level signals (`~0.5–1 Vpp`). High-impedance passive pickups (e.g., electric guitar) will experience treble/level loss unless preceded by a high-Z buffer.
-- Because `D3` (`1N4148`) sits outside `U1C`'s feedback loop, signals whose rectified amplitude `1.1 · |V_gain|` stays below `~0.6 V` will not charge `C2`. Turn `GAIN` up so peak signal amplitude after `U1A`/`U1C` comfortably exceeds `~0.6 V` (`1 V` to `10 V` peak).
-
-### 6.3 Attack / Release Control Interaction
-- When `ATK` (`RV2`) is set high (`~50 kΩ`) **and** `Release` (`RV3`) is set near minimum (`0 Ω`), `RV2` (`50 kΩ`) and `R9 + R10` (`11 kΩ`) form a voltage divider during charging (`11k / (50k + 11k) ≈ 0.18`), which limits peak envelope voltage on `C2` unless `Release` is increased or `GAIN` is raised. This is normal behavior for passive diode-resistor AR envelope followers.
-
-### 6.4 Potentiometer Rotation Direction (`GAIN`, `ATK`, `Release`, `OFFSET`)
-Looking at the front of a standard rotary potentiometer with pins pointing down (`1 = CCW`, `2 = Wiper`, `3 = CW`):
-- **`GAIN` (`RV1`), `ATK` (`RV2`), `Release` (`RV3`):** Wiring Pin `1` (`CCW`) to one circuit node and tying Pins `2 + 3` (`Wiper + CW`) to the other gives `0 Ω` at full CCW and maximum resistance (`100 kΩ` / `50 kΩ` / `1 MΩ`) at full CW (clockwise = more gain, slower attack, slower release). If you prefer clockwise = *faster* attack on `ATK`, tie Pins `1 + 2` together instead.
-- **`OFFSET` (`RV4`):** Because the wiper feeds the **inverting** input (`-`) of `U1D`, turning the wiper toward `+12V` shifts `OUT` **negative** (and `INV_OUT` positive), while turning toward `-12V` shifts `OUT` **positive**.
-  - To make **clockwise = more positive `OUT`**: wire Pin `1` (`CCW`) to `OFF_TOP` (`R11` → `+12V`) and Pin `3` (`CW`) to `OFF_BOT` (`R12` → `-12V`).
-  - To make **clockwise = more negative `OUT` / positive `INV_OUT`**: wire Pin `1` (`CCW`) to `OFF_BOT` (`-12V`) and Pin `3` (`CW`) to `OFF_TOP` (`+12V`).
-
-### 6.5 LED Brightness & Threshold (`D4`, `R21`–`R23`)
-- With `R21 = 22 kΩ`, `R22 = 10 kΩ`, and `R23 = 33 kΩ`, the LED forward current is relatively low (`~0.33 mA` at `V_ENV_RAW = +10 V`, `~0.16 mA` at `+5 V` for a `2.9 V` green/blue LED). Use a **high-brightness / high-efficiency LED** so it remains clearly visible at sub-milliamp current.
-- At idle (`V_ENV_RAW = 0 V`), the cathode sits at `-2.79 V`:
-  - A **green, blue, or white LED** (`V_f ≈ 2.8–3.2 V`) stays completely off at `0 V` and lights promptly as soon as `V_ENV_RAW` rises above `~0.1–0.4 V`.
-  - A **red or amber LED** (`V_f ≈ 1.8–2.0 V`) has `~30 µA` trickle current at `0 V` (usually invisible or a very faint glow; if unwanted, adjust `R23` upward slightly, e.g., `47 kΩ`, so `V_bias ≈ -2.1 V`).
-
-### 6.6 Bring-Up & Bench Test Procedure
-1. **Unpowered continuity check:** Verify no shorts between `+12V`, `GND`, and `-12V`. Confirm polarity of `C3`, `C4`, `D1`, `D2`, `D3`, and `D4` (`LED`).
-2. **Power-up (no input, `U1`/`U2` installed):**
-   - Measure `+12 V` and `-12 V` at `U1` pins `4`/`11` and `U2` pins `8`/`4`.
-   - With `IN` unplugged (`GND`), verify `U1A` out (`pin 1`), `U1B` out (`pin 7` ≈ `0 V`), `U1C` out (`pin 8` ≈ `0 V`), and `ENV_RAW` (`≈ 0 V`).
-   - Adjust `OFFSET` (`RV4`) through its full sweep and verify `OUT` (`J2` Tip) sweeps smoothly between roughly `-5.2 V` and `+5.2 V`, and `INV_OUT` (`J3` Tip) tracks at `-OUT`. Center `OFFSET` so `OUT ≈ 0.0 V`.
-3. **Dynamic envelope test:**
-   - Set `GAIN` (`RV1`) to ~50%, `ATK` (`RV2`) to ~10% (fast), `Release` (`RV3`) to ~30%.
-   - Inject a `1 kHz`, `2 Vpp` sine wave into `IN` (`J1`).
-   - Verify `U1A` out (`pin 1`) shows an inverted amplified sine wave (`~10 Vpp` at 50% linear pot), `U1C` out (`pin 8`) shows a positive full-wave rectified waveform (`~5.5 V` peak), `OUT` (`J2`) outputs a steady positive DC envelope (`~+10 V` capped near op-amp headroom if `GAIN` is high), `INV_OUT` (`J3`) outputs the negative mirror (`~-10 V`), and `LED` (`D4`) lights brightly.
-   - Gate/burst the sine wave on and off and confirm `ATK` slows the rising edge and `Release` extends the falling tail up to several seconds.
+1. **Diode Polarity:** Double-check all three `1N4148` diodes (`D1`, `D2`, `D3`) before soldering—reversing `D1` or `D2` breaks full-wave symmetry, and reversing `D3` produces a negative peak detector instead of a positive envelope.
+2. **Electrolytic Polarity (`C3`, `C4`):** Observe that `C4` on the `-12V` rail has its **`+` lead at `GND`** and its **`-` lead at `-12V`**.
+3. **Decoupling Capacitors:** Even though not explicitly drawn in the sketch, solder one `100 nF` ceramic capacitor from `+12V` to `GND` and one from `-12V` to `GND` right next to `U1` and `U2` to prevent oscillation.
+4. **Potentiometer Taper Suggestions:**
+   - `GAIN` (`RV1`, `100 kΩ`): Linear (`B100K`) or Reverse-Log (`C100K`) for smooth dB control.
+   - `ATK` (`RV2`, `50 kΩ`): Linear (`B50K`) or Audio/Log (`A50K`) for fine control at fast attack settings.
+   - `Release` (`RV3`, `1 MΩ`): Audio/Log (`A1M`) strongly recommended for smooth control over short `11 ms–150 ms` releases as well as long `1 s` decays (Linear `B1M` works too, with most range compressed near the bottom).
+   - `OFFSET` (`RV4`, `100 kΩ`): Linear (`B100K`), optionally center-detented.
+5. **Initial Power-Up Test:**
+   - Measure `+12V` (`U1.4`, `U2.8`) and `-12V` (`U1.11`, `U2.4`) before inserting socketed ICs (if using sockets).
+   - With `IN` unplugged, set `GAIN` mid-way and verify `OFFSET` sweeps `OUT` smoothly over roughly `±5 V` and `INV_OUT` tracks `-OUT`.
+   - Center `OFFSET` so `OUT ≈ 0 V` at idle, set `ATK` fast and `Release` medium, feed a `1 Vpp` `100 Hz` sine wave into `IN`, and verify `OUT` rises smoothly to a steady positive DC voltage (adjustable with `GAIN`), `INV_OUT` mirrors it negatively, and `LED` illuminates proportionally.
