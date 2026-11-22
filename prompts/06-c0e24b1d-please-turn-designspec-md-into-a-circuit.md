@@ -6,8 +6,8 @@
 | :--- | :--- |
 | **Session ID** | `c0e24b1d-a380-43c7-9b3d-211c59674ca3` [↗](conversation://c0e24b1d-a380-43c7-9b3d-211c59674ca3) |
 | **Project / Workspace** | [`/Users/brett/Documents/GitHub/EnvelopeFollowerWithSkewLimiter`](file:///Users/brett/Documents/GitHub/EnvelopeFollowerWithSkewLimiter) |
-| **Started At** | `2026-11-22 00:28` |
-| **Ended At** | `2026-11-22 02:10` |
+| **Started At** | `2026-11-21 22:28` |
+| **Ended At** | `2026-11-22 00:10` |
 | **Duration** | `1:42:52` |
 | **Model** | Gemini 4 Neon (XHigh) |
 | **Total Steps** | 501 |

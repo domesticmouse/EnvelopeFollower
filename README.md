@@ -86,7 +86,7 @@ Documentation sources, clean-room stage artifacts, audit reports, and prompt log
 * [**`stages/`**](stages/) & [**`AuditReport.md`**](AuditReport.md) – Clean-room end-to-end replay artifacts (`stages/stage-1/` through `stages/stage-7/`) including SKiDL code, KiCad PCBs, Gerbers/drills, bottom-side CPL, [`stages/stage-7/OrderingNotes.md`](stages/stage-7/OrderingNotes.md), and test-drive audit report.
 * [**`SkillImprovementAuditReport.md`**](SkillImprovementAuditReport.md) – Per-prompt `/agy-customizations` hardware skill improvement audit (`25` deduplicated findings across `15` tutorial prompts).
 * [**`PotentialImprovements.md`**](PotentialImprovements.md) – Engineering note on adding an `AC / DC` input coupling switch (`SW1`) for CV rectification and AR slew limiting.
-* [**`prompts/README.md`**](prompts/README.md) – Exported per-conversation prompt traces (`12` sessions) from [**EnvelopeFollowerWithSkewLimiter**](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter), a companion project loosely following this codelab (used as source material for updating [`docs/tutorial/`](docs/tutorial/)).
+* [**`prompts/README.md`**](prompts/README.md) – Exported per-conversation prompt traces (`16` sessions) from [**EnvelopeFollowerWithSkewLimiter**](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter), a companion project loosely following this codelab (used as source material for updating [`docs/tutorial/`](docs/tutorial/)).
 
 ---
 
@@ -110,7 +110,7 @@ EnvelopeFollower/
 │   ├── javascripts/mathjax.js             # MathJax v3 initialization for circuit equations
 │   └── images/                            # Sketch, 3D portrait PCB/panel renders & landscape PCBA hero
 ├── stages/                                # Clean-room tutorial stage snapshots (stage-1 .. stage-7)
-├── prompts/                               # Per-conversation prompt traces from EnvelopeFollowerWithSkewLimiter (12 sessions)
+├── prompts/                               # Per-conversation prompt traces from EnvelopeFollowerWithSkewLimiter (16 sessions)
 ├── skills-lock.json                       # Agent skill lockfile
 └── .agents/skills/                        # Workspace skills (agy-brain-explorer, skill-improvement-audit, tutorial-test-drive)
 ```
