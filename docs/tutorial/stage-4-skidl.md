@@ -1,207 +1,175 @@
-# Stage 4: Translating the Improved Circuit to SKiDL (`envelope_follower.py`)
+# Stage 4: SKiDL Capture, Custom Footprints & KiCad PDF Schematic
 
-Defining the circuit in **SKiDL** turns the netlist into testable, version-controlled Python code that enforces `ERC()` assertions and outputs both a KiCad netlist and a JLCPCB-ready BOM in one execution—while keeping optional `DNP` test points, optical fiducials, and manual THT hardware cleanly separated from the SMT PCBA BOM.
+With every net, part number, and `DNP` test point locked inside `DesignSpec.md` ([Stage 3](stage-3-bom-and-dfm.md)), SKiDL turns the netlist into testable Python code (`envelope_follower.py`)—and then drives a custom 9-section KiCad 10 `.kicad_sch` schematic and printable PDF (`generate_schematic.py`) directly from `build_circuit()` as the single source of truth.
 
-## AI Agent Prompt
+---
 
-Because [Stage 3](stage-3-bom-and-dfm.md) already froze every net, component reference, LCSC code, `DNP` attribute, and silkscreen schedule inside `EnvelopeFollowerImproved.md`, `EnvelopeFollowerBOM.md`, and `SilkscreenInstructions.md`, you only need a single prompt to drive the `/skidl` skill:
+## Step 4.1: Single-Sentence `/skidl` Handoff & Downstream-First Alignment
 
-> *"`/skidl` Please turn `@EnvelopeFollowerImproved.md`, `@EnvelopeFollowerBOM.md`, and `@SilkscreenInstructions.md` into a SKiDL circuit in `envelope_follower.py`, run ERC (`envelope_follower.erc`), and export `envelope_follower.net`, `envelope_follower_bom.xml`, and `jlcpcb_bom.csv`."*
+### AI Agent Prompt ([Trace 06 Turn 1](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/06-c0e24b1d-please-turn-designspec-md-into-a-circuit.md))
 
-!!! note "One Prompt Runs the Entire Stage"
-    **You do not need to run the commands below manually.** Sending this single prompt causes the AI agent (guided by `.agents/skills/skidl/SKILL.md`) to execute Steps 4.1–4.3 automatically behind the scenes:
+> *"`/skidl` Please turn `@[DesignSpec.md]` into a circuit."*
 
-    - Creating the isolated Python 3.14 `.venv` and installing `skidl`.
-    - Inspecting KiCad 10 symbol pins and footprint pad polarities (and optionally querying `jlcpcb_search.py` if any LCSC codes need live verification).
-    - Writing `envelope_follower.py` with all `71` footprints (`60` populated physical parts = `49` SMD + `11` THT, plus `8` `DNP` `TP1`–`TP8` test points and `3` `DNP` optical fiducials `FID1`–`FID3`) across `42` active nets.
-    - Running `.venv/bin/python envelope_follower.py`, verifying `ERC()` passes with `0` errors and `0` warnings, exporting `envelope_follower.net`, `envelope_follower_bom.xml`, and `jlcpcb_bom.csv`, and formatting the code with `ruff`.
+Notice how a complete `DesignSpec.md` shrinks the SKiDL prompt to one sentence. The only remaining hardware ambiguity (`SW1`/`SW2` SPST vs. SPDT symbol and footprint) surfaced as a single multiple-choice question—locking in `Switch:SW_SPDT` (`Pin 2` common, `Pin 3` active when lever is UP, `Pin 1 = NC`) on a project-local `Dailywell 2MS1` footprint.
 
-    Steps 4.1–4.3 below show what the agent executes under the hood—and give you the exact commands to re-run manually if you ever edit `envelope_follower.py` by hand.
+### Environment Setup & Downstream-First Habits
 
-## Step 4.1: Environment Setup & Symbol Verification (Run by the Agent)
-
-In response to the `/skidl` prompt, **the agent creates** an isolated `.venv` with `uv` (using Python 3.14 so prebuilt `h5py` wheels install without compiling from source) and installs `skidl`:
+1. **Pin `.venv` to Python 3.14 (Not 3.15+)**:
+   System Python 3.15 lacks prebuilt `h5py` wheels needed by `skidl`. Create `.venv` on Python `3.12`–`3.14`:
 
 ```bash
 uv venv --clear --python 3.14 .venv
 uv pip install skidl
 ```
 
-Before writing `envelope_follower.py`, **the agent inspects** the local KiCad 10 `.kicad_sym` and `.kicad_mod` definitions—for example via `show("Amplifier_Operational", "TL074")`, `show("Diode", "BAT54S")`, `show("Diode", "BAV99")`, `show("Connector_Audio", "AudioJack2_SwitchT")`, and `show("Connector", "TestPoint")`—to confirm exact pin numbers and pad polarities.
-
-Because `EnvelopeFollowerBOM.md` ([Stage 3](stage-3-bom-and-dfm.md)) already locked down the LCSC part numbers, the agent reads them directly from the BOM. If any part needs a live stock or Basic vs. Extended pricing re-check, the agent (or you) can run `jlcpcb_search.py`:
+2. **Read Downstream Skills Before Writing SKiDL**:
+   Inspect `.agents/skills/kicad-pcbnew-layout/` and `.agents/skills/eurorack-panel/` *before* coding `envelope_follower.py`. Those downstream generators read `LCSC`, `MPN`, `Manufacturer`, `JLCPCB_Class`, `Silkscreen`, and `Notes` directly from `part.fields`, rely on `JLCPCB_Class = "Manual THT"` for [Stage 7](stage-7-manufacturing.md)'s THT-only `InteractiveHtmlBom` filter, and expect front-panel bushings (`(0, 0)` on switches) to match `eurorack-panel`.
+3. **Budgeted JLCPCB Basic vs. Extended Sourcing**:
+   Query live stock and feeder fees via `jlcpcb_search.py --in-stock-only`:
 
 ```bash
 .venv/bin/python .agents/skills/skidl/scripts/jlcpcb_search.py \
-    --in-stock-only "TL074HIDR" "BAT54S" "BAV99" "B5819W" "1N4148WS" "RT0603BRD0710KL" "RTT124700FTP" "22uF 50V"
+    --in-stock-only "TL074HIDR" "BAT54S" "RT0603BRD0710KL" "B5819W" "1N4148W" "2.2nF 50V" "220nF 50V" "10uF 1206"
 ```
 
-## Step 4.2: Anatomy of the Generated `envelope_follower.py`
+   The finalized **`50` SMDs** fit across **`17` BOM rows** while honoring a strict **3-Extended-SKU budget** (`C2878713` `TL074HIDR` `×2`, `C83935` `BAT54S` `×1`, `C95204` `10k 0.1%` `×14`). Upgrading `10 µF` decoupling/filter caps (`C9`, `C15`, `C16`) to Basic `50 V` `1206` MLCCs (`C13585`) preserves far more capacitance under DC bias than `0805` X5R parts at zero extra feeder fee, while `C10` uses a Basic `2.2 nF 50 V C0G` `0805` (`C28260`) and `C14` uses a Basic `220 nF 50 V X7R` `0805` (`C5378`).
 
-**The agent generates `envelope_follower.py`** using four SKiDL patterns from the `skidl` skill that make the improved 60-populated (+8 `DNP` test points + 3 fiducials), 42-net circuit modular and fabrication-ready:
+---
 
-1. **Working-Directory Lock & Pre-Import Environment Setup**:
-   Call `os.chdir(Path(__file__).resolve().parent)` *before* importing `skidl` so SKiDL writes `skidl_REPL.*` logs locally instead of polluting parent folders, and set `XDG_DATA_HOME`, `MPLCONFIGDIR`, `KICAD*_SYMBOL_DIR`, and `KICAD10_FOOTPRINT_DIR` so SKiDL resolves KiCad 10's `.kicad_sym` libraries cleanly on macOS.
+## Step 4.2: Authoring & Validating Custom Project-Local Footprints
 
-2. **Templates, `_apply_fields()` Metadata, `DNP` Test Points & Optical Fiducials**:
-   Instantiate reusable `dest=TEMPLATE` parts for `0603`/`1206`/`1210` resistors, `0603` capacitors, `Alps RK09K` pots, `WQP-PJ398SM` jacks, `TestPoint_THTPad_D2.0mm_Drill1.0mm` test points, and `Mechanical:Fiducial` (`Fiducial:Fiducial_1mm_Mask2mm`), setting `fid_t.lib.filename = "Mechanical"` when present. Write catalog and silkscreen metadata directly into `part.fields` via `_apply_fields()` (rather than plain Python attributes, which SKiDL's netlist and XML exporters ignore):
+KiCad 10 does not ship a vertical sub-miniature PCB toggle footprint for the Dailywell `2MS1T1B1M2QES` (`Tayda A-6087`, `2.54 mm` pitch, `1.2 mm` drills). Instead of approximating it with a pin header, create a project-local library:
 
-    ```python
-    def _apply_fields(
-        part,
-        *,
-        lcsc: str = "",
-        mpn: str = "",
-        manufacturer: str = "",
-        jlc_class: str = "",
-        silkscreen: str = "",
-        notes: str = "",
-    ) -> None:
-        """Populate BOM, catalog, silkscreen, and assembly metadata into part.fields."""
-        metadata = {
-            "LCSC": lcsc,
-            "MPN": mpn,
-            "Manufacturer": manufacturer,
-            "JLCPCB_Class": jlc_class,
-            "Silkscreen": silkscreen,
-            "Notes": notes,
-        }
-        for key, val in metadata.items():
-            if val:
-                part.fields[key] = val
+- **`footprints/Eurorack_Custom.pretty/SW_Toggle_SPDT_Dailywell_2MS1.kicad_mod`**: Sets `(0, 0)` at `Pad 2` (and the `5.0 mm` bushing `fp_circle` on `F.Fab`) so `eurorack-panel` extracts exact drill coordinates automatically, with `Pad 1` (`NC`) at `(0, -2.54)` and `Pad 3` (active throw when toggle lever is UP = `SMOOTH` / `SLOW`) at `(0, +2.54)`.
+- **`fp-lib-table`** in the repo root registers `Eurorack_Custom` via `${KIPRJMOD}/footprints/Eurorack_Custom.pretty`.
+- Append `pathlib.Path(__file__).resolve().parent / "footprints"` to `footprint_search_paths[KICAD]` in `envelope_follower.py`, and validate that KiCad loads the footprint cleanly with `pcbnew.FootprintLoad()`:
 
+```bash
+/Applications/KiCad/KiCad.app/Contents/Frameworks/Python.framework/Versions/Current/bin/python3 - <<'EOF'
+import pcbnew
+fp = pcbnew.FootprintLoad("footprints/Eurorack_Custom.pretty", "SW_Toggle_SPDT_Dailywell_2MS1")
+assert fp is not None and len(fp.Pads()) == 3
+print("Loaded custom footprint with pads:", [p.GetNumber() for p in fp.Pads()])
+EOF
+```
 
-    def make_r_10k_01(ref: str):
-        return make_r(
-            r0603_t,
-            ref,
-            "10k 0.1%",
-            lcsc="C95204",
-            mpn="RT0603BRD0710KL",
-            manufacturer="YAGEO",
-            jlc_class="Extended",
-            silkscreen="10k",
-            notes="0.1% 25ppm matched rectifier network at U1B/U1C",
-        )
-    ```
+---
 
-    - **Populated THT Hardware** (`RV1`–`RV4`, `J1`–`J3`, `D4`, `J4`, `C1`, `C2`) is tagged `JLCPCB_Class = "Manual THT"` or `"Consigned THT"` so `generate_jlcpcb_bom()` excludes them from the SMT pick-and-place CSV while `part.fields["Silkscreen"]` preserves labels like `"RV1 GAIN A100k"` and `"J4 PWR"`.
-    - **Optional Test Points (`TP1`–`TP8`) & SMT Fiducials (`FID1`–`FID3`)**: Both instantiate with `tp.dnp = True` and `tp.exclude_from_bom = True` (`TP1`–`TP8` carry `LCSC="C5199801"`, `MPN="RH-5001"`, `Silkscreen=tp_silk`) so neither `jlcpcb_bom.csv` nor the assembly build tries to populate them (`exclude_from_pos_files` is likewise enforced during [Stage 5](stage-5-schematic-and-pcb.md) PCB generation).
+## Step 4.3: Anatomy of `envelope_follower.py` & Multi-Layer Netlist Verification
 
-3. **Stage-by-Stage Net Wiring in `build_circuit()` (All 8 `TL074H` Channels Active)**:
-   Power nets (`+12V_IN`, `-12V_IN`, `+12V_PROT`, `-12V_PROT`, `+12V`, `-12V`, `GND`) carry `drive = POWER` and `NetClass("Power", priority=1, trace_width=0.5, clearance=0.2)`. Unused output jack normalled switches (`j2["TN"]`, `j3["TN"]`) connect to `builtins.NC`, while `j1["TN"]` wires to `gnd`. Notice how `U2D` forms the `101 kΩ` input buffer (`Stage 1A`), `U2C` forms the active peak detector (`Stage 4`), and `D_IN`/`D_OUT`/`D_INV_OUT` (`BAV99`) wire by physical pin number `[1, 2, 3]`:
+Key patterns inside `reference/envelope_follower.py` (`80` footprints, `48` active nets):
 
-    ```python
-    # Stages 2 & 3 — 0.1%-Matched Unity-Gain Precision Rectifier (U1B, U1C, D1_D2)
-    gnd += u1[5], u1[10]
-    u1b_inv += r3[2], u1[6], r6[1], d1_d2[2]
-    u1b_out += u1[7], d1_d2[3]
-    rect_hw += d1_d2[1], r6[2], r7[1]
-    ff_mid += r4[2], r5[1]
-    u1c_inv += r5[2], r7[2], u1[9], r8a[1]
-    rect_fb_mid += r8a[2], r8b[1]
-    rect_out += u1[8], r8b[2], u2[10]
+```python
+# Excerpt from reference/envelope_follower.py: NetClasses, ERC assertions & XML BOM
+pwr_class = NetClass("Power", priority=1, trace_width=0.30, clearance=0.20)
+hiz_class = NetClass("HighImpedance", priority=2, trace_width=0.25, clearance=0.25)
 
-    # Stage 4 — Active Zero-Deadzone Peak Detector & Attack/Release (U2C)
-    u2c_out += u2[8], d3[2]  # A
-    atk_in += d3[1], u2[9], r_atk_min[1]  # K
-    atk_pot_1 += r_atk_min[2], rv2[1]
-    env_node += rv2[2], rv2[3], c2[1], r10[1], r_env_prot[1], r20[1]
-    rel_pot_top += r10[2], rv3[1]
-    gnd += c2[2], rv3[2], rv3[3]
+erc_assert(
+    "len(builtins.default_circuit.parts) == 80",
+    "Expected 80 total footprints (68 populated + 12 DNP test points).",
+)
+erc_assert(
+    "{n.name for n in builtins.default_circuit.get_nets()} == EXPECTED_NETS",
+    "Circuit net set does not match the 48 nets in DesignSpec.md.",
+)
+erc_assert(
+    "_part('C2')[1].net.name == 'GND' and _part('C2')[2].net.name == '-12V'",
+    "C2 (-12V electrolytic) must have pin 1 (+) on GND and pin 2 (-) on -12V.",
+)
+erc_assert(
+    "_part('D3')[1].net.name == 'NET_RECT_HALF' "
+    "and _part('D3')[2].net.name == 'NET_U1B_INV' "
+    "and _part('D3')[3].net.name == 'NET_U1B_OUT'",
+    "D3 (BAT54S) pinout mismatch against DesignSpec.md.",
+)
+erc_assert(
+    "all(getattr(_part(f'TP{i}'), 'dnp', False) "
+    "and getattr(_part(f'TP{i}'), 'exclude_from_bom', False) for i in range(1, 13))",
+    "All test points TP1-TP12 must be marked dnp=True and exclude_from_bom=True.",
+)
+```
 
-    # Stage 5 — Linearized OFFSET, In-Loop Feedback & Protected Outputs (U1D, U2A)
-    u1d_in += r_env_prot[2], u1[12]
-    off_top += r11[2], rv4[1]
-    off_bot += r12[2], rv4[3]
-    off_wiper += rv4[2], r13[1]
-    u1d_inv += r13[2], r15[1], c_out1[1], u1[13]
-    u1d_out += u1[14], c_out1[2], r16a[1]
-    out_clamp += r16a[2], r15[2], d_out[3], r16b[1], r17[1]
-    out_tip += r16b[2], j2["T"]
-    gnd += j2["S"], u2[3], j3["S"]
-    j2["TN"] += builtins.NC
-
-    u2a_inv += r17[2], r18[1], c_out2[1], u2[2]
-    u2a_out += u2[1], c_out2[2], r19a[1]
-    inv_out_clamp += r19a[2], r18[2], d_inv_out[3], r19b[1]
-    inv_out_tip += r19b[2], j3["T"]
-    j3["TN"] += builtins.NC
-    ```
-
-4. **Programmatic `erc_assert()` & BOM Filtering**:
-   Ten exact part-count and net pin-count assertions catch missing or stray connections before `ERC()`, `generate_netlist()`, `generate_xml()`, and `generate_jlcpcb_bom()` run:
-
-    ```python
-    erc_assert(
-        "len(builtins.default_circuit.parts) == 71",
-        "Expected 71 total footprints (68 BOM/DNP + 3 fiducials)",
-    )
-    erc_assert(
-        "len(builtins.default_circuit.get_nets()) == 42",
-        "Expected 42 active signal/power nets",
-    )
-    erc_assert("len(v12p) == 11", "Expected 11 nodes on +12V rail")
-    erc_assert("len(v12n) == 11", "Expected 11 nodes on -12V rail")
-    erc_assert("len(gnd) == 26", "Expected 26 nodes on GND net")
-    erc_assert("len(preamp_out) == 8", "Expected 8 nodes on PREAMP_OUT")
-    erc_assert("len(rect_out) == 4", "Expected 4 nodes on RECT_OUT")
-    erc_assert("len(env_node) == 6", "Expected 6 nodes on ENV_NODE")
-    erc_assert("len(out_clamp) == 6", "Expected 6 nodes on OUT_CLAMP")
-    erc_assert("len(inv_out_clamp) == 5", "Expected 5 nodes on INV_OUT_CLAMP")
-    ```
-
-!!! warning "KiCad 10 Polarized & Dual-Diode Pin Conventions"
-    Always inspect `.kicad_sym` and `.kicad_mod` definitions before wiring polarized parts by pin number:
-
-    - **`Device:C_Polarized` (`CP_Elec_6.3x5.4`)**: Pin `1` is `+` and Pin `2` is `-`. On the `-12V` rail, **`c4[1]` connects to `GND`** (`0 V`) and **`c4[2]` connects to `-12V`** (`-11.55 V`).
-    - **`Device:D_Schottky`, `Diode:1N4148WS`, and `Device:LED`**: Pin `1` is **`K` (cathode)** and Pin `2` is **`A` (anode)**—the opposite of intuitive "1 = anode" assumptions. Verify `d_pwr_n[1]` (`K`) goes to `-12V_IN`, `d_pwr_n[2]` (`A`) goes to `-12V_PROT`, and `d_led_clamp` sits anti-parallel (`[1]` to `U2B_OUT`, `[2]` to `LED_K`) across `D4`.
-    - **`Diode:BAV99` (`SOT-23`)**: Physical `SOT-23` pins are `1 = A1` (`-12V`), `2 = K2` (`+12V`), and `3 = COM` (`IN_AC` / `OUT_CLAMP` / `INV_OUT_CLAMP`). Always index `BAV99` by physical pin integers `[1, 2, 3]` because KiCad's legacy hidden pin names read `K`/`A`/`K`.
-
-## Step 4.3: Automated Execution, Linting & Outputs (Run by the Agent)
-
-After writing `envelope_follower.py`, **the agent automatically runs the script** inside `.venv` to execute `ERC()` and generate the netlist and BOM files, then lints and formats the Python files with `ruff` (you can re-run these same commands manually any time you tweak `envelope_follower.py`):
+- **Multi-Layer Netlist Verification**: After running `.venv/bin/python envelope_follower.py`, check every `(ref, pin)` pair in `envelope_follower.net` against real `.kicad_mod` pad names (`S`/`T`/`TN`, `1`/`2`/`3`, `1`–`14`), and verify `parse_netlist("envelope_follower.net")` *without* passing `dnp_prefixes` so you confirm genuine `.net` `dnp` properties propagate on `TP1`–`TP12`.
+- **Clean Execution & Linting**:
 
 ```bash
 .venv/bin/python envelope_follower.py
-ruff check --fix envelope_follower.py envelope_follower_sklib.py
-ruff format envelope_follower.py envelope_follower_sklib.py
+ruff check --fix envelope_follower.py
+ruff format envelope_follower.py
 ```
 
-Console summary:
-
-```text
-Summary: 71 total footprints, 42 active nets, jlcpcb_bom.csv -> 19 lines (49 SMT parts)
-```
-
-Key generated files:
-
-- `envelope_follower.erc`: `ERC INFO: No errors or warnings found while running ERC.`
-- `envelope_follower.net`: KiCad netlist containing all **60 populated physical components + 8 `DNP` test points + 3 `DNP` fiducials (`71` footprints total)** and **42 active nets** (zero `NO_LIB` entries).
-- `envelope_follower_bom.xml`: Full XML BOM with embedded `LCSC`, `MPN`, `JLCPCB_Class`, `Silkscreen`, `DNP`, and `Notes` fields.
-- `jlcpcb_bom.csv`: Grouped 4-column JLCPCB SMT BOM (`Comment,Designator,Footprint,LCSC Part #`) with **19 SMT line items** (**49 SMD components total**: `14` JLCPCB Basic lines / `33` parts + `5` Extended lines / `16` parts; the `11` populated THT parts, `8` `DNP` test points, and `3` `DNP` fiducials are excluded automatically).
-
-??? info "Preview of generated `jlcpcb_bom.csv` (19 SMT line items, 49 SMD components)"
+??? info "Preview of generated `jlcpcb_bom.csv` (17 SMD rows, 50 SMD parts, 3 Extended SKUs)"
 
     ```csv
     Comment,Designator,Footprint,LCSC Part #
-    TL074H,"U1, U2",SOIC-14_3.9x8.7mm_P1.27mm,C2878713
-    B5819W,"D_PWR_P, D_PWR_N",D_SOD-123,C8598
-    BAT54S,D1_D2,SOT-23,C47546
-    1N4148WS,"D3, D_LED_CLAMP",D_SOD-323,C2128
-    BAV99,"D_IN, D_OUT, D_INV_OUT",SOT-23,C2500
-    10R,"R_PWR_P, R_PWR_N",R_1206_3216Metric,C17903
-    470R,R_ATK_MIN,R_0603_1608Metric,C23179
-    470R 0.5W,"R16A, R16B, R19A, R19B",R_1210_3225Metric,C333193
-    1k,"R_IN_PROT, R_IN_BUF, R_GAIN_MIN, R11, R12",R_0603_1608Metric,C21190
-    2.2k,R_LED,R_0603_1608Metric,C4190
-    10k,"R2, R10, R_ENV_PROT, R15, R17, R18, R20",R_0603_1608Metric,C25804
-    10k 0.1%,"R3, R4, R5, R6, R7, R8A, R8B",R_0603_1608Metric,C95204
-    18k,R13,R_0603_1608Metric,C25810
-    100k,R1,R_0603_1608Metric,C25803
-    1M,R_GAIN_FAIL,R_0603_1608Metric,C22935
-    100nF,"C_DEC1, C_DEC2, C_DEC3, C_DEC4",C_0603_1608Metric,C14663
-    47pF C0G,C_HF,C_0603_1608Metric,C1671
-    100pF C0G,"C_OUT1, C_OUT2",C_0603_1608Metric,C14858
-    22uF 50V,"C3, C4",CP_Elec_6.3x5.4,C2836438
+    100nF,"C3, C4, C5, C6",C_0603_1608Metric,C14663
+    33pF,C8,C_0603_1608Metric,C1663
+    10uF,"C9, C15, C16",C_1206_3216Metric,C13585
+    2.2nF,C10,C_0805_2012Metric,C28260
+    220nF,C14,C_0805_2012Metric,C5378
+    B5819W,"D1, D2",D_SOD-123,C8598
+    BAT54S,D3,SOT-23,C83935
+    1N4148W,"D4, D5",D_SOD-123,C81598
+    10R,"R1, R2",R_0603_1608Metric,C22859
+    1M,"R3, R5, R16",R_0603_1608Metric,C22935
+    10k 0.1%,"R4, R6, R7, R8, R9, R10, R11, R12, R13, R14, R17, R18, R30, R31",R_0603_1608Metric,C95204
+    1k,"R15, R19, R20, R25, R26, R28, R32",R_0603_1608Metric,C21190
+    49.9k,"R21, R22",R_0603_1608Metric,C23184
+    100k,"R23, R24",R_0603_1608Metric,C25803
+    5.1k,"R27, R29",R_0603_1608Metric,C23186
+    2.2k,R33,R_0603_1608Metric,C4190
+    TL074HIDR,"U1, U2",SOIC-14_3.9x8.7mm_P1.27mm,C2878713
     ```
+
+---
+
+## Step 4.4: Generating a Human-Readable KiCad 10 Schematic & PDF
+
+### AI Agent Prompts ([Trace 06 Turns 2 & 4](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/06-c0e24b1d-please-turn-designspec-md-into-a-circuit.md))
+
+> *"`/skidl` I'd like a KiCad schematic so I can visualise this circuit"*
+>
+> *"Please generate a PDF version of the schematic. Add to `@[README.md]` and git commit."*
+
+!!! warning "Do Not Rely on `skidl.generate_schematic()` (`schematizer 0.2.0`)"
+    SKiDL's built-in `generate_schematic()` (`schematizer`) fails or produces tangled, stub-exploded diagrams on multi-op-amp analog circuits with shared rails, multi-unit `TL074` packages, and switched jacks. Keep `envelope_follower.py` as your electrical single source of truth and drive a clean KiCad 10 `.kicad_sch` generator directly from `envelope_follower.build_circuit()`.
+
+### Architecture of `generate_schematic.py`
+
+1. **SKiDL as Single Source of Truth**: Imports `envelope_follower.build_circuit()` directly so component values, footprints, `LCSC`/`MPN`/`Silkscreen` fields, `DNP` flags, and net connectivity never drift from `envelope_follower.net`.
+2. **Quote-Preserving S-Expression Parser**: Uses a custom `Quoted(str)` AST parser/dumper instead of `simp_sexp`, which strips quotes from strings containing spaces or parentheses.
+3. **Flattening `(extends ...)` KiCad Symbols**: Recursively merges child flags (`pin_names`, `in_bom`, `on_board`) onto parent symbols during `_flatten()` so extended symbols like `Amplifier_Operational:TL074` keep valid KiCad properties.
+4. **KiCad 10 Formatting & Text Rules**: Omits explicit `(justify center)` (which aborts KiCad 10 schematic loading), applies empirical `_text_transform(rot, mirror)` relative-angle rules for `SCH_FIELD`s, emits explicit `PWR_FLAG` symbols on driven rails, and lays out **9 titled sections** (`128` symbol instances, `236` wires, `4` no-connect markers) clear of the A3 title block.
+
+### 4-Layer Schematic Verification Loop
+
+Before committing `envelope_follower.kicad_sch` and `envelope_follower.pdf`, verify all four layers:
+
+```bash
+# 1. Generate schematic & export its KiCad netlist for 100% pin-for-pin parity diff against SKiDL
+.venv/bin/python generate_schematic.py
+kicad-cli sch export netlist --output /tmp/sch_check.net envelope_follower.kicad_sch
+
+# 2. Run KiCad 10 schematic ERC (0 errors)
+kicad-cli sch erc --severity-all --output /tmp/sch_erc.rpt envelope_follower.kicad_sch
+
+# 3. Run kicad skill schematic analyzer
+python3 .agents/skills/kicad/scripts/analyze_schematic.py envelope_follower.kicad_sch
+
+# 4. Export printable A3 PDF & rasterize preview for Pillow visual inspection of every section
+kicad-cli sch export pdf --output envelope_follower.pdf envelope_follower.kicad_sch
+sips -s format png -Z 2400 envelope_follower.pdf --out images/schematic.png
+```
+
+Use `PIL.Image.crop()` on `images/schematic.png` to inspect each of the 9 schematic sections visually—catching overlapping labels, dangling wires, or clipped title-block margins before PCB layout begins.
+
+![KiCad 10 9-Section A3 Schematic](../images/schematic.png)
+
+---
+
+!!! warning "SKiDL 3.0.0 & KiCad 10 Pitfalls"
+    - **Python `<= 3.14`:** System Python 3.15 lacks prebuilt `h5py` wheels (`uv venv --clear --python 3.14 .venv`).
+    - **Upstream `generate_xml()` Bug:** SKiDL 3.0.0's `generate_xml()` emits invalid unparseable XML—write your own `xml.etree.ElementTree` XML exporter (`generate_kicad_xml()`).
+    - **`erc_assert()` Evaluation Scoping:** Python 3 generator comprehensions referencing caller locals inside `erc_assert("...")` string expressions raise `NameError` inside `eval()`. Keep helper lookups in module scope (`_part('C2')`) or avoid local captures inside assertion strings.
+    - **Benign `default_circuit.root.tag = ""` Warning:** Keep `builtins.default_circuit.root.tag` empty and pass `tag=...` on subcircuits/parts; ignore SKiDL's benign tag warning when organizing `@subcircuit` blocks.
+    - **Scratch File Hygiene & KiCad Python `< 3.12`:** Ensure `.gitignore` ignores `skidl_REPL.*` and `*.kicad_prl`, and pull dict lookups out of f-strings (`{...}`) whenever a script may run under KiCad's bundled Python 3.9 (`SyntaxError` on backslashes inside `{...}`).

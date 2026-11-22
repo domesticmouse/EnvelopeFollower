@@ -3,4 +3,5 @@ site/
 .venv/
 _tmp_*
 capability_mode.json
+skidl_REPL.*
 
