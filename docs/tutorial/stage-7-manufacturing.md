@@ -267,7 +267,7 @@ assert not missing, f"Broken local links in README.md: {missing}"
 
 ## Next: Planning the Companion Site (Stage 8) & Tutorial Appendix
 
-Your hardware design is now fabrication-ready, visually documented across `81` **Build Checklist** renders, backed by real-world vendor order logs, and paired with `8` musical **Patch Guides** — completing the `20`-file Markdown corpus. Next, in **Stage 8**, you shift from hardware CAD into software/site planning: layering `mattpocock/skills` atop your hardware skills and running a structured `/wayfinder` planning arc (from one seed **Prompt Block** through parallel research, HITL grilling, `GLOSSARY.md`, ADR `0001`, throwaway UI prototypes, and an implementation spec) before building and shipping the live **`ENV / SKEW` Companion Site** in Stage 9.
+Your hardware design is now fabrication-ready, visually documented across `81` **Build Checklist** renders, backed by real-world vendor order logs, and paired with `8` musical **Patch Guides** — completing the `20`-file Markdown corpus. Next, in **[Stage 8: Planning the Companion Site with `/wayfinder`](stage-8-wayfinder-site-planning.md)**, you shift from hardware CAD into software/site planning: layering `mattpocock/skills` atop your hardware skills and running a structured `/wayfinder` planning arc (from one seed **Prompt Block** through parallel research, HITL grilling, `GLOSSARY.md`, ADR `0001`, throwaway UI prototypes, and an implementation spec) before building and shipping the live **`ENV / SKEW` Companion Site** in Stage 9.
 
 You can also consult the **Tutorial Appendix** at any time:
 
