@@ -4,6 +4,9 @@ site_url: https://domesticmouse.github.io/EnvelopeFollower/
 repo_url: https://github.com/domesticmouse/EnvelopeFollower
 repo_name: domesticmouse/EnvelopeFollower
 edit_uri: blob/main/docs/
+exclude_docs: |
+  agents/
+  adr/
 
 theme:
   name: material
