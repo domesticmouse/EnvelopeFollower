@@ -81,6 +81,7 @@ nav:
           - "Stage 7: Fabrication, Visual Checklists, Orders & Patch Guides": tutorial/stage-7-manufacturing.md
       - Companion Site:
           - "Stage 8: Planning the Companion Site with /wayfinder": tutorial/stage-8-wayfinder-site-planning.md
+          - "Stage 9: Building, Reviewing & Shipping the Companion Site": tutorial/stage-9-companion-site-delivery.md
       - Optional Exploration:
           - "Optional: AC/DC Input Coupling Mode": tutorial/optional-dc-coupled-mode.md
   - Reference:
