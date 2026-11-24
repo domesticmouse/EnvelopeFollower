@@ -1,5 +1,5 @@
-site_name: Eurorack Envelope Follower Tutorial
-site_description: End-to-End Interactive Hardware Design Tutorial with AI Skills, SKiDL, VectorCraft, and KiCad 10
+site_name: ENV / SKEW Build Tutorial
+site_description: End-to-End Interactive Hardware & Companion Site Tutorial for ENV / SKEW with AI Skills, SKiDL, KiCad 10, VectorCraft, and /wayfinder
 site_url: https://domesticmouse.github.io/EnvelopeFollower/
 repo_url: https://github.com/domesticmouse/EnvelopeFollower
 repo_name: domesticmouse/EnvelopeFollower
@@ -7,24 +7,24 @@ edit_uri: blob/main/docs/
 exclude_docs: |
   agents/
   adr/
+  research/
 
 theme:
   name: material
+  font: false
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: indigo
-      accent: amber
+    - scheme: slate
+      primary: custom
+      accent: custom
       toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: indigo
-      accent: amber
-      toggle:
-        icon: material/brightness-4
+        icon: material/weather-sunny
         name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark studio mode
   features:
     - navigation.tabs
     - navigation.sections
@@ -59,9 +59,14 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
 
+extra_css:
+  - stylesheets/fonts.css
+  - stylesheets/extra.css
+
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/prompt-copy.js
 
 nav:
   - Overview: index.md
