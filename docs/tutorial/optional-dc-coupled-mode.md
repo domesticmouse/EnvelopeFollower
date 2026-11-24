@@ -1,9 +1,9 @@
-# Optional Engineering Branch: DC-Coupled FWR Mode (`SW3` Across `C7`)
+# Optional Exploration: AC/DC Input Coupling Mode (`SW3` Across `C7`)
 
 Rather than bolting on every possible feature at once, [Stage 2](stage-2-circuit-upgrades.md) (`EnvelopeFollowerImprovements.md`) shows how an interactive AI engineering session captures **modular upgrade ideas** as standalone option notes before you lock a panel layout.
 
-!!! info "Relationship to the `EnvelopeFollowerWithSkewLimiter` Worked Build"
-    The completed 6 HP module featured throughout [Stage 3](stage-3-bom-and-dfm.md) through [Stage 7](stage-7-manufacturing.md) (**`EnvelopeFollowerWithSkewLimiter`**) **already includes three major Eurorack upgrades**:
+!!! info "Relationship to the `ENV / SKEW` Worked Build"
+    The completed 6 HP module featured throughout [Stage 3](stage-3-bom-and-dfm.md) through [Stage 7](stage-7-manufacturing.md) (**`ENV / SKEW`**, built in `domesticmouse/EnvelopeFollowerWithSkewLimiter`) **already includes three major Eurorack upgrades**:
 
     - **`J2` (`SLEW IN`):** A dedicated **DC-coupled** direct input to the active skew limiter (`U1D`/`U2A`, `R16 = 1 MΩ` to `GND`, `R17 = 10 kΩ`), normalled from the internal full-wave rectifier when unpatched.
     - **`SW1` (`SMOOTH` / `RAW`):** Switchable `29 Hz` Sallen/T-network `2f` ripple filter (`R21`/`R22` = `49.9 kΩ`, `C14 = 220 nF`).
@@ -44,11 +44,11 @@ flowchart LR
 
 ## Critical Design Interactions on the Updated Schematic
 
-If you add `SW3` on top of the [`DesignSpec.md`](../reference/netlist-and-bom.md) circuit, inspect these **four** concrete circuit interactions identified by the agent architecture:
+If you add `SW3` on top of the [`DesignSpec.md`](../reference/netlist-and-bom.md) circuit ([view the Reference Spec on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/specs/design-spec/)), inspect these **four** concrete circuit interactions identified by the agent architecture:
 
 ### 1. Preamp `C9` (`10 µF`) Low-Frequency Gain Shelf (`1.59 Hz`)
 
-In `EnvelopeFollowerWithSkewLimiter`, `U1A` uses `R6 = 10 kΩ`, `R7 = 10 kΩ`, and `C9 = 10 µF` to `GND` (`1 / (2π · 10 kΩ · 10 µF) = 1.59 Hz`) so DC offset is already blocked (`1.00×` DC gain -> only `~1 mV` typical offset with **`TL074HIDR`**):
+In **`ENV / SKEW`**, `U1A` uses `R6 = 10 kΩ`, `R7 = 10 kΩ`, and `C9 = 10 µF` to `GND` (`1 / (2π · 10 kΩ · 10 µF) = 1.59 Hz`) so DC offset is already blocked (`1.00×` DC gain -> only `~1 mV` typical offset with **`TL074HIDR`**):
 
 - **Good news:** Shorting `C7` with `SW3` will **never** saturate `U1A` or require a second blocking switch, because `C9` keeps DC gain at unity (`1.00×`).
 - **Shelf effect to decide on:** Because `U1A` has **`1.00×` gain below `~0.5 Hz`** and **`2.00×` (`+6 dB`) gain above `~5 Hz`**, a variable-rate LFO swept across `0.2–5 Hz` shifts amplitude by `2×` unless you either keep LFO gain unified or switch `C9` out in `DC` mode. Use a **DPDT toggle for `SW3`** (`pole 1` shorts `C7` for DC passage; `pole 2` disconnects `C9` or leaves unity `1×` gain everywhere for flat `DC–20 kHz` LFO tracking) if flat sub-Hz CV amplitude matters.

@@ -1,5 +1,5 @@
-site_name: Eurorack Envelope Follower Tutorial
-site_description: End-to-End Interactive Hardware Design Tutorial with AI Skills, SKiDL, VectorCraft, and KiCad 10
+site_name: ENV / SKEW Build Tutorial
+site_description: End-to-End Interactive Hardware & Companion Site Tutorial for ENV / SKEW with AI Skills, SKiDL, KiCad 10, VectorCraft, and /wayfinder
 site_url: https://domesticmouse.github.io/EnvelopeFollower/
 repo_url: https://github.com/domesticmouse/EnvelopeFollower
 repo_name: domesticmouse/EnvelopeFollower
@@ -7,24 +7,24 @@ edit_uri: blob/main/docs/
 exclude_docs: |
   agents/
   adr/
+  research/
 
 theme:
   name: material
+  font: false
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: indigo
-      accent: amber
+    - scheme: slate
+      primary: custom
+      accent: custom
       toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: indigo
-      accent: amber
-      toggle:
-        icon: material/brightness-4
+        icon: material/weather-sunny
         name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark studio mode
   features:
     - navigation.tabs
     - navigation.sections
@@ -59,21 +59,31 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
 
+extra_css:
+  - stylesheets/fonts.css
+  - stylesheets/extra.css
+
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/prompt-copy.js
 
 nav:
   - Overview: index.md
   - Tutorial:
-      - "Stage 1: Hardware Agent Skills & Repo Setup": tutorial/stage-1-agent-skills.md
-      - "Stage 2: Sketch Extraction & Circuit Critique": tutorial/stage-2-circuit-upgrades.md
-      - "Stage 3: Interactive DesignSpec & Test Points": tutorial/stage-3-bom-and-dfm.md
-      - "Stage 4: SKiDL Capture & KiCad Schematic": tutorial/stage-4-skidl.md
-      - "Stage 5: 6 HP PCB, silk_layout.json & /edit-silkscreen": tutorial/stage-5-schematic-and-pcb.md
-      - "Stage 6: Mated 3U Front Panel & VectorCraft Artwork": tutorial/stage-6-front-panel.md
-      - "Stage 7: Checklists, IBOM, Fabrication & Bring-Up": tutorial/stage-7-manufacturing.md
-      - "Optional: AC/DC Input Coupling Mode": tutorial/optional-dc-coupled-mode.md
-  - Reference:
-      - "Netlist, BOM & Capture Guide": reference/netlist-and-bom.md
-      - "PCB & Fabrication Checklist": reference/build-checklist.md
+      - Hardware Build:
+          - "Stage 1: Hardware Agent Skills & Repo Setup": tutorial/stage-1-agent-skills.md
+          - "Stage 2: Sketch Extraction & Circuit Critique": tutorial/stage-2-circuit-upgrades.md
+          - "Stage 3: Interactive DesignSpec & Test Points": tutorial/stage-3-bom-and-dfm.md
+          - "Stage 4: SKiDL Capture & KiCad Schematic": tutorial/stage-4-skidl.md
+          - "Stage 5: 6 HP PCB, silk_layout.json & /edit-silkscreen": tutorial/stage-5-schematic-and-pcb.md
+          - "Stage 6: Mated 3U Front Panel & VectorCraft Artwork": tutorial/stage-6-front-panel.md
+          - "Stage 7: Fabrication, Visual Checklists, Orders & Patch Guides": tutorial/stage-7-manufacturing.md
+      - Companion Site:
+          - "Stage 8: Planning the Companion Site with /wayfinder": tutorial/stage-8-wayfinder-site-planning.md
+          - "Stage 9: Building, Reviewing & Shipping the Companion Site": tutorial/stage-9-companion-site-delivery.md
+      - Optional Exploration:
+          - "Optional: AC/DC Input Coupling Mode": tutorial/optional-dc-coupled-mode.md
+  - Appendix:
+      - "Netlist, BOM & Silkscreen Schedule": reference/netlist-and-bom.md
+      - "Engineering Sign-Off Checklist": reference/build-checklist.md

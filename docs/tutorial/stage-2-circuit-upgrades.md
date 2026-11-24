@@ -1,6 +1,6 @@
 # Stage 2: Sketch Extraction & Quantitative Circuit Critique
 
-Start from [Hagiwo's original post](https://note.com/solder_state/n/n110e9ba066b3?hl=en) and the hand-drawn reference schematic, [`EnvelopeFollower.webp`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.webp):
+Start from the **Hagiwo Sketch** ([`EnvelopeFollower.webp`](https://github.com/domesticmouse/EnvelopeFollower/blob/main/EnvelopeFollower.webp)), drawn by **HAGIWO/ハギヲ** (`@solder_state`) for his DIY Eurorack Project **No. 43**, [`$4 Envelope Follower module`](https://note.com/solder_state/n/n110e9ba066b3?hl=en) (published `2022-01-28`, with a companion [YouTube build demo (`0eHllqHmlZQ`)](https://www.youtube.com/watch?v=0eHllqHmlZQ); read the full lineage on the [Origin Story page on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/origin/)):
 
 ![Hagiwo's Original Envelope Follower Sketch](../images/EnvelopeFollower.webp)
 
@@ -17,9 +17,10 @@ Rather than jumping straight from a raw sketch to a PCB in a single prompt, Stag
 
 ## Step 2.1: Multi-Scale Extraction into Immutable `EnvelopeFollower.md`
 
-### AI Agent Prompt
+Run the extraction prompt below ([Trace 02](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/02-7f75c0c1-please-review-envelopefollower-webp-i-d-like.md)) to transcribe the **Hagiwo Sketch** into an immutable baseline spec ([read `EnvelopeFollower.md` on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/specs/base-circuit/) · [source in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/EnvelopeFollower.md)):
 
-> *"Please review `EnvelopeFollower.webp`. I'd like to extract a Markdown description of the circuit that can be used to build a circuit, and save it to `EnvelopeFollower.md`. Afterwards, update `@[README.md]` and git commit."*
+!!! prompt "AI Agent Prompt — Sketch Extraction"
+    Please review `EnvelopeFollower.webp`. I'd like to extract a Markdown description of the circuit that can be used to build a circuit, and save it to `EnvelopeFollower.md`. Afterwards, update `@[README.md]` and git commit.
 
 ### Extraction Guardrails Observed in Trace 02
 
@@ -60,9 +61,10 @@ EOF
 
 ## Step 2.2: Quantitative Critique & Tiered Upgrade Architecture (`EnvelopeFollowerImprovements.md`)
 
-### AI Agent Prompt
+Next, ask the agent to perform a quantitative analog critique ([Trace 03](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/03-6a910d47-please-review-envelopefollower-md-are-there-improv.md)) and record the tiered upgrades ([read `EnvelopeFollowerImprovements.md` on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/specs/circuit-review/) · [source in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/EnvelopeFollowerImprovements.md)):
 
-> *"Please review `EnvelopeFollower.md`. Are there improvements that could be made to the circuit? Record the suggested improvements and explanations to `EnvelopeFollowerImprovements.md`. Update `@[README.md]` and git commit."*
+!!! prompt "AI Agent Prompt — Quantitative Circuit Critique"
+    Please review `EnvelopeFollower.md`. Are there improvements that could be made to the circuit? Record the suggested improvements and explanations to `EnvelopeFollowerImprovements.md`. Update `@[README.md]` and git commit.
 
 ### What Makes a Critique Actionable (Distilled from Trace 03)
 
@@ -94,5 +96,5 @@ EOF
 
 In earlier drafts of this workflow, users ran a separate one-shot *"add Eurorack protections"* prompt at the end of Stage 2 before firing another one-shot prompt to produce four disconnected Markdown files. Instead, both **Tier 2 Eurorack protections (`2.4`)** and **Tier 3 feature candidates (`3.1`–`3.4`)** are now decided **collaboratively inside [Stage 3](stage-3-bom-and-dfm.md)**—locking every electrical value, component package, and test point straight into a single **`DesignSpec.md`**.
 
-!!! tip "Exploring Optional Feature Branches from `EnvelopeFollowerImprovements.md`"
-    Want to see how Antigravity expands on an individual Tier 3 candidate when you explore a custom branch—such as turning Tier 3.3's **`AC / DC` coupling switch** into a precision CV rectifier and LFO frequency doubler? Read **[Optional Direction: AC/DC Input Coupling Mode](optional-dc-coupled-mode.md)**.
+!!! tip "Exploring Optional Features from `EnvelopeFollowerImprovements.md`"
+    Want to see how Antigravity expands on an individual Tier 3 candidate when you explore a custom feature—such as turning Tier 3.3's **`AC / DC` coupling switch** into a precision CV rectifier and LFO frequency doubler? Read **[Optional: AC/DC Input Coupling Mode](optional-dc-coupled-mode.md)**.
