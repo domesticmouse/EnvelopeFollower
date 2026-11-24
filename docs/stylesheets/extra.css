@@ -5,7 +5,7 @@
 
   --md-text-font: "IBM Plex Sans";
   --md-code-font: "IBM Plex Mono";
-  --font-display: "Space Grotesk", var(--md-text-font-family), system-ui, -apple-system, sans-serif;
+  --font-display: "Space Grotesk", "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Raw ENV / SKEW studio tokens */
