@@ -218,5 +218,5 @@ With [ENV / SKEW GitHub Pages Site & README Overhaul — Implementation Specific
 
 You can also consult the **Tutorial Appendix** at any time:
 
-- **[Netlist, BOM & Capture Guide](../reference/netlist-and-bom.md)** — Complete `80`-component (`+ 3` fiducials) BOM, `jlcpcb_bom.csv`, `48` active nets, and `silk_layout.json` schedule.
+- **[Netlist, BOM & Silkscreen Schedule](../reference/netlist-and-bom.md)** — Complete `80`-component (`+ 3` fiducials) BOM, `jlcpcb_bom.csv`, `48` active nets, and `silk_layout.json` schedule.
 - **[Engineering Sign-Off Checklist](../reference/build-checklist.md)** — End-to-end engineering verification summary tying hardware phases to `EnvelopeFollowerWithSkewLimiter`.

@@ -37,7 +37,7 @@
     }
   }
 
-  function report(button, ok) {
+  function showCopyFeedback(button, ok) {
     const tip = button.nextElementSibling;
     if (!tip) return;
     clearTimeout(timers.get(button));
@@ -69,19 +69,17 @@
 
   async function copyPrompt(button, target) {
     if (!button || !target) return;
-    const text = target.matches("input, textarea")
-      ? target.value
-      : target.innerText.trim();
+    const text = target.innerText.trim();
     if (!text) return;
 
     try {
       await navigator.clipboard.writeText(text);
-      report(button, true);
+      showCopyFeedback(button, true);
     } catch {
       if (legacyCopy(text)) {
-        report(button, true);
+        showCopyFeedback(button, true);
       } else {
-        report(button, false);
+        showCopyFeedback(button, false);
       }
     }
   }

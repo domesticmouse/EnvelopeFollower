@@ -205,14 +205,22 @@ class ParsedPage:
     blockquote_count: int = 0
 
 
+@dataclass
+class _TagStackFrame:
+    """Parser stack frame tracking element tag, prompt-container flag, and adjacency."""
+
+    tag: str
+    is_prompt_div: bool = False
+    last_child_was_prompt: bool = False
+
+
 class SiteHTMLParser(HTMLParser):
     """Single-pass HTML parser extracting ids, links, images, prompts, and blockquotes."""
 
     def __init__(self, path: Path, raw_text: str) -> None:
         super().__init__(convert_charrefs=True)
         self.page = ParsedPage(path=path, raw_text=raw_text)
-        # Stack entries: [tag, is_prompt_div, last_child_was_prompt]
-        self._stack: list[list[object]] = [["__root__", False, False]]
+        self._stack: list[_TagStackFrame] = [_TagStackFrame("__root__")]
         self._active_prompt_depth: int | None = None
         self._in_prompt_title: bool = False
         self._prompt_title_parts: list[str] = []
@@ -238,18 +246,18 @@ class SiteHTMLParser(HTMLParser):
         if self._active_prompt_depth is None:
             parent_state = self._stack[-1]
             if is_prompt_div:
-                self._prompt_adjacent = bool(parent_state[2])
+                self._prompt_adjacent = parent_state.last_child_was_prompt
                 self._active_prompt_depth = len(self._stack)
                 self._prompt_title_parts = []
                 self._prompt_body_parts = []
-                parent_state[2] = False
+                parent_state.last_child_was_prompt = False
             else:
-                parent_state[2] = False
+                parent_state.last_child_was_prompt = False
         elif tag == "p" and "admonition-title" in classes:
             self._in_prompt_title = True
 
         if tag not in VOID_HTML_TAGS:
-            self._stack.append([tag, is_prompt_div, False])
+            self._stack.append(_TagStackFrame(tag=tag, is_prompt_div=is_prompt_div))
 
     def handle_endtag(self, tag: str) -> None:
         if tag in VOID_HTML_TAGS:
@@ -261,7 +269,7 @@ class SiteHTMLParser(HTMLParser):
         # Pop back to matching open tag (defensive for malformed HTML)
         while len(self._stack) > 1:
             entry = self._stack.pop()
-            if entry[1] and self._active_prompt_depth == len(self._stack):
+            if entry.is_prompt_div and self._active_prompt_depth == len(self._stack):
                 title = " ".join("".join(self._prompt_title_parts).split())
                 body = " ".join("".join(self._prompt_body_parts).split())
                 self.page.prompt_blocks.append(
@@ -273,8 +281,8 @@ class SiteHTMLParser(HTMLParser):
                 )
                 self._active_prompt_depth = None
                 self._in_prompt_title = False
-                self._stack[-1][2] = True
-            if entry[0] == tag:
+                self._stack[-1].last_child_was_prompt = True
+            if entry.tag == tag:
                 break
 
     def handle_data(self, data: str) -> None:
@@ -284,7 +292,7 @@ class SiteHTMLParser(HTMLParser):
             else:
                 self._prompt_body_parts.append(data)
         elif data.strip():
-            self._stack[-1][2] = False
+            self._stack[-1].last_child_was_prompt = False
 
 
 def parse_built_pages(site_dir: Path) -> dict[Path, ParsedPage]:
@@ -407,6 +415,17 @@ def check_html_links_and_images(
                 result.fail("Check 2", f"{rel_page} <img src='{src}'> points to missing file")
 
 
+def _check_no_google_fonts(label: str, text: str, result: VerificationResult) -> None:
+    """Fail if text contains any external Google Fonts domain reference."""
+    lowered = text.lower()
+    for domain in GOOGLE_FONT_DOMAINS:
+        if domain in lowered:
+            result.fail(
+                "Check 3",
+                f"External Google Fonts reference ({domain}) in {label}",
+            )
+
+
 def check_self_hosted_typography(
     root: Path,
     site_dir: Path,
@@ -442,23 +461,16 @@ def check_self_hosted_typography(
             if not target.is_file():
                 result.fail("Check 3", f"Broken url(...) in docs/stylesheets/fonts.css: {url}")
 
+    site_root = site_dir.resolve()
     for page_path, page in pages.items():
-        lowered = page.raw_text.lower()
-        for domain in GOOGLE_FONT_DOMAINS:
-            if domain in lowered:
-                result.fail(
-                    "Check 3",
-                    f"External Google Fonts reference ({domain}) in {page_path.relative_to(site_dir.resolve())}",
-                )
+        _check_no_google_fonts(str(page_path.relative_to(site_root)), page.raw_text, result)
 
     for css_path in sorted(site_dir.rglob("*.css")) if site_dir.is_dir() else []:
-        lowered = css_path.read_text(encoding="utf-8").lower()
-        for domain in GOOGLE_FONT_DOMAINS:
-            if domain in lowered:
-                result.fail(
-                    "Check 3",
-                    f"External Google Fonts reference ({domain}) in {css_path.relative_to(site_dir)}",
-                )
+        _check_no_google_fonts(
+            str(css_path.relative_to(site_dir)),
+            css_path.read_text(encoding="utf-8"),
+            result,
+        )
 
 
 def check_visual_assets_and_framing(
@@ -619,9 +631,17 @@ def check_prompt_blocks_and_prototype_cleanup(
             result.fail("Check 5", f"Prototype leftover role=tablist found in {rel}")
 
 
+@dataclass
+class _MermaidSubgraphFrame:
+    """Stack frame tracking direction LR and member nodes inside a Mermaid subgraph."""
+
+    has_lr: bool = False
+    nodes: set[str] = field(default_factory=set)
+
+
 def _has_mixed_lr_subgraph_cross_edges(diagram: str) -> bool:
     """Detect any `direction LR` subgraph whose nodes connect across its boundary."""
-    subgraph_stack: list[dict[str, object]] = []
+    subgraph_stack: list[_MermaidSubgraphFrame] = []
     lr_subgraphs: list[set[str]] = []
     edges: list[tuple[str, str]] = []
 
@@ -630,15 +650,15 @@ def _has_mixed_lr_subgraph_cross_edges(diagram: str) -> bool:
         if not line or line.startswith("%%"):
             continue
         if line.startswith("subgraph "):
-            subgraph_stack.append({"has_lr": False, "nodes": set()})
+            subgraph_stack.append(_MermaidSubgraphFrame())
             continue
         if line == "end" and subgraph_stack:
             finished = subgraph_stack.pop()
-            if finished["has_lr"]:
-                lr_subgraphs.append(finished["nodes"])  # type: ignore[arg-type]
+            if finished.has_lr:
+                lr_subgraphs.append(finished.nodes)
             continue
         if re.match(r"^direction\s+LR\b", line, re.IGNORECASE) and subgraph_stack:
-            subgraph_stack[-1]["has_lr"] = True
+            subgraph_stack[-1].has_lr = True
             continue
 
         # Parse chained edges (A --> B --> C) or standalone node declarations
@@ -650,7 +670,7 @@ def _has_mixed_lr_subgraph_cross_edges(diagram: str) -> bool:
                 node_id = m.group(1)
                 line_nodes.append(node_id)
                 for sg in subgraph_stack:
-                    sg["nodes"].add(node_id)  # type: ignore[union-attr]
+                    sg.nodes.add(node_id)
 
         if len(parts) > 1 and len(line_nodes) >= 2:
             for src, dst in zip(line_nodes, line_nodes[1:]):
@@ -707,6 +727,31 @@ def _all_repo_markdown_files(root: Path) -> list[Path]:
     return files
 
 
+def _verify_github_target(
+    base_root: Path,
+    kind: str,
+    raw_subpath: str,
+    rel_source: Path,
+    ref_label: str,
+    result: VerificationResult,
+) -> None:
+    """Verify a GitHub blob/tree subpath stays within base_root and matches file/dir kind."""
+    subpath = unquote(raw_subpath.split("#", 1)[0]).rstrip("/")
+    target = (base_root / subpath).resolve()
+    if not target.is_relative_to(base_root):
+        result.fail(
+            "Check 7",
+            f"{rel_source}: {kind}/{ref_label}/{raw_subpath} escapes target root",
+        )
+        return
+    exists = target.is_file() if kind == "blob" else target.is_dir()
+    if not exists:
+        result.fail(
+            "Check 7",
+            f"{rel_source}: missing target for {kind}/{ref_label}/{raw_subpath}",
+        )
+
+
 def _check_reference_8ad81d0_links(
     root: Path,
     md_files: list[Path],
@@ -732,17 +777,7 @@ def _check_reference_8ad81d0_links(
         rel = md_path.relative_to(root)
         text = md_path.read_text(encoding="utf-8")
         for kind, raw_subpath in PINNED_8AD81D0_RE.findall(text):
-            subpath = unquote(raw_subpath.split("#", 1)[0]).rstrip("/")
-            target = (ref_root / subpath).resolve()
-            if not target.is_relative_to(ref_root):
-                result.fail("Check 7", f"{rel}: 8ad81d0 link escapes reference dir: {raw_subpath}")
-                continue
-            exists = target.is_file() if kind == "blob" else target.is_dir()
-            if not exists:
-                result.fail(
-                    "Check 7",
-                    f"{rel}: pinned {kind}/8ad81d0/{raw_subpath} missing in reference dir",
-                )
+            _verify_github_target(ref_root, kind, raw_subpath, rel, "8ad81d0", result)
 
 
 def _check_root_doc_relative_links(
@@ -783,14 +818,7 @@ def check_links_hygiene_and_glossary(
             result.fail("Check 7", f"{rel}: references deleted TutorialUpdateTodo.md")
 
         for kind, raw_subpath in LOCAL_MAIN_RE.findall(text):
-            subpath = unquote(raw_subpath.split("#", 1)[0]).rstrip("/")
-            target = (root_resolved / subpath).resolve()
-            exists = target.is_file() if kind == "blob" else target.is_dir()
-            if not target.is_relative_to(root_resolved) or not exists:
-                result.fail(
-                    "Check 7",
-                    f"{rel}: broken local repo link {kind}/main/{raw_subpath}",
-                )
+            _verify_github_target(root_resolved, kind, raw_subpath, rel, "main", result)
 
     _check_reference_8ad81d0_links(root, all_md, reference_dir, require_reference, result)
 
