@@ -161,4 +161,4 @@ Inspect both high-resolution raytraced KiCad 3D renders closely — checking eve
 | **Missing KiCad 10 `(stackup ...)`** | `kicad-cli pcb render` renders default green mask + silver HASL instead of Matte Black + ENIG Gold | Inject `(stackup ...)` (`Black` mask, `White` silk, `ENIG`) before `pcbnew.LoadBoard()` |
 | **`generate_eurorack_panel.py` `lib_footprint_issues`** | DRC exits non-zero if `13` embedded footprint library warnings aren't distinguished from real errors | Filter `lib_footprint_issues` and assert **`0`** electrical, silk, mask, or copper-edge violations |
 
-With both the main board (`envelope_follower.kicad_pcb`) and front panel (`envelope_follower_panel.kicad_pcb`) verified cleanly in 3D and DRC, you are ready for **[Stage 7: Gerbers, Ordering Checklists, Interactive BOM & Renders](stage-7-manufacturing.md)**.
+With both the main board (`envelope_follower.kicad_pcb`) and front panel (`envelope_follower_panel.kicad_pcb`) verified cleanly in 3D and DRC, you are ready for **[Stage 7: Fabrication, Visual Checklists, Orders & Patch Guides](stage-7-manufacturing.md)**.
