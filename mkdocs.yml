@@ -77,7 +77,7 @@ nav:
       - "Stage 4: SKiDL Capture & KiCad Schematic": tutorial/stage-4-skidl.md
       - "Stage 5: 6 HP PCB, silk_layout.json & /edit-silkscreen": tutorial/stage-5-schematic-and-pcb.md
       - "Stage 6: Mated 3U Front Panel & VectorCraft Artwork": tutorial/stage-6-front-panel.md
-      - "Stage 7: Checklists, IBOM, Fabrication & Bring-Up": tutorial/stage-7-manufacturing.md
+      - "Stage 7: Fabrication, Visual Checklists, Orders & Patch Guides": tutorial/stage-7-manufacturing.md
       - "Optional: AC/DC Input Coupling Mode": tutorial/optional-dc-coupled-mode.md
   - Reference:
       - "Netlist, BOM & Capture Guide": reference/netlist-and-bom.md
