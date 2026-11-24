@@ -8,7 +8,8 @@ With every net, part number, and `DNP` test point locked inside `DesignSpec.md` 
 
 ### AI Agent Prompt ([Trace 06 Turn 1](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/06-c0e24b1d-please-turn-designspec-md-into-a-circuit.md))
 
-> *"`/skidl` Please turn `@[DesignSpec.md]` into a circuit."*
+!!! prompt "AI Agent Prompt"
+    `/skidl` Please turn `@[DesignSpec.md]` into a circuit.
 
 Notice how a complete `DesignSpec.md` shrinks the SKiDL prompt to one sentence. The only remaining hardware ambiguity (`SW1`/`SW2` SPST vs. SPDT symbol and footprint) surfaced as a single multiple-choice question—locking in `Switch:SW_SPDT` (`Pin 2` common, `Pin 3` active when lever is UP, `Pin 1 = NC`) on a project-local `Dailywell 2MS1` footprint.
 
@@ -127,9 +128,11 @@ ruff format envelope_follower.py
 
 ### AI Agent Prompts ([Trace 06 Turns 2 & 4](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/06-c0e24b1d-please-turn-designspec-md-into-a-circuit.md))
 
-> *"`/skidl` I'd like a KiCad schematic so I can visualise this circuit"*
->
-> *"Please generate a PDF version of the schematic. Add to `@[README.md]` and git commit."*
+!!! prompt "AI Agent Prompt — Turn 1"
+    `/skidl` I'd like a KiCad schematic so I can visualise this circuit
+
+!!! prompt "AI Agent Prompt — Turn 2"
+    Please generate a PDF version of the schematic. Add to `@[README.md]` and git commit.
 
 !!! warning "Do Not Rely on `skidl.generate_schematic()` (`schematizer 0.2.0`)"
     SKiDL's built-in `generate_schematic()` (`schematizer`) fails or produces tangled, stub-exploded diagrams on multi-op-amp analog circuits with shared rails, multi-unit `TL074` packages, and switched jacks. Keep `envelope_follower.py` as your electrical single source of truth and drive a clean KiCad 10 `.kicad_sch` generator directly from `envelope_follower.build_circuit()`.

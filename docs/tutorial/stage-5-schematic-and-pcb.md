@@ -8,7 +8,8 @@ Because `envelope_follower.net` and `envelope_follower.kicad_sch` ([Stage 4](sta
 
 ### AI Agent Prompt ([Trace 07 Turn 1](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/07-49155441-kicad-silkscreen-markup-eurorack-panel-kicad-pleas.md))
 
-> *"`/kicad-pcbnew-layout` `/kicad-silkscreen-markup` `/eurorack-panel` `/kicad` Please create and run `generate_kicad_pcb.py` to generate a 6 HP main PCB (`envelope_follower.kicad_pcb`) from `@[envelope_follower.net]`, following `@[DesignSpec.md]`."*
+!!! prompt "AI Agent Prompt"
+    `/kicad-pcbnew-layout` `/kicad-silkscreen-markup` `/eurorack-panel` `/kicad` Please create and run `generate_kicad_pcb.py` to generate a 6 HP main PCB (`envelope_follower.kicad_pcb`) from `@[envelope_follower.net]`, following `@[DesignSpec.md]`.
 
 ### Board Partitioning & 6 HP Mechanical Grid (`83` PCB Footprints, `48` Nets)
 
@@ -54,9 +55,11 @@ Exact front-panel control coordinates (`BOARD_X0 = 100.00`, `BOARD_Y0 = 40.00`, 
 
 ### Motivating Prompts ([Trace 07 Turns 2–3](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/07-49155441-kicad-silkscreen-markup-eurorack-panel-kicad-pleas.md))
 
-> *"How should I move silkscreen entries such that they can be updated in the generate script?"*
->
-> *"Git commit the current state. Then update the script so that I can work with it to move things around in a new chat. Assume I am going to want to move most silkscreen entries, one by one."*
+!!! prompt "AI Agent Prompt — Turn 1"
+    How should I move silkscreen entries such that they can be updated in the generate script?
+
+!!! prompt "AI Agent Prompt — Turn 2"
+    Git commit the current state. Then update the script so that I can work with it to move things around in a new chat. Assume I am going to want to move most silkscreen entries, one by one.
 
 Editing coordinates buried inside a 2,000-line Python script makes one-by-one label tweaks brittle and risks unintended copper diffs. Extracting all board silkscreen positions into **`silk_layout.json`** solves both problems:
 

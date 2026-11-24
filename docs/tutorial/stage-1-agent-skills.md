@@ -57,7 +57,8 @@ Before extracting your first circuit from a sketch, adopt two habits observed ac
 
 Fresh chat sessions start with zero memory of what files you generated earlier. Initialize `README.md` right after installing your skills so it indexes every source file, script, skill, and preview render in your workspace:
 
-> *"Please update `@[README.md]` to track the files and skills in this directory so future prompts know where to look for things."*
+!!! prompt "AI Agent Prompt"
+    Please update `@[README.md]` to track the files and skills in this directory so future prompts know where to look for things.
 
 From [Stage 2](stage-2-circuit-upgrades.md) onward, end every major stage or iteration prompt with **"update `@[README.md]` and git commit"**. Keeping `README.md` current turns `@[README.md]` into a compact, zero-hallucination context anchor for any new conversation.
 

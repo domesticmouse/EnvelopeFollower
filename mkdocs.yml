@@ -1,4 +1,4 @@
-site_name: Eurorack Envelope Follower Tutorial
+site_name: ENV / SKEW Build Tutorial
 site_description: End-to-End Interactive Hardware Design Tutorial with AI Skills, SKiDL, VectorCraft, and KiCad 10
 site_url: https://domesticmouse.github.io/EnvelopeFollower/
 repo_url: https://github.com/domesticmouse/EnvelopeFollower
@@ -10,21 +10,20 @@ exclude_docs: |
 
 theme:
   name: material
+  font: false
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: indigo
-      accent: amber
+    - scheme: slate
+      primary: custom
+      accent: custom
       toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: indigo
-      accent: amber
-      toggle:
-        icon: material/brightness-4
+        icon: material/weather-sunny
         name: Switch to light mode
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark studio mode
   features:
     - navigation.tabs
     - navigation.sections
@@ -59,9 +58,16 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
 
+extra_css:
+  - stylesheets/fonts.css
+  - stylesheets/prototype-theme.css
+  - stylesheets/prototype-variants.css
+
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascripts/prompt-copy.js
+  - javascripts/prototype-switcher.js
 
 nav:
   - Overview: index.md
@@ -74,6 +80,6 @@ nav:
       - "Stage 6: Mated 3U Front Panel & VectorCraft Artwork": tutorial/stage-6-front-panel.md
       - "Stage 7: Checklists, IBOM, Fabrication & Bring-Up": tutorial/stage-7-manufacturing.md
       - "Optional: AC/DC Input Coupling Mode": tutorial/optional-dc-coupled-mode.md
-  - Reference:
+  - Appendix:
       - "Netlist, BOM & Capture Guide": reference/netlist-and-bom.md
       - "PCB & Fabrication Checklist": reference/build-checklist.md

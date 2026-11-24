@@ -19,7 +19,8 @@ Rather than jumping straight from a raw sketch to a PCB in a single prompt, Stag
 
 ### AI Agent Prompt
 
-> *"Please review `EnvelopeFollower.webp`. I'd like to extract a Markdown description of the circuit that can be used to build a circuit, and save it to `EnvelopeFollower.md`. Afterwards, update `@[README.md]` and git commit."*
+!!! prompt "AI Agent Prompt"
+    Please review `EnvelopeFollower.webp`. I'd like to extract a Markdown description of the circuit that can be used to build a circuit, and save it to `EnvelopeFollower.md`. Afterwards, update `@[README.md]` and git commit.
 
 ### Extraction Guardrails Observed in Trace 02
 
@@ -62,7 +63,8 @@ EOF
 
 ### AI Agent Prompt
 
-> *"Please review `EnvelopeFollower.md`. Are there improvements that could be made to the circuit? Record the suggested improvements and explanations to `EnvelopeFollowerImprovements.md`. Update `@[README.md]` and git commit."*
+!!! prompt "AI Agent Prompt"
+    Please review `EnvelopeFollower.md`. Are there improvements that could be made to the circuit? Record the suggested improvements and explanations to `EnvelopeFollowerImprovements.md`. Update `@[README.md]` and git commit.
 
 ### What Makes a Critique Actionable (Distilled from Trace 03)
 

@@ -8,9 +8,15 @@ Rather than firing a single one-shot prompt to generate four disconnected Markdo
 
 ### AI Agent Prompt
 
-> *"Let's work through `@[EnvelopeFollowerImprovements.md]`, one improvement at a time. This is primarily for my education, but in cases where there are options or trade offs, I want to make informed decisions."*
+!!! prompt "AI Agent Prompt"
+    Let's work through `@[EnvelopeFollowerImprovements.md]`, one improvement at a time. This is primarily for my education, but in cases where there are options or trade offs, I want to make informed decisions.
 
 *(Finish the session with: *"write design spec to disk, update `@[README.md]`, and git commit"*.)*
+
+??? note "PROTOTYPE ONLY — Compare Zero-JS Fenced Prompt (Pattern A)"
+    ```text {.prompt title="AI Agent Prompt (Zero-JS Pattern A)"}
+    Let's work through @[EnvelopeFollowerImprovements.md], one improvement at a time. This is primarily for my education, but in cases where there are options or trade offs, I want to make informed decisions.
+    ```
 
 ### Four Habits That Make Interactive Design Q&A Work
 
@@ -91,9 +97,11 @@ flowchart LR
 
 ### AI Agent Prompts ([Trace 05](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/05-a4aff487-designspec-md-i-m-wondering-what-options.md))
 
-> *"@[DesignSpec.md] I'm wondering what options we have for adding test points, specifically Ronghe RH-5001, LCSC C5199801, DNP."*
->
-> *"All 12 TP, I'm ok with tight silkscreen. I'm planning on hand optimising the labels anyway."*
+!!! prompt "AI Agent Prompt — Turn 1"
+    `@[DesignSpec.md]` I'm wondering what options we have for adding test points, specifically Ronghe RH-5001, LCSC C5199801, DNP.
+
+!!! prompt "AI Agent Prompt — Turn 2"
+    All 12 TP, I'm ok with tight silkscreen. I'm planning on hand optimising the labels anyway.
 
 ### Authoritative Verification & Probe-Safe TP Rules
 
