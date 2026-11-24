@@ -1,14 +1,14 @@
 # Potential Improvements: DC-Coupled CV / LFO Slew & Precision Rectification Mode
 
-*(Standalone engineering note originally drafted against Hagiwo's baseline RefDes [`EnvelopeFollower.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/EnvelopeFollower.md) and [`EnvelopeFollowerImprovements.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/EnvelopeFollowerImprovements.md) Section 2.7: "Optional Eurorack Feature Enhancements". Also mirrored locally under `./reference/`.)*
+*(Standalone engineering note originally drafted against Hagiwo's baseline RefDes [`EnvelopeFollower.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/EnvelopeFollower.md) and [`EnvelopeFollowerImprovements.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/EnvelopeFollowerImprovements.md) Section 2.7: "Optional Eurorack Feature Enhancements". Also mirrored locally under `./reference/`.)*
 
-> **Note for `EnvelopeFollowerWithSkewLimiter` builders:** The finalized `6 HP` companion module in `reference/` already incorporates DC-coupled slew input (`J2` `SLEW IN`), active skew limiting, `TL074HIDR`, `SMOOTH`, and `FAST/SLOW`. See [`docs/tutorial/optional-dc-coupled-mode.md`](docs/tutorial/optional-dc-coupled-mode.md) for how this `AC / DC` bypass translates onto the updated `SW3` / `C7` schematic alongside [`reference/DesignSpec.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/DesignSpec.md).
+> **Note for ENV / SKEW builders:** The finalized `6 HP` module in `reference/` already incorporates DC-coupled slew input (`J2` `SLEW IN`), active skew limiting, `TL074HIDR`, `SMOOTH`, and `FAST/SLOW`. See [`docs/tutorial/optional-dc-coupled-mode.md`](docs/tutorial/optional-dc-coupled-mode.md) for how this `AC / DC` bypass translates onto the updated `SW3` / `C7` schematic alongside [`reference/DesignSpec.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/DesignSpec.md) and the [Base Circuit & Review specs (`/specs/`) on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/specs/).
 
 ---
 
 ## 1. Concept Overview
 
-In Hagiwo's baseline circuit ([`EnvelopeFollower.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/EnvelopeFollower.md)), input jack `J1` (`IN`) feeds the inverting preamp `U1A` exclusively through AC-coupling capacitor `C1` (`4.7 µF` baseline; `470 nF–1 µF` in the high-`Z_in` upgrade). With `R1 || R2 = 9.90 kΩ` (or `100 kΩ` upgraded), `C1` forms a `1.6–3.4 Hz` high-pass filter:
+In Hagiwo's baseline circuit ([`EnvelopeFollower.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/EnvelopeFollower.md)), input jack `J1` (`IN`) feeds the inverting preamp `U1A` exclusively through AC-coupling capacitor `C1` (`4.7 µF` baseline; `470 nF–1 µF` in the high-`Z_in` upgrade). With `R1 || R2 = 9.90 kΩ` (or `100 kΩ` upgraded), `C1` forms a `1.6–3.4 Hz` high-pass filter:
 
 - **Advantage for audio:** Strips any DC offset from audio signals so silence sits strictly at `0 V` entering the precision full-wave rectifier (`U1B`, `U1C`).
 - **Limitation for CV / LFO sources:** Sub-audio modulation (slow LFOs, stepped sequencer CVs, gates/triggers, or static DC voltages) decays back toward `0 V` across `C1` instead of being tracked accurately.
@@ -41,7 +41,7 @@ When `SW1` bypasses `C1`, DC and low-frequency control voltages (`-10 V` to `+10
 
 ## 3. Critical Design Constraints When Implementing `SW1` (`AC / DC`)
 
-To prevent subtle DC errors or signal blockage when `SW1` is added alongside the upgrades in [`EnvelopeFollowerImprovements.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/EnvelopeFollowerImprovements.md), account for the following three interactions:
+To prevent subtle DC errors or signal blockage when `SW1` is added alongside the upgrades in [`EnvelopeFollowerImprovements.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/EnvelopeFollowerImprovements.md), account for the following three interactions:
 
 1. **Inter-Stage AC Coupling Conflict (`IMP-07` / Section 2.3.2):**
    - Section 2.3.2 recommends adding a second `1 µF + 100 kΩ` AC-coupling network *between* `PREAMP_OUT` and the rectifier (`R3`/`R4`) to block `U1A`'s amplified input offset voltage (`11 × V_os`) when using an active zero-deadzone peak detector (`D3` inside an op-amp feedback loop).
