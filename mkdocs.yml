@@ -71,14 +71,18 @@ extra_javascript:
 nav:
   - Overview: index.md
   - Tutorial:
-      - "Stage 1: Hardware Agent Skills & Repo Setup": tutorial/stage-1-agent-skills.md
-      - "Stage 2: Sketch Extraction & Circuit Critique": tutorial/stage-2-circuit-upgrades.md
-      - "Stage 3: Interactive DesignSpec & Test Points": tutorial/stage-3-bom-and-dfm.md
-      - "Stage 4: SKiDL Capture & KiCad Schematic": tutorial/stage-4-skidl.md
-      - "Stage 5: 6 HP PCB, silk_layout.json & /edit-silkscreen": tutorial/stage-5-schematic-and-pcb.md
-      - "Stage 6: Mated 3U Front Panel & VectorCraft Artwork": tutorial/stage-6-front-panel.md
-      - "Stage 7: Fabrication, Visual Checklists, Orders & Patch Guides": tutorial/stage-7-manufacturing.md
-      - "Optional: AC/DC Input Coupling Mode": tutorial/optional-dc-coupled-mode.md
+      - Hardware Build:
+          - "Stage 1: Hardware Agent Skills & Repo Setup": tutorial/stage-1-agent-skills.md
+          - "Stage 2: Sketch Extraction & Circuit Critique": tutorial/stage-2-circuit-upgrades.md
+          - "Stage 3: Interactive DesignSpec & Test Points": tutorial/stage-3-bom-and-dfm.md
+          - "Stage 4: SKiDL Capture & KiCad Schematic": tutorial/stage-4-skidl.md
+          - "Stage 5: 6 HP PCB, silk_layout.json & /edit-silkscreen": tutorial/stage-5-schematic-and-pcb.md
+          - "Stage 6: Mated 3U Front Panel & VectorCraft Artwork": tutorial/stage-6-front-panel.md
+          - "Stage 7: Fabrication, Visual Checklists, Orders & Patch Guides": tutorial/stage-7-manufacturing.md
+      - Companion Site:
+          - "Stage 8: Planning the Companion Site with /wayfinder": tutorial/stage-8-wayfinder-site-planning.md
+      - Optional Exploration:
+          - "Optional: AC/DC Input Coupling Mode": tutorial/optional-dc-coupled-mode.md
   - Reference:
       - "Netlist, BOM & Capture Guide": reference/netlist-and-bom.md
       - "PCB & Fabrication Checklist": reference/build-checklist.md
