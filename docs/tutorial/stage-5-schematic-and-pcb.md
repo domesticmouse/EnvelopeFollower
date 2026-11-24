@@ -6,9 +6,10 @@ Because `envelope_follower.net` and `envelope_follower.kicad_sch` ([Stage 4](sta
 
 ## Step 5.1: Automated 6 HP Main PCB Generation & Layout Debugging
 
-### AI Agent Prompt ([Trace 07 Turn 1](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/07-49155441-kicad-silkscreen-markup-eurorack-panel-kicad-pleas.md))
+Generate the 6 HP main PCB from the verified netlist and design spec ([Trace 07 Turn 1](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/07-49155441-kicad-silkscreen-markup-eurorack-panel-kicad-pleas.md); see [`generate_kicad_pcb.py` in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/generate_kicad_pcb.py) and the [interactive PCB viewer on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/hardware/#pcb)):
 
-> *"`/kicad-pcbnew-layout` `/kicad-silkscreen-markup` `/eurorack-panel` `/kicad` Please create and run `generate_kicad_pcb.py` to generate a 6 HP main PCB (`envelope_follower.kicad_pcb`) from `@[envelope_follower.net]`, following `@[DesignSpec.md]`."*
+!!! prompt "AI Agent Prompt — Generate 6 HP Main PCB"
+    `/kicad-pcbnew-layout` `/kicad-silkscreen-markup` `/eurorack-panel` `/kicad` Please create and run `generate_kicad_pcb.py` to generate a 6 HP main PCB (`envelope_follower.kicad_pcb`) from `@[envelope_follower.net]`, following `@[DesignSpec.md]`.
 
 ### Board Partitioning & 6 HP Mechanical Grid (`83` PCB Footprints, `48` Nets)
 
@@ -52,11 +53,13 @@ Exact front-panel control coordinates (`BOARD_X0 = 100.00`, `BOARD_Y0 = 40.00`, 
 
 ## Step 5.2: Declarative Silkscreen Sidecar (`silk_layout.json`) & Bidirectional CLI
 
-### Motivating Prompts ([Trace 07 Turns 2–3](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/07-49155441-kicad-silkscreen-markup-eurorack-panel-kicad-pleas.md))
+Extract board silkscreen positions into a declarative sidecar ([Trace 07 Turns 2–3](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/07-49155441-kicad-silkscreen-markup-eurorack-panel-kicad-pleas.md); see [`silk_layout.json` in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/silk_layout.json)):
 
-> *"How should I move silkscreen entries such that they can be updated in the generate script?"*
->
-> *"Git commit the current state. Then update the script so that I can work with it to move things around in a new chat. Assume I am going to want to move most silkscreen entries, one by one."*
+!!! prompt "Turn 1 — Declarative Silkscreen Strategy"
+    How should I move silkscreen entries such that they can be updated in the generate script?
+
+!!! prompt "Turn 2 — Extract silk_layout.json"
+    Git commit the current state. Then update the script so that I can work with it to move things around in a new chat. Assume I am going to want to move most silkscreen entries, one by one.
 
 Editing coordinates buried inside a 2,000-line Python script makes one-by-one label tweaks brittle and risks unintended copper diffs. Extracting all board silkscreen positions into **`silk_layout.json`** solves both problems:
 

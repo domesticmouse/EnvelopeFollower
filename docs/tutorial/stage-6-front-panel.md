@@ -1,6 +1,6 @@
 # Stage 6: Blank-Front Panel Spec, VectorCraft Art & KiCad Panel Integration
 
-A raw aluminum or PCB panel with auto-generated KiCad text works for bench testing, but Eurorack modules live on crowded racks where typography, jack grouping, input/output polarity cues, and panel-to-panel spacing determine daily playability. In this stage — captured in traces [`13-03d1c3c6` (`prompts/13-03d1c3c6-how-do-i-build-a-faceplate-that.md`)](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/13-03d1c3c6-how-do-i-build-a-faceplate-that.md), [`15-ef99cb65` (`prompts/15-ef99cb65-please-create-a-front-panel-for-this.md`)](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/15-ef99cb65-please-create-a-front-panel-for-this.md), and [`16-cd7d0409` (`prompts/16-cd7d0409-i-d-like-to-design-a-front.md`)](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/16-cd7d0409-i-d-like-to-design-a-front-panel-for-this.md) — you split mechanical panel generation from vector graphic design: first generate a precision blank-front KiCad panel with a machine-readable specification contract, then design custom Matte Black + ENIG Gold artwork in `vectorcraft-cli`, and finally fracture and import those SVG polygons back into KiCad 10 for full DRC and 3D verification.
+A raw aluminum or PCB panel with auto-generated KiCad text works for bench testing, but Eurorack modules live on crowded racks where typography, jack grouping, input/output polarity cues, and panel-to-panel spacing determine daily playability. In this stage — captured in **Session Traces** [`13-03d1c3c6` (`prompts/13-03d1c3c6-how-do-i-build-a-faceplate-that.md`)](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/13-03d1c3c6-how-do-i-build-a-faceplate-that.md), [`15-ef99cb65` (`prompts/15-ef99cb65-please-create-a-front-panel-for-this.md`)](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/15-ef99cb65-please-create-a-front-panel-for-this.md), and [`16-cd7d0409` (`prompts/16-cd7d0409-i-d-like-to-design-a-front.md`)](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/16-cd7d0409-i-d-like-to-design-a-front.md) — you split mechanical panel generation from vector graphic design: first generate a precision blank-front KiCad panel with a machine-readable specification contract, then design custom Matte Black + ENIG Gold artwork in `vectorcraft-cli`, and finally fracture and import those SVG polygons back into KiCad 10 for full DRC and 3D verification.
 
 ```mermaid
 flowchart LR
@@ -75,7 +75,7 @@ Inspecting the generated `envelope_follower_panel.kicad_pcb` and `panel_svg_spec
   - Vertical `90°` mirrored GitHub repository URL (`github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter`) at `(24.61, 39.47)` (`clearance = 3.25 mm`).
   - `5.00 × 5.00 mm` filled `gr_rect` JLCPCB QR blank centered at `(22.50, 121.00)` (`clearance = 2.73 mm`).
 - **Copper fill & KiCad 10 inline nets:** Both `F.Cu` and `B.Cu` pour `~95%` solid `GND` zones tied to the `10` plated control shells via KiCad 10 inline `(net "GND")` declarations on every hole pad, while `envelope_follower_panel.kicad_pro` is generated and tracked alongside the PCB.
-- **Specification contract (`panel_svg_spec.md`):** Documents exact safe artwork bounds (`X = 0.50..29.50 mm`, `Y = 0.50..128.00 mm`), rail keepouts (`Y = 0..6.5 mm` top, `122.0..128.5 mm` bottom), cutout keepouts, rear mirror zones, and layer color semantics (`#FFFFFF` White `F.SilkS`, `#D4AF37` ENIG Gold `F.Mask` over `F.Cu`, `#111111` Matte Black soldermask background).
+- **Specification contract (`panel_svg_spec.md`):** Documents exact safe artwork bounds (`X = 0.50..29.50 mm`, `Y = 0.50..128.00 mm`), rail keepouts (`Y = 0..6.5 mm` top, `122.0..128.5 mm` bottom), cutout keepouts, rear mirror zones, and layer color semantics (`#FFFFFF` White `F.SilkS`, `#D4AF37` ENIG Gold `F.Mask` over `F.Cu`, `#111111` Matte Black soldermask background) ([view the Panel SVG Spec on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/specs/panel-svg-spec/) · [source in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/panel_svg_spec.md)).
 
 ---
 
@@ -85,7 +85,7 @@ Armed with `panel_svg_spec.md`, open a dedicated artwork session ([Trace 16](htt
 
 ### Split Sandbox-Safe Batch Pipeline
 
-Because `vectorcraft-cli` writes SVG exports outside typical sandbox assumptions or needs native macOS font services, split generation cleanly into three commands in `panel_art/generate_panel_art.py`:
+Because `vectorcraft-cli` writes SVG exports outside typical sandbox assumptions or needs native macOS font services, split generation cleanly into three commands in [`panel_art/generate_panel_art.py`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/panel_art/generate_panel_art.py) (in `EnvelopeFollowerWithSkewLimiter`):
 
 ```bash
 # 1. Emit VectorCraft JSON command queue (runs inside sandbox)
@@ -125,7 +125,7 @@ Render both `panel_art/preview_clean.png` (simulating Matte Black + ENIG Gold + 
 
 Exporting valid 1:1 mm SVGs is only half the battle: KiCad GUI SVG import requires manual clicks and lacks headless CI reproducibility, while KiCad `gr_poly` (`PCB_SHAPE` with `SHAPE_T_POLY`) objects only support a **single outer boundary without inner holes**. If you naively import glyphs containing counters (`O`, `A`, `R`, `D`, `0`) or reversed mask pills (`OUT`, `INV OUT`), inner islands fill solid!
 
-In [`panel_art/import_svgs_to_kicad.py`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/panel_art/import_svgs_to_kicad.py), solve both compound-path fracturing and stackup finish cleanly inside KiCad's bundled Python 3.9 `pcbnew` runtime:
+In [`panel_art/import_svgs_to_kicad.py`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/panel_art/import_svgs_to_kicad.py) (in `EnvelopeFollowerWithSkewLimiter`), solve both compound-path fracturing and stackup finish cleanly inside KiCad's bundled Python 3.9 `pcbnew` runtime:
 
 1. **Inject KiCad 10 `(stackup ...)` before `LoadBoard()`:** Prepend the physical finish block (`F.Mask`/`B.Mask` `"Black"`, `F.SilkS`/`B.SilkS` `"White"`, `copper_finish "ENIG"`, `FR4` dielectric) into `envelope_follower_panel.kicad_pcb` before `pcbnew.LoadBoard()`. Reloading and saving preserves it natively so `kicad-cli pcb render` displays authentic Matte Black solder mask and brushed ENIG Gold pads.
 2. **Idempotent cleanup & `AuxOrigin` alignment:** Delete any prior `F.SilkS` or `F.Mask` drawings (while leaving all `5` `B.SilkS` rear markings untouched), read `ds.GetAuxOrigin()` (`(100.00, 29.75)`), and drop the `30.00 × 128.50 mm` `registration_frame` `<rect>`.
@@ -142,7 +142,7 @@ kicad-cli pcb render --side bottom --width 900 --height 2400 --background transp
   --output images/panel_back.png envelope_follower_panel.kicad_pcb
 ```
 
-Inspect both high-resolution raytraced KiCad 3D renders closely — checking every counter (`O`, `A`, `R`, `D`, `0`), crisp `F.Mask` gold edges over `F.Cu`, Matte Black background uniformity, tented front holes around controls, and mirrored rear `B.SilkS` text and QR box — before moving on to manufacturing files:
+Inspect both high-resolution raytraced KiCad 3D renders closely — checking every counter (`O`, `A`, `R`, `D`, `0`), crisp `F.Mask` gold edges over `F.Cu`, Matte Black background uniformity, tented front holes around controls, and mirrored rear `B.SilkS` text and QR box — or toggle individual SVG and keepout layers live in the [4-layer Panel Inspector on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/hardware/#panel) before moving on to manufacturing files:
 
 | Front Panel 3D Render (`panel_front.png`) | Back Panel 3D Render (`panel_back.png`) |
 | :---: | :---: |
