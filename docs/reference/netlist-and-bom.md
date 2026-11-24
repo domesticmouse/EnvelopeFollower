@@ -1,6 +1,6 @@
 # Netlist, BOM & Silkscreen Schedule
 
-Complete electrical and physical reference for the finalized **`EnvelopeFollowerWithSkewLimiter`** build ([`reference/envelope_follower_bom.xml`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/envelope_follower_bom.xml), [`reference/jlcpcb_bom.csv`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/jlcpcb_bom.csv), and [`reference/silk_layout.json`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/silk_layout.json)).
+Complete electrical and physical reference for the finalized **`ENV / SKEW`** build ([`reference/envelope_follower_bom.xml`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/envelope_follower_bom.xml), [`reference/jlcpcb_bom.csv`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/jlcpcb_bom.csv), and [`reference/silk_layout.json`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/silk_layout.json) in [`EnvelopeFollowerWithSkewLimiter` (`8ad81d0`)](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0); read the full **Reference Spec** on [`/specs/design-spec/` on the live `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/specs/design-spec/)).
 
 ---
 
@@ -41,6 +41,12 @@ Complete electrical and physical reference for the finalized **`EnvelopeFollower
 | `C10` | 1 | `2.2nF` | `Capacitor_SMD:C_0805_2012Metric` | `CL21C222JBFNNNE` | Samsung | `C28260` | Basic | `U1D` skew-limiter loop compensation (`2.2 nF` C0G/NP0, `> 90°` phase margin) |
 | `C12`, `C13` | 2 | `2.2uF` | `Capacitor_THT:C_Rect_L7.2mm_W7.2mm_P5.00mm_FKS2_FKP2_MKS2_MKP2` | `WIMA MKS2 2.2uF 50V` | WIMA | — | Manual THT | `SLOW` timing bank extension (`+4.40 µF` -> `4.87 µF` total via `SW2`) |
 | `C14` | 1 | `220nF` | `Capacitor_SMD:C_0805_2012Metric` | `CL21B224KBFNNNE` | Samsung | `C5378` | Basic | Switchable `SMOOTH` `29.0 Hz` `2f` ripple T-filter capacitor (`SW1`) |
+
+!!! note "Real-World Capacitor Substitutions (`manufacturing/orders/tayda-1000489380.md`)"
+    The table above preserves the canonical `DesignSpec.md` component selection (`A-7257` and `WIMA MKS2 2.2uF`). When parts are out of stock or lead-spacing differs at order time, keep [`checklists/03-tayda-ordering.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/checklists/03-tayda-ordering.md) untouched and log batch substitutions separately — as recorded in [`manufacturing/orders/tayda-1000489380.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/manufacturing/orders/tayda-1000489380.md) ([raw cart TSV](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/manufacturing/orders/tayda-1000489380.tsv); see [Stage 7.4](../tutorial/stage-7-manufacturing.md#step-74-recording-real-world-parts-orders-substitutions-manufacturingorders)):
+
+    - **`C1` / `C2` (`A-6764`):** Straight-lead `47 µF / 35 V` (`5 × 11 mm`, `2.0 ± 0.5 mm` pitch) substituted for `A-7257` (`5.0 mm` pre-formed leads) so both electrolytics seat flush into the `2.50 mm` PCB footprint.
+    - **`C12` / `C13` (`A-6940` `1.5 µF`):** Substituted KEMET R82 `1.5 µF / 63 V` box film when `2.2 µF` WIMA MKS2 SKUs were out of stock, shifting total `SLOW` timing capacitance (`C11 + C12 + C13`) from `4.87 µF` to **`3.47 µF`** (and [`05-board-bringup.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/checklists/05-board-bringup.md) `SLOW` CW times from `~3.0 s` rise / `~1.84 s` fall to **`~2.13 s` rise / `~1.31 s` fall**).
 
 ### 3. Resistors (`R1`–`R33`) — `33` SMD Parts (`0603`, `19` Basic + `14` Extended)
 
@@ -174,7 +180,7 @@ Use this checklist when reconstructing or auditing `envelope_follower.kicad_sch`
 
 ## Pinned Silkscreen Schedule (`silk_layout.json`)
 
-Board-local coordinates relative to `(BOARD_X0 = 100.0, BOARD_Y0 = 40.0 mm)` on a `30.0 × 108.0 mm` PCB (from [`reference/silk_layout.json`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/main/silk_layout.json)). Managed dynamically via `/edit-silkscreen` and `generate_kicad_pcb.py --sync-silk` / `--check-silk`:
+Board-local coordinates relative to `(BOARD_X0 = 100.0, BOARD_Y0 = 40.0 mm)` on a `30.0 × 108.0 mm` PCB (from [`reference/silk_layout.json`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/silk_layout.json)). Managed dynamically via `/edit-silkscreen` and `generate_kicad_pcb.py --sync-silk` / `--check-silk`:
 
 ### Board-Level Primitives, Dots & Banners (`F.SilkS` / `B.SilkS`)
 

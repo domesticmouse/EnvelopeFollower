@@ -84,6 +84,6 @@ nav:
           - "Stage 9: Building, Reviewing & Shipping the Companion Site": tutorial/stage-9-companion-site-delivery.md
       - Optional Exploration:
           - "Optional: AC/DC Input Coupling Mode": tutorial/optional-dc-coupled-mode.md
-  - Reference:
-      - "Netlist, BOM & Capture Guide": reference/netlist-and-bom.md
-      - "PCB & Fabrication Checklist": reference/build-checklist.md
+  - Appendix:
+      - "Netlist, BOM & Silkscreen Schedule": reference/netlist-and-bom.md
+      - "Engineering Sign-Off Checklist": reference/build-checklist.md
