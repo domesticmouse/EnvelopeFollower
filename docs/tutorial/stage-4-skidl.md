@@ -6,9 +6,10 @@ With every net, part number, and `DNP` test point locked inside `DesignSpec.md` 
 
 ## Step 4.1: Single-Sentence `/skidl` Handoff & Downstream-First Alignment
 
-### AI Agent Prompt ([Trace 06 Turn 1](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/06-c0e24b1d-please-turn-designspec-md-into-a-circuit.md))
+With `DesignSpec.md` locked, hand off SKiDL circuit capture in one sentence ([Trace 06 Turn 1](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/06-c0e24b1d-please-turn-designspec-md-into-a-circuit.md)):
 
-> *"`/skidl` Please turn `@[DesignSpec.md]` into a circuit."*
+!!! prompt "AI Agent Prompt — SKiDL Circuit Capture"
+    `/skidl` Please turn `@[DesignSpec.md]` into a circuit.
 
 Notice how a complete `DesignSpec.md` shrinks the SKiDL prompt to one sentence. The only remaining hardware ambiguity (`SW1`/`SW2` SPST vs. SPDT symbol and footprint) surfaced as a single multiple-choice question—locking in `Switch:SW_SPDT` (`Pin 2` common, `Pin 3` active when lever is UP, `Pin 1 = NC`) on a project-local `Dailywell 2MS1` footprint.
 
@@ -57,7 +58,7 @@ EOF
 
 ## Step 4.3: Anatomy of `envelope_follower.py` & Multi-Layer Netlist Verification
 
-Key patterns inside `reference/envelope_follower.py` (`80` footprints, `48` active nets):
+Key patterns inside [`envelope_follower.py` in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/envelope_follower.py) (`80` footprints, `48` active nets):
 
 ```python
 # Excerpt from reference/envelope_follower.py: NetClasses, ERC assertions & XML BOM
@@ -125,11 +126,13 @@ ruff format envelope_follower.py
 
 ## Step 4.4: Generating a Human-Readable KiCad 10 Schematic & PDF
 
-### AI Agent Prompts ([Trace 06 Turns 2 & 4](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/06-c0e24b1d-please-turn-designspec-md-into-a-circuit.md))
+Generate the KiCad schematic and export a printable PDF ([Trace 06 Turns 2 & 4](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/06-c0e24b1d-please-turn-designspec-md-into-a-circuit.md); explore the interactive [9-block schematic viewer on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/hardware/#schematic) or [`generate_schematic.py` in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/generate_schematic.py)):
 
-> *"`/skidl` I'd like a KiCad schematic so I can visualise this circuit"*
->
-> *"Please generate a PDF version of the schematic. Add to `@[README.md]` and git commit."*
+!!! prompt "Turn 1 — Generate KiCad Schematic"
+    `/skidl` I'd like a KiCad schematic so I can visualise this circuit
+
+!!! prompt "Turn 2 — Export PDF & Commit"
+    Please generate a PDF version of the schematic. Add to `@[README.md]` and git commit.
 
 !!! warning "Do Not Rely on `skidl.generate_schematic()` (`schematizer 0.2.0`)"
     SKiDL's built-in `generate_schematic()` (`schematizer`) fails or produces tangled, stub-exploded diagrams on multi-op-amp analog circuits with shared rails, multi-unit `TL074` packages, and switched jacks. Keep `envelope_follower.py` as your electrical single source of truth and drive a clean KiCad 10 `.kicad_sch` generator directly from `envelope_follower.build_circuit()`.

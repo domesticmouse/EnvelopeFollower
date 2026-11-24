@@ -21,6 +21,9 @@ If you plan to design custom **Matte Black + ENIG Gold + White Silkscreen** fron
 npx skills add domesticmouse/skills --skill vectorcraft-cli
 ```
 
+!!! info "Stage 1 Hardware Skills vs. Stage 8 Workflow Skills"
+    Install **only** the `9` core hardware skills above (plus optional `vectorcraft-cli`, expanding to `11` directories in `.agents/skills/` once Stage 5 creates `/edit-silkscreen`) while building the PCB and front panel. The `39` software and planning workflow skills from `mattpocock/skills` (`wayfinder`, `research`, `grilling`, `code-review`, and companions) are intentionally deferred until **Stage 8**, when you begin planning the **`ENV / SKEW` Companion Site**.
+
 Verify the installed directory layout:
 
 ```text
@@ -51,15 +54,16 @@ Each installed skill equips the agent with specialized reference documentation a
 
 ## Step 1.2: Repo Bootstrap Habits (Before Stage 2)
 
-Before extracting your first circuit from a sketch, adopt two habits observed across every trace in `prompts/`:
+Before extracting your first circuit from a sketch, adopt two habits observed across every **Session Trace** in `prompts/`:
 
-### 1. Maintain `README.md` as a "Living Context Map"
+### 1. Maintain `README.md` as a Living Context Map
 
-Fresh chat sessions start with zero memory of what files you generated earlier. Initialize `README.md` right after installing your skills so it indexes every source file, script, skill, and preview render in your workspace:
+Fresh chat sessions start with zero memory of what files you generated earlier. Initialize `README.md` right after installing your skills ([Trace 01](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/01-4b4ac404-please-update-readme-md.md)) so it indexes every source file, script, skill, and preview render in your workspace:
 
-> *"Please update `@[README.md]` to track the files and skills in this directory so future prompts know where to look for things."*
+!!! prompt "AI Agent Prompt — Living Context Map Bootstrap"
+    Please update `@[README.md]` to track the files and skills in this directory so future prompts know where to look for things.
 
-From [Stage 2](stage-2-circuit-upgrades.md) onward, end every major stage or iteration prompt with **"update `@[README.md]` and git commit"**. Keeping `README.md` current turns `@[README.md]` into a compact, zero-hallucination context anchor for any new conversation.
+From [Stage 2](stage-2-circuit-upgrades.md) onward, end every major stage or iteration prompt with **"update `@[README.md]` and git commit"**. Keeping `README.md` current turns `@[README.md]` into a compact, zero-hallucination **Living Context Map** for any new hardware conversation—a role it holds until **Stage 9**, when publishing the **`ENV / SKEW` Companion Site** lets `README.md` transition into a concise human-facing **Repository Front Door** (see [`README.md` in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/README.md) for the finished front door).
 
 ### 2. Configure `.gitignore` & Git Checkpointing Up Front
 

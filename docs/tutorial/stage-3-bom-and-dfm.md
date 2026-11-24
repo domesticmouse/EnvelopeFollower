@@ -1,14 +1,15 @@
 # Stage 3: Interactive `DesignSpec.md` & Design-for-Testability (DFT)
 
-Rather than firing a single one-shot prompt to generate four disconnected Markdown files (`EnvelopeFollowerImproved.md`, `EnvelopeFollowerBOM.md`, `EnvelopeFollowerExplanation.md`, `SilkscreenInstructions.md`), Stage 3 uses a **two-step interactive workflow** ([Trace 04](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/04-4dfb0979-let-s-work-through-envelopefollowerimprovements-md.md) and [Trace 05](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/05-a4aff487-designspec-md-i-m-wondering-what-options.md)) to converge on a single, pin-accurate **`DesignSpec.md`**.
+Rather than firing a single one-shot prompt to generate four disconnected Markdown files (`EnvelopeFollowerImproved.md`, `EnvelopeFollowerBOM.md`, `EnvelopeFollowerExplanation.md`, `SilkscreenInstructions.md`), Stage 3 uses a **two-step interactive workflow** ([Trace 04](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/04-4dfb0979-let-s-work-through-envelopefollowerimprovements-md.md) and [Trace 05](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/05-a4aff487-designspec-md-i-m-wondering-what-options.md)) to converge on a single, pin-accurate **`DesignSpec.md`** ([view the Reference Spec on the `ENV / SKEW` Companion Site](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/specs/design-spec/) · [source in `EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/DesignSpec.md)).
 
 ---
 
 ## Step 3.1: Interactive One-Improvement-at-a-Time Q&A → `DesignSpec.md`
 
-### AI Agent Prompt
+Start the one-improvement-at-a-time architecture review ([Trace 04](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/04-4dfb0979-let-s-work-through-envelopefollowerimprovements-md.md)):
 
-> *"Let's work through `@[EnvelopeFollowerImprovements.md]`, one improvement at a time. This is primarily for my education, but in cases where there are options or trade offs, I want to make informed decisions."*
+!!! prompt "AI Agent Prompt — Interactive Design Q&A"
+    Let's work through `@[EnvelopeFollowerImprovements.md]`, one improvement at a time. This is primarily for my education, but in cases where there are options or trade offs, I want to make informed decisions.
 
 *(Finish the session with: *"write design spec to disk, update `@[README.md]`, and git commit"*.)*
 
@@ -25,7 +26,7 @@ Rather than firing a single one-shot prompt to generate four disconnected Markdo
 4. **Sequential RefDes Renumbering & Python Netlist Completeness Verification**:
    Once all choices locked in, `DesignSpec.md` renumbered every part cleanly (`R1`–`R33`, `C1`–`C16`, `D1`–`D5`, `LED1`, `RV1`–`RV4`, `SW1`–`SW2`, `J1`–`J4`, `J_PWR`, `U1`–`U2`) and ran a Python BOM↔Netlist completeness check confirming every single IC/diode/connector pin appeared on its exact named net before writing `DesignSpec.md` to disk.
 
-### Locked-In Architecture (`EnvelopeFollowerWithSkewLimiter`)
+### Locked-In Architecture (`ENV / SKEW`)
 
 | Review Item | Topic | Final Choice in `DesignSpec.md` | Key Rationale |
 | :--- | :--- | :--- | :--- |
@@ -89,11 +90,13 @@ flowchart LR
 
 ## Step 3.2: Design-for-Testability (DFT) Test-Point Pass (`TP1`–`TP12`)
 
-### AI Agent Prompts ([Trace 05](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/05-a4aff487-designspec-md-i-m-wondering-what-options.md))
+Lock in probe-safe bring-up test points across the board ([Trace 05](https://github.com/domesticmouse/EnvelopeFollower/blob/main/prompts/05-a4aff487-designspec-md-i-m-wondering-what-options.md)):
 
-> *"@[DesignSpec.md] I'm wondering what options we have for adding test points, specifically Ronghe RH-5001, LCSC C5199801, DNP."*
->
-> *"All 12 TP, I'm ok with tight silkscreen. I'm planning on hand optimising the labels anyway."*
+!!! prompt "Turn 1 — Test-Point Options"
+    `@[DesignSpec.md]` I'm wondering what options we have for adding test points, specifically Ronghe RH-5001, LCSC C5199801, DNP.
+
+!!! prompt "Turn 2 — Lock All 12 Test Points"
+    All 12 TP, I'm ok with tight silkscreen. I'm planning on hand optimising the labels anyway.
 
 ### Authoritative Verification & Probe-Safe TP Rules
 
