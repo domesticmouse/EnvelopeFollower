@@ -1,0 +1,45 @@
+/* Variant C (Patchbay Workbench) — Dark-Studio-Only ENV / SKEW Design Tokens */
+:root {
+  color-scheme: dark;
+
+  --bg-void: #0d0e11;
+  --bg-canvas: #141518;
+  --bg-surface: #1b1d22;
+  --bg-surface-elevated: #1d2028;
+  --bg-code: #090a0d;
+  --bg-code-elevated: #101216;
+
+  --ink-primary: #e8eaef;
+  --ink-silk: #f4f5f7;
+  --ink-muted: #a6acb8;
+
+  --accent-gold: #d8b154;
+  --accent-gold-link: #d8b154;
+  --accent-gold-bright: #e2be66;
+  --accent-gold-ink: #141518;
+  --accent-gold-tint: #262013;
+
+  --border-ui: #6e7485;
+  --border-subtle: #2b2f3b;
+  --border-grid: #323642;
+
+  --led-green: #4ade80;
+  --led-green-bg: #102819;
+  --led-red: #f87171;
+  --led-red-bg: #2c1416;
+  --led-amber: #fbbf24;
+  --led-amber-bg: #291e09;
+
+  --scrollbar-thumb: #7b8294;
+  --scrollbar-track: #141518;
+
+  --font-slab: 'Barlow Condensed', 'DIN Condensed', 'Arial Narrow', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --focus-ring: 2px solid var(--accent-gold-bright);
+  accent-color: var(--accent-gold);
+  /* Never transition or animate scrollbar-color */
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}

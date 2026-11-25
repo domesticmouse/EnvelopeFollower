@@ -1,0 +1,46 @@
+---
+import {
+  COMPANION_SITE_URL,
+  HAGIWO_NOTE_URL,
+  HARDWARE_REPO_URL,
+  SECTION_LABELS,
+  TUTORIAL_REPO_URL,
+  withBase,
+} from '../lib/routes.ts';
+---
+
+<footer class="site-footer" data-pagefind-ignore>
+  <div class="site-footer-inner">
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <a href={withBase('/')}>{SECTION_LABELS.overview}</a>
+      <a href={withBase('/stages/01-hardware-agent-skills/')}>{SECTION_LABELS.hardware}</a>
+      <a href={withBase('/stages/08-wayfinder-site-planning/')}>{SECTION_LABELS['companion-site']}</a>
+      <a href={withBase('/optional/ac-dc-input-coupling/')}>{SECTION_LABELS.optional}</a>
+      <a href={withBase('/appendix/netlist-and-bom/')}>{SECTION_LABELS.appendix}</a>
+      <a href={COMPANION_SITE_URL} target="_blank" rel="noopener noreferrer">Companion Site ↗</a>
+      <a href={TUTORIAL_REPO_URL} target="_blank" rel="noopener noreferrer">Tutorial Repo ↗</a>
+      <a href={HARDWARE_REPO_URL} target="_blank" rel="noopener noreferrer">Hardware Repo ↗</a>
+    </nav>
+
+    <div class="footer-meta">
+      <p>
+        <strong>ENV / SKEW Build Tutorial</strong> · 6 HP Eurorack Envelope Follower &amp;
+        Asymmetric Skew Limiter · Inspired by{' '}
+        <a href={HAGIWO_NOTE_URL} target="_blank" rel="noopener noreferrer">
+          HAGIWO/ハギヲ (No. 43: $4 Envelope Follower)
+        </a>{' '}
+        and{' '}
+        <a href={HARDWARE_REPO_URL} target="_blank" rel="noopener noreferrer">
+          domesticmouse/EnvelopeFollowerWithSkewLimiter
+        </a>
+        .
+      </p>
+      <p>
+        <a href={`${TUTORIAL_REPO_URL}/blob/main/LICENSE`} target="_blank" rel="noopener noreferrer">
+          Apache License 2.0
+        </a>{' '}
+        · This is not an officially supported Google product.
+      </p>
+    </div>
+  </div>
+</footer>
