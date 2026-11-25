@@ -33,6 +33,15 @@ export const SECTION_LABELS: Readonly<Record<TutorialSection, string>> = {
   appendix: 'Tutorial Appendix',
 };
 
+/** Compact section badge labels for search result hits across all five curriculum sections. */
+export const SEARCH_SECTION_LABELS: Readonly<Record<TutorialSection, string>> = {
+  overview: 'Overview',
+  hardware: 'Hardware Build',
+  'companion-site': 'Companion Site',
+  optional: 'Optional',
+  appendix: 'Appendix',
+};
+
 /** Ordered list of all five tutorial curriculum groups. */
 export const SECTION_ORDER: readonly TutorialSection[] = [
   'overview',
@@ -321,4 +330,28 @@ export function getProgressMeterLabel(route: TutorialRoute): string {
     return `PROGRESS · STAGE ${String(route.stage).padStart(2, '0')} / 09`;
   }
   return `PROGRESS · ${route.badge}`;
+}
+
+/** Resolve a built or relative URL to its canonical TutorialSection via TUTORIAL_ROUTES. */
+export function getSectionByUrl(rawUrl: string): TutorialSection {
+  const withoutOrigin = rawUrl.replace(/^https?:\/\/[^/]+/i, '');
+  const matched = getRouteByPath(withoutOrigin);
+  if (matched) {
+    return matched.section;
+  }
+
+  const normalized = normalizeRoutePath(withoutOrigin);
+  if (normalized.startsWith('/optional/')) {
+    return 'optional';
+  }
+  if (normalized.startsWith('/appendix/')) {
+    return 'appendix';
+  }
+  if (normalized.startsWith('/stages/08') || normalized.startsWith('/stages/09')) {
+    return 'companion-site';
+  }
+  if (normalized.startsWith('/stages/')) {
+    return 'hardware';
+  }
+  return 'overview';
 }
