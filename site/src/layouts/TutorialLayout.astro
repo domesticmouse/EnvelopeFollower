@@ -258,9 +258,11 @@ const pageTitle = isOverview ? title : `${title} | ENV / SKEW Build Tutorial`;
     <slot name="dialogs" />
 
     <script>
+      import { initCopyController } from '../lib/copy-controller.ts';
       import { initTocScrollSpy } from '../lib/toc-scrollspy.ts';
 
       initTocScrollSpy();
+      initCopyController();
     </script>
     <slot name="scripts" />
   </body>

@@ -8,6 +8,17 @@ const DIST_DIR = path.join(SITE_DIR, 'dist');
 
 const EXPECTED_PAGES = [
   {
+    file: path.join(DIST_DIR, 'stages/01-hardware-agent-skills/index.html'),
+    checklistItems: 0,
+    expectedChecked: 0,
+    expectedCalloutTitleCode: undefined,
+    expectedProgress: 'PROGRESS · STAGE 01 / 09',
+    expectedPrevHref: '/EnvelopeFollower/',
+    expectedNextHref: '/EnvelopeFollower/stages/02-sketch-extraction-and-critique/',
+    expectedPromptStrips: 1,
+    expectedCodeConsoles: 5,
+  },
+  {
     file: path.join(DIST_DIR, 'appendix/netlist-and-bom/index.html'),
     checklistItems: 9,
     expectedChecked: 0,
@@ -15,6 +26,8 @@ const EXPECTED_PAGES = [
     expectedProgress: 'PROGRESS · APP',
     expectedPrevHref: '/EnvelopeFollower/optional/ac-dc-input-coupling/',
     expectedNextHref: '/EnvelopeFollower/appendix/engineering-sign-off-checklist/',
+    expectedPromptStrips: 0,
+    expectedCodeConsoles: 1,
   },
   {
     file: path.join(DIST_DIR, 'appendix/engineering-sign-off-checklist/index.html'),
@@ -23,6 +36,8 @@ const EXPECTED_PAGES = [
     expectedProgress: 'PROGRESS · APP',
     expectedPrevHref: '/EnvelopeFollower/appendix/netlist-and-bom/',
     expectedNextHref: undefined,
+    expectedPromptStrips: 0,
+    expectedCodeConsoles: 0,
   },
 ];
 
@@ -156,6 +171,20 @@ for (const page of EXPECTED_PAGES) {
     }
   }
 
+  const promptStrips = win.document.querySelectorAll('.c-patch-strip');
+  if (promptStrips.length !== page.expectedPromptStrips) {
+    fail(
+      `Expected ${page.expectedPromptStrips} .c-patch-strip blocks in ${page.file}, found ${promptStrips.length}`,
+    );
+  }
+
+  const codeConsoles = win.document.querySelectorAll('.code-console');
+  if (codeConsoles.length !== page.expectedCodeConsoles) {
+    fail(
+      `Expected ${page.expectedCodeConsoles} .code-console blocks in ${page.file}, found ${codeConsoles.length}`,
+    );
+  }
+
   const checkboxes = Array.from(win.document.querySelectorAll('article input[type="checkbox"]'));
   if (checkboxes.length !== page.checklistItems) {
     fail(`Expected ${page.checklistItems} checkboxes in ${page.file}, found ${checkboxes.length}`);
@@ -174,5 +203,5 @@ for (const page of EXPECTED_PAGES) {
 }
 
 console.log(
-  `OK: Verified ${EXPECTED_PAGES.length} built Tutorial Appendix routes, ${woff2Files.length} self-hosted .woff2 assets, and 0 external CSS URLs.`,
+  `OK: Verified ${EXPECTED_PAGES.length} built tutorial routes, ${woff2Files.length} self-hosted .woff2 assets, and 0 external CSS URLs.`,
 );

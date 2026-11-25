@@ -1,0 +1,62 @@
+---
+import { COPY_ICON_DEFS } from '../lib/copy-icons.ts';
+import { extractFaceplateMotifs } from '../lib/panel-svg.ts';
+
+export interface Props {
+  title: string;
+  trace?: string;
+  turn?: number;
+}
+
+const { title, trace, turn } = Astro.props;
+const motifs = extractFaceplateMotifs();
+const spineLabel = turn !== undefined ? `T${turn}` : 'PROMPT';
+const showConnector = turn !== undefined && turn > 1;
+const payloadId = `prompt-payload-${crypto.randomUUID().slice(0, 8)}`;
+---
+
+{
+  showConnector && (
+    <div class="c-patch-connector" aria-hidden="true">
+      <Fragment set:html={motifs.normalArrowSvg} />
+      <span>PATCHED TO TURN {turn}</span>
+    </div>
+  )
+}
+
+<div class="c-patch-strip">
+  <div class="c-patch-spine" data-pagefind-ignore>
+    <span class="c-patch-label">{spineLabel}</span>
+    <span class="c-patch-led" aria-hidden="true">
+      <Fragment set:html={motifs.ledOctagonSvg} />
+    </span>
+    <span class="prompt-copy-wrap">
+      <button
+        type="button"
+        class="prompt-copy-btn"
+        command="--copy"
+        commandfor={payloadId}
+        aria-label={`Copy ${title}`}
+      >
+        {
+          COPY_ICON_DEFS.map((icon) => (
+            <svg class={icon.className} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d={icon.pathD} />
+            </svg>
+          ))
+        }
+        <span>Copy</span>
+      </button>
+      <span class="prompt-copy-tip" role="status"></span>
+    </span>
+  </div>
+  <div class="c-patch-payload">
+    <div class="c-patch-title">
+      <span>{title}</span>
+      {trace && <span class="c-patch-trace"> · {trace}</span>}
+    </div>
+    <div class="c-patch-text" id={payloadId}>
+      <slot />
+    </div>
+  </div>
+</div>

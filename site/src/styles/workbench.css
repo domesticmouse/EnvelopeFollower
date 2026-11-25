@@ -855,6 +855,369 @@ dialog::backdrop {
   font-size: inherit;
 }
 
+/* Shiki Code Console Frame & In-Flow Hardware Header */
+.code-console {
+  margin-block: 1.1rem;
+  border: 1px solid var(--border-ui);
+  background: var(--bg-code);
+}
+
+.code-console-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.34rem 0.65rem 0.34rem 0.85rem;
+  background: var(--bg-code-elevated);
+  border-block-end: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+}
+
+.code-console-lang {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent-gold-link);
+}
+
+.code-console pre {
+  margin-block: 0;
+  border: 0;
+}
+
+/* Shared Copy Button & Accessible Status Bubble (never hidden via display/visibility) */
+.prompt-copy-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.prompt-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.32rem;
+  min-inline-size: 56px;
+  min-block-size: 28px;
+  padding: 0.22rem 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid var(--accent-gold);
+  background: var(--accent-gold);
+  color: var(--accent-gold-ink);
+  transition:
+    background-color 0.14s ease,
+    color 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.prompt-copy-btn:hover,
+.prompt-copy-btn:focus-visible {
+  background: var(--accent-gold-bright);
+  border-color: var(--accent-gold-bright);
+  color: var(--accent-gold-ink);
+}
+
+.prompt-copy-btn[data-copied] {
+  background: var(--led-green-bg);
+  border-color: var(--led-green);
+  color: var(--led-green);
+}
+
+.prompt-copy-btn[data-failed] {
+  background: var(--led-red-bg);
+  border-color: var(--led-red);
+  color: var(--led-red);
+}
+
+.prompt-copy-icon {
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  flex-shrink: 0;
+  fill: currentColor;
+}
+
+.prompt-copy-btn .prompt-icon-check,
+.prompt-copy-btn .prompt-icon-error {
+  display: none;
+}
+
+.prompt-copy-btn[data-copied] .prompt-icon-copy,
+.prompt-copy-btn[data-failed] .prompt-icon-copy {
+  display: none;
+}
+
+.prompt-copy-btn[data-copied] .prompt-icon-check {
+  display: inline-block;
+}
+
+.prompt-copy-btn[data-failed] .prompt-icon-error {
+  display: inline-block;
+}
+
+.prompt-copy-tip {
+  position: absolute;
+  inset-block-end: calc(100% + 0.35rem);
+  inset-inline-end: 0;
+  padding: 0.18rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+  border: 1px solid var(--led-green);
+  background: var(--led-green-bg);
+  color: var(--led-green);
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease;
+  z-index: 30;
+}
+
+.prompt-copy-btn[data-copied] + .prompt-copy-tip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.prompt-copy-btn[data-failed] + .prompt-copy-tip {
+  opacity: 1;
+  transform: translateY(0);
+  border-color: var(--led-red);
+  background: var(--led-red-bg);
+  color: var(--led-red);
+}
+
+/* Variant C Split Patch-Strip (<PromptBlock> & <PromptGroup>) */
+.c-patch-strip {
+  margin-block: 1.1rem;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  border: 1px solid var(--border-ui);
+  background: var(--bg-code);
+}
+
+.c-patch-spine {
+  background: var(--bg-surface);
+  border-inline-end: 1px solid var(--border-ui);
+  padding: 0.65rem 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+}
+
+.c-patch-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink-silk);
+}
+
+.c-patch-led {
+  inline-size: 16px;
+  block-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-gold);
+}
+
+.c-patch-led .motif-led-octagon {
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.c-patch-strip:has(.prompt-copy-btn[data-copied]) .c-patch-led {
+  color: var(--led-green);
+}
+
+.c-patch-strip:has(.prompt-copy-btn[data-failed]) .c-patch-led {
+  color: var(--led-red);
+}
+
+.c-patch-spine .prompt-copy-btn {
+  min-inline-size: 56px;
+  min-block-size: 28px;
+  padding: 0.22rem 0.35rem;
+  font-size: 0.66rem;
+}
+
+.c-patch-spine .prompt-copy-tip {
+  inset-inline-start: 0;
+  inset-inline-end: auto;
+}
+
+.c-patch-payload {
+  padding: 0.85rem 1rem;
+  min-inline-size: 0;
+}
+
+.c-patch-title {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-gold-link);
+  margin-block-end: 0.45rem;
+}
+
+.c-patch-trace {
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.c-patch-text {
+  font-family: var(--font-mono);
+  font-size: 0.83rem;
+  line-height: 1.62;
+  color: var(--ink-silk);
+}
+
+.c-patch-text > :first-child {
+  margin-block-start: 0;
+}
+
+.c-patch-text > :last-child {
+  margin-block-end: 0;
+}
+
+.c-patch-text code.chip-skill {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-ink);
+  font-weight: 600;
+}
+
+.c-patch-text code.chip-file {
+  background: var(--bg-surface);
+  border: 1px dashed var(--accent-gold);
+  color: var(--ink-silk);
+}
+
+.c-patch-chain {
+  margin-block: 1.25rem;
+}
+
+.c-patch-chain .c-patch-strip {
+  margin-block: 0;
+}
+
+.c-patch-connector {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding-block: 0.28rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent-gold-link);
+}
+
+.c-patch-chain .c-patch-connector {
+  display: flex;
+}
+
+.c-patch-connector .motif-normal-arrow {
+  inline-size: 14px;
+  block-size: auto;
+  color: var(--accent-gold);
+  transform: rotate(90deg);
+}
+
+/* Native Zero-JS <Disclosure> Component */
+.c-disclosure {
+  margin-block: 1.15rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-ui);
+}
+
+.c-disclosure-summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+  min-block-size: 40px;
+  padding: 0.58rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55ch;
+  background: var(--bg-surface-elevated);
+  font-family: var(--font-display);
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--ink-silk);
+}
+
+.c-disclosure[open] > .c-disclosure-summary {
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.c-disclosure-summary::-webkit-details-marker {
+  display: none;
+}
+
+.c-disclosure-summary::before {
+  content: '▾';
+  display: inline-block;
+  color: var(--accent-gold);
+  flex-shrink: 0;
+  rotate: -90deg;
+}
+
+.c-disclosure[open] > .c-disclosure-summary::before {
+  rotate: 0deg;
+}
+
+.c-disclosure-title {
+  min-inline-size: 0;
+}
+
+.c-disclosure::details-content {
+  interpolate-size: allow-keywords;
+  overflow: clip;
+  contain: layout;
+}
+
+.c-disclosure:not([open])::details-content {
+  block-size: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .c-disclosure-summary::before {
+    transition: rotate 0.2s ease;
+  }
+
+  .c-disclosure::details-content {
+    transition:
+      block-size 0.22s ease-in-out,
+      content-visibility 0.22s ease-in-out,
+      display 0.22s ease-in-out;
+    transition-behavior: allow-discrete;
+  }
+}
+
+.c-disclosure-body {
+  padding: 0.85rem 1rem;
+}
+
+.c-disclosure-body > :first-child {
+  margin-block-start: 0;
+}
+
+.c-disclosure-body > :last-child {
+  margin-block-end: 0;
+}
+
 /* Scrollable Data Tables */
 .table-wrapper {
   overflow-x: auto;
@@ -1156,6 +1519,25 @@ dialog::backdrop {
   }
 }
 
+@media (max-width: 640px) {
+  .c-patch-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .c-patch-spine {
+    flex-direction: row;
+    justify-content: space-between;
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--border-ui);
+    padding: 0.5rem 0.75rem;
+  }
+
+  .c-patch-spine .prompt-copy-tip {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+  }
+}
+
 /* ============================================================================
  * REDUCED MOTION, FORCED COLORS & PRINT WHITE-PAPER STYLES
  * ============================================================================ */
@@ -1185,7 +1567,16 @@ dialog::backdrop {
   .nav-drawer,
   .nav-drawer-close,
   .tutorial-prose li.task-list-item,
-  .tutorial-prose pre {
+  .tutorial-prose pre,
+  .code-console,
+  .code-console-head,
+  .c-patch-strip,
+  .c-patch-spine,
+  .c-patch-text code.chip-skill,
+  .c-patch-text code.chip-file,
+  .c-disclosure,
+  .prompt-copy-btn,
+  .prompt-copy-tip {
     border-color: CanvasText !important;
   }
 
@@ -1246,6 +1637,7 @@ dialog::backdrop {
   .nav-drawer,
   .footer-nav,
   .skip-link,
+  .prompt-copy-wrap,
   .no-print {
     display: none !important;
   }
@@ -1260,6 +1652,11 @@ dialog::backdrop {
   .callout,
   .table-wrapper,
   .tutorial-prose pre,
+  .code-console,
+  .code-console-head,
+  .c-patch-strip,
+  .c-patch-spine,
+  .c-disclosure,
   .tutorial-prose li.task-list-item {
     background: #ffffff !important;
     color: #000000 !important;
