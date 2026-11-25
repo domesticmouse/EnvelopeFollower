@@ -1049,6 +1049,24 @@ dialog.search-dialog[open] {
   margin-block-start: 0.35rem;
 }
 
+.tutorial-prose blockquote {
+  margin-block: 1rem;
+  margin-inline: 0;
+  padding: 0.65rem 1rem;
+  border-inline-start: 3px solid var(--border-ui);
+  background: var(--bg-surface);
+  color: var(--ink-muted);
+  text-wrap: pretty;
+}
+
+.tutorial-prose blockquote > :first-child {
+  margin-block-start: 0;
+}
+
+.tutorial-prose blockquote > :last-child {
+  margin-block-end: 0;
+}
+
 /* Framing Wings Section Dividers */
 .tutorial-prose hr,
 .c-wing-hr {
@@ -2066,7 +2084,9 @@ dialog.figure-lightbox[open] {
   .search-result-link,
   .search-result-badge,
   .tutorial-prose li.task-list-item,
+  .tutorial-prose blockquote,
   .tutorial-prose pre,
+  .tutorial-prose blockquote,
   .code-console,
   .code-console-head,
   .c-patch-strip,
@@ -2170,6 +2190,7 @@ dialog.figure-lightbox[open] {
   .callout,
   .table-wrapper,
   .tutorial-prose pre,
+  .tutorial-prose blockquote,
   .code-console,
   .code-console-head,
   .c-patch-strip,
