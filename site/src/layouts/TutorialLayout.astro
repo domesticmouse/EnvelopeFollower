@@ -1,0 +1,267 @@
+---
+import '../styles/fonts.css';
+import '../styles/tokens.css';
+import '../styles/workbench.css';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { extractFaceplateMotifs } from '../lib/panel-svg.ts';
+import {
+  SECTION_LABELS,
+  SITE_URL,
+  type TutorialSection,
+  formatPrevNextKicker,
+  getPrevNextRoutes,
+  getProgressMeterLabel,
+  getRouteByPath,
+  getRouteGroups,
+  normalizeRoutePath,
+  withBase,
+} from '../lib/routes.ts';
+
+export interface HeadingItem {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+export interface HeroMetaItem {
+  label: string;
+  value: string;
+}
+
+interface Props {
+  title: string;
+  navTitle: string;
+  description: string;
+  section: TutorialSection;
+  order: number;
+  badge?: string;
+  stage?: number;
+  heroMeta?: readonly HeroMetaItem[];
+  currentPath: string;
+  headings?: readonly HeadingItem[];
+}
+
+const {
+  title,
+  navTitle,
+  description,
+  section,
+  order,
+  badge,
+  stage,
+  heroMeta,
+  currentPath,
+  headings = [],
+} = Astro.props;
+
+const normalizedCurrent = normalizeRoutePath(currentPath);
+const activeRoute = getRouteByPath(normalizedCurrent) ?? {
+  order,
+  id: '',
+  path: normalizedCurrent,
+  section,
+  badge: badge ?? '00',
+  stage,
+  navTitle,
+};
+
+const motifs = extractFaceplateMotifs();
+const routeGroups = getRouteGroups();
+const { prev, next } = getPrevNextRoutes(order);
+const outlineHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+const showToc = outlineHeadings.length >= 2;
+const isOverview = section === 'overview';
+const sectionLabel = SECTION_LABELS[section];
+
+const resolvedHeroMeta: readonly HeroMetaItem[] =
+  heroMeta && heroMeta.length > 0
+    ? heroMeta
+    : [
+        { label: 'SECTION', value: sectionLabel },
+        {
+          label: stage !== undefined ? 'STAGE' : 'BADGE',
+          value: stage !== undefined ? `Stage ${String(stage).padStart(2, '0')} / 09` : badge ?? 'APP',
+        },
+      ];
+
+const bayKicker =
+  stage !== undefined
+    ? `${sectionLabel} · Stage ${String(stage).padStart(2, '0')}`
+    : sectionLabel;
+
+const canonicalHref = new URL(
+  normalizedCurrent === '/' ? '' : normalizedCurrent.replace(/^\//, ''),
+  SITE_URL,
+).toString();
+const pageTitle = isOverview ? title : `${title} | ENV / SKEW Build Tutorial`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalHref} />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <SiteHeader currentPath={normalizedCurrent}>
+      <slot name="search-trigger" slot="search-trigger" />
+    </SiteHeader>
+
+    <div class="c-shell">
+      <aside class="c-rail left-rail" aria-label="Modular curriculum rack" data-pagefind-ignore>
+        <div class="c-progress-module">
+          <span>{getProgressMeterLabel(activeRoute)}</span>
+          <Fragment set:html={motifs.gainBarsSvg} />
+        </div>
+
+        {
+          routeGroups.map((group) => (
+            <details class="c-rack-module" open>
+              <summary>{group.label}</summary>
+              <ul class="c-rack-list">
+                {group.routes.map((route) => {
+                  const isCurrent = route.path === normalizedCurrent;
+                  return (
+                    <li>
+                      <a
+                        href={withBase(route.path)}
+                        class="c-rack-link"
+                        aria-current={isCurrent ? 'page' : undefined}
+                      >
+                        {isCurrent ? (
+                          <Fragment set:html={motifs.normalArrowSvg} />
+                        ) : (
+                          <span class="c-rack-badge">{route.badge}</span>
+                        )}
+                        <span>{route.navTitle}</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </details>
+          ))
+        }
+      </aside>
+
+      <main id="main-content" class="c-main">
+        {
+          showToc && (
+            <details class="toc-mobile" data-pagefind-ignore>
+              <summary>On this page ({outlineHeadings.length})</summary>
+              <ul class="toc-list">
+                {outlineHeadings.map((heading) => (
+                  <li>
+                    <a
+                      class="toc-link"
+                      data-depth={String(heading.depth)}
+                      href={`#${heading.slug}`}
+                    >
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )
+        }
+
+        {
+          !isOverview && (
+            <nav class="breadcrumbs" aria-label="Breadcrumb" data-pagefind-ignore>
+              <a href={withBase('/')}>Build Tutorial</a>
+              <span aria-hidden="true">/</span>
+              <span>{sectionLabel}</span>
+              <span aria-hidden="true">/</span>
+              <span aria-current="page">{navTitle}</span>
+            </nav>
+          )
+        }
+
+        <header class="c-output-bay">
+          <div class="c-bay-main">
+            <span class="c-bay-kicker">{bayKicker}</span>
+            <h1 data-pagefind-body>{title}</h1>
+            <p class="c-bay-desc">{description}</p>
+          </div>
+          <div class="c-bay-spine" aria-hidden="true"></div>
+          <div class="c-bay-specs" data-pagefind-ignore>
+            {
+              resolvedHeroMeta.map((item) => (
+                <div class="c-bay-spec-row">
+                  <span class="c-bay-spec-label">{item.label}</span>
+                  <span class="c-bay-spec-value">{item.value}</span>
+                </div>
+              ))
+            }
+          </div>
+        </header>
+
+        <article class="tutorial-prose" data-pagefind-body>
+          <slot />
+        </article>
+
+        {
+          (prev || next) && (
+            <nav class="prev-next-nav" aria-label="Previous and next stage" data-pagefind-ignore>
+              {prev && (
+                <a href={withBase(prev.path)} class="prev-next-card" data-dir="prev">
+                  <span class="prev-next-kicker">{formatPrevNextKicker(prev, 'prev')}</span>
+                  <span class="prev-next-title">{prev.navTitle}</span>
+                </a>
+              )}
+              {next && (
+                <a href={withBase(next.path)} class="prev-next-card" data-dir="next">
+                  <span class="prev-next-kicker">{formatPrevNextKicker(next, 'next')}</span>
+                  <span class="prev-next-title">{next.navTitle}</span>
+                </a>
+              )}
+            </nav>
+          )
+        }
+      </main>
+
+      {
+        showToc && (
+          <aside class="c-toc right-toc" aria-label="On this page" data-pagefind-ignore>
+            <div class="c-toc-heading">SIGNAL OUTLINE</div>
+            <nav class="c-toc-nav" aria-label="Signal outline">
+              <ul class="toc-list">
+                {outlineHeadings.map((heading) => (
+                  <li>
+                    <a
+                      class="toc-link"
+                      data-depth={String(heading.depth)}
+                      href={`#${heading.slug}`}
+                    >
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        )
+      }
+    </div>
+
+    <SiteFooter />
+
+    <slot name="dialogs" />
+
+    <script>
+      import { initTocScrollSpy } from '../lib/toc-scrollspy.ts';
+
+      initTocScrollSpy();
+    </script>
+    <slot name="scripts" />
+  </body>
+</html>
