@@ -7,11 +7,13 @@ import {
   SITE_ORIGIN,
   SITE_URL,
   TUTORIAL_ROUTES,
+  TUTORIAL_SECTIONS,
   formatPrevNextKicker,
   getPrevNextRoutes,
   getProgressMeterLabel,
   getRouteByPath,
   getRouteGroups,
+  getSectionByUrl,
   isJumpNavActive,
   normalizeRoutePath,
   withBase,
@@ -51,6 +53,13 @@ describe('routes registry', () => {
   });
 
   it('groups all 13 routes into 5 glossary-aligned sections', () => {
+    expect(TUTORIAL_SECTIONS).toEqual([
+      'overview',
+      'hardware',
+      'companion-site',
+      'optional',
+      'appendix',
+    ]);
     expect(SECTION_LABELS).toEqual({
       overview: 'Overview',
       hardware: 'Hardware Build',
@@ -141,6 +150,18 @@ describe('routes registry', () => {
     expect(getProgressMeterLabel(getRouteByPath('/appendix/netlist-and-bom/')!)).toBe(
       'PROGRESS · APP',
     );
+  });
+
+  it('resolves canonical and prefix URLs to TutorialSection via getSectionByUrl', () => {
+    expect(getSectionByUrl('https://domesticmouse.github.io/EnvelopeFollower/')).toBe('overview');
+    expect(getSectionByUrl('/EnvelopeFollower/stages/04-skidl-and-schematic/#netlist')).toBe(
+      'hardware',
+    );
+    expect(getSectionByUrl('/stages/08-wayfinder-site-planning/')).toBe('companion-site');
+    expect(getSectionByUrl('/stages/09-extra/')).toBe('companion-site');
+    expect(getSectionByUrl('/optional/custom/')).toBe('optional');
+    expect(getSectionByUrl('/appendix/custom/')).toBe('appendix');
+    expect(getSectionByUrl('/unknown/')).toBe('overview');
   });
 });
 

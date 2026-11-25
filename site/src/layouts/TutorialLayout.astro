@@ -214,49 +214,30 @@ const hasSearchSlot = Astro.slots.has('search-trigger');
           )
         }
 
-        {
-          assembledFaceplateSvg ? (
-            <header class="c-output-bay c-output-bay-overview">
-              <div class="c-bay-lead">
-                <div class="c-bay-main">
-                  <span class="c-bay-kicker">{bayKicker}</span>
-                  <h1 data-pagefind-body>{title}</h1>
-                  <p class="c-bay-desc">{description}</p>
-                </div>
-                <div class="c-bay-specs" data-pagefind-ignore>
-                  {resolvedHeroMeta.map((item) => (
-                    <div class="c-bay-spec-row">
-                      <span class="c-bay-spec-label">{item.label}</span>
-                      <span class="c-bay-spec-value">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
+        <header class={`c-output-bay${assembledFaceplateSvg ? ' is-overview-bay' : ''}`}>
+          <div class="c-bay-main">
+            <span class="c-bay-kicker">{bayKicker}</span>
+            <h1 data-pagefind-body>{title}</h1>
+            <p class="c-bay-desc">{description}</p>
+          </div>
+          <div class="c-bay-spine" aria-hidden="true"></div>
+          <div class="c-bay-specs" data-pagefind-ignore>
+            {resolvedHeroMeta.map((item) => (
+              <div class="c-bay-spec-row">
+                <span class="c-bay-spec-label">{item.label}</span>
+                <span class="c-bay-spec-value">{item.value}</span>
               </div>
-              <div class="c-bay-spine" aria-hidden="true"></div>
+            ))}
+          </div>
+          {
+            assembledFaceplateSvg && (
               <div class="c-bay-faceplate" data-pagefind-ignore>
                 <Fragment set:html={assembledFaceplateSvg} />
                 <span class="c-bay-faceplate-label">6 HP · 30 × 128.5 mm</span>
               </div>
-            </header>
-          ) : (
-            <header class="c-output-bay">
-              <div class="c-bay-main">
-                <span class="c-bay-kicker">{bayKicker}</span>
-                <h1 data-pagefind-body>{title}</h1>
-                <p class="c-bay-desc">{description}</p>
-              </div>
-              <div class="c-bay-spine" aria-hidden="true"></div>
-              <div class="c-bay-specs" data-pagefind-ignore>
-                {resolvedHeroMeta.map((item) => (
-                  <div class="c-bay-spec-row">
-                    <span class="c-bay-spec-label">{item.label}</span>
-                    <span class="c-bay-spec-value">{item.value}</span>
-                  </div>
-                ))}
-              </div>
-            </header>
-          )
-        }
+            )
+          }
+        </header>
 
         <article class="tutorial-prose" data-pagefind-body>
           <slot />

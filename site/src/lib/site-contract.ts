@@ -301,7 +301,7 @@ const HTML_ATTR_LINK_RE = /\b(?:href|src)\s*=\s*["']([^"']+)["']/gi;
 const COMPANION_SPECS_URL =
   'https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/specs/';
 
-const AVOIDED_GLOSSARY_PATTERNS: readonly [string, RegExp][] = [
+export const AVOIDED_GLOSSARY_PATTERNS: readonly [string, RegExp][] = [
   ['codelab', /\bcodelabs?\b/i],
   ['docs site', /\bdocs\s+sites?\b/i],
   ['documentation portal', /\bdocumentation\s+portals?\b/i],

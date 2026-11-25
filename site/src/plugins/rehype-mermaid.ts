@@ -1,29 +1,9 @@
-import type { Element, ElementContent, Properties, Root, RootContent } from 'hast';
+import type { Element, ElementContent, Properties, Root } from 'hast';
 import { visit } from 'unist-util-visit';
-
-function getClasses(el: Element): string[] {
-  const raw: unknown = el.properties?.className;
-  if (Array.isArray(raw)) {
-    return raw.map((item) => String(item));
-  }
-  if (typeof raw === 'string') {
-    return raw.split(/\s+/).filter(Boolean);
-  }
-  return [];
-}
+import { extractText, readClassNames } from './hast-utils.ts';
 
 function hasClass(el: Element, className: string): boolean {
-  return getClasses(el).includes(className);
-}
-
-function extractText(node: Root | RootContent): string {
-  if (node.type === 'text') {
-    return node.value;
-  }
-  if ('children' in node && Array.isArray(node.children)) {
-    return node.children.map((child) => extractText(child)).join('');
-  }
-  return '';
+  return readClassNames(el.properties?.className ?? el.properties?.class).includes(className);
 }
 
 function h(tagName: string, properties: Properties, children: ElementContent[]): Element {
@@ -45,7 +25,7 @@ function isMermaidPre(node: Element): { isMermaid: boolean; codeChild: Element |
   const dataLang =
     typeof node.properties?.dataLanguage === 'string' ? node.properties.dataLanguage : undefined;
   const classLang = codeChild
-    ? getClasses(codeChild)
+    ? readClassNames(codeChild.properties?.className ?? codeChild.properties?.class)
         .find((cls) => cls.startsWith('language-'))
         ?.slice('language-'.length)
     : undefined;
