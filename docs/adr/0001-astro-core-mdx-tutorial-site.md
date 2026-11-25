@@ -4,7 +4,7 @@ status: accepted
 
 # Astro Core in `site/` with Relocated MDX Content Collections and Managed Image Assets
 
-We will build the **`ENV / SKEW` Build Tutorial** GitHub Pages site using **Astro (Core)** inside an isolated `site/` directory managed by `npm` on Node.js `>=24.0.0`, relocating the `13` published tutorial pages from `docs/` into `site/src/content/` as `.mdx` (`@astrojs/mdx`) files with YAML frontmatter and typed Astro components (`<PromptBlock>`, `<PromptGroup>`, `<Callout>`, native `<details>`, and `$$...$$`) and moving the `17` tutorial images into `site/src/assets/images/`, while keeping repository-level `docs/agents/`, `docs/adr/`, and `docs/research/` in `docs/`.
+We will build the **`ENV / SKEW` Build Tutorial** GitHub Pages site using **Astro (Core)** inside an isolated `site/` directory managed by `npm` on Node.js `>=24.0.0`, relocating the `13` published tutorial pages from `docs/` into `site/src/content/` as `.mdx` (`@astrojs/mdx`) files with YAML frontmatter and typed Astro components (`<PromptBlock>`, `<PromptGroup>`, `<Callout>`, native `<details>`, and `$$...$$`) and moving the `14` unique tutorial images (rendered across `17` figures) into `site/src/assets/images/`, while keeping repository-level `docs/agents/`, `docs/adr/`, and `docs/research/` in `docs/`.
 
 ## Considered Options
 
