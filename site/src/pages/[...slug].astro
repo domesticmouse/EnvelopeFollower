@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Callout from '../components/Callout.astro';
 import TableWrapper from '../components/TableWrapper.astro';
 import TutorialLayout from '../layouts/TutorialLayout.astro';
+import { detectContentFeatures } from '../lib/content-features.ts';
 
 export async function getStaticPaths() {
   const entries = await getCollection('tutorial');
@@ -17,6 +18,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content, headings } = await render(entry);
 const currentPath = entry.id === 'index' ? '/' : `/${entry.id}/`;
+const { hasMath, hasMermaid } = detectContentFeatures(entry.body);
 ---
 
 <TutorialLayout
@@ -30,6 +32,8 @@ const currentPath = entry.id === 'index' ? '/' : `/${entry.id}/`;
   heroMeta={entry.data.heroMeta}
   currentPath={currentPath}
   headings={headings}
+  hasMath={hasMath}
+  hasMermaid={hasMermaid}
 >
   <Content components={{ Callout, table: TableWrapper }} />
 </TutorialLayout>

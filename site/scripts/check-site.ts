@@ -6,7 +6,30 @@ import { Window } from 'happy-dom';
 const SITE_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST_DIR = path.join(SITE_DIR, 'dist');
 
-const EXPECTED_PAGES = [
+interface ExpectedPage {
+  file: string;
+  checklistItems: number;
+  expectedChecked: number;
+  expectedCalloutTitleCode?: string;
+  expectedProgress: string;
+  expectedPrevHref?: string;
+  expectedNextHref?: string;
+  expectMath: boolean;
+  expectMermaid: boolean;
+}
+
+const EXPECTED_PAGES: ExpectedPage[] = [
+  {
+    file: path.join(DIST_DIR, 'optional/ac-dc-input-coupling/index.html'),
+    checklistItems: 0,
+    expectedChecked: 0,
+    expectedCalloutTitleCode: 'ENV / SKEW',
+    expectedProgress: 'PROGRESS · OPT',
+    expectedPrevHref: '/EnvelopeFollower/stages/09-companion-site-delivery/',
+    expectedNextHref: '/EnvelopeFollower/appendix/netlist-and-bom/',
+    expectMath: true,
+    expectMermaid: true,
+  },
   {
     file: path.join(DIST_DIR, 'appendix/netlist-and-bom/index.html'),
     checklistItems: 9,
@@ -15,6 +38,8 @@ const EXPECTED_PAGES = [
     expectedProgress: 'PROGRESS · APP',
     expectedPrevHref: '/EnvelopeFollower/optional/ac-dc-input-coupling/',
     expectedNextHref: '/EnvelopeFollower/appendix/engineering-sign-off-checklist/',
+    expectMath: false,
+    expectMermaid: false,
   },
   {
     file: path.join(DIST_DIR, 'appendix/engineering-sign-off-checklist/index.html'),
@@ -23,6 +48,8 @@ const EXPECTED_PAGES = [
     expectedProgress: 'PROGRESS · APP',
     expectedPrevHref: '/EnvelopeFollower/appendix/netlist-and-bom/',
     expectedNextHref: undefined,
+    expectMath: false,
+    expectMermaid: false,
   },
 ];
 
@@ -156,6 +183,54 @@ for (const page of EXPECTED_PAGES) {
     }
   }
 
+  if (win.document.querySelectorAll('.katex-error').length > 0) {
+    fail(`Rendered KaTeX parse error (.katex-error) detected in ${page.file}`);
+  }
+
+  const stylesheetLinks = Array.from(
+    win.document.querySelectorAll('link[rel="stylesheet"]'),
+  ).map((el) => el.getAttribute('href') ?? '');
+  const hasKatexCssLink = stylesheetLinks.some((href) => /katex/i.test(href));
+  const scriptSrcs = Array.from(win.document.querySelectorAll('script[src]')).map(
+    (el) => el.getAttribute('src') ?? '',
+  );
+  const hasMermaidScript = scriptSrcs.some((src) => /mermaid/i.test(src));
+
+  if (page.expectMath) {
+    if (!hasKatexCssLink) {
+      fail(`Expected self-hosted KaTeX CSS link on math route ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.katex').length === 0) {
+      fail(`Expected rendered .katex math nodes in ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.katex-display').length === 0) {
+      fail(`Expected rendered .katex-display block in ${page.file}`);
+    }
+  } else {
+    if (hasKatexCssLink) {
+      fail(`Unexpected KaTeX CSS link on non-math route ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.katex').length > 0) {
+      fail(`Unexpected .katex nodes on non-math route ${page.file}`);
+    }
+  }
+
+  if (page.expectMermaid) {
+    if (!hasMermaidScript) {
+      fail(`Expected Mermaid hydrator script on diagram route ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.mermaid-card[data-pagefind-ignore] pre.mermaid').length === 0) {
+      fail(`Expected .mermaid-card[data-pagefind-ignore] pre.mermaid block in ${page.file}`);
+    }
+  } else {
+    if (hasMermaidScript) {
+      fail(`Unexpected Mermaid script on non-diagram route ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.mermaid').length > 0) {
+      fail(`Unexpected .mermaid block on non-diagram route ${page.file}`);
+    }
+  }
+
   const checkboxes = Array.from(win.document.querySelectorAll('article input[type="checkbox"]'));
   if (checkboxes.length !== page.checklistItems) {
     fail(`Expected ${page.checklistItems} checkboxes in ${page.file}, found ${checkboxes.length}`);
@@ -174,5 +249,5 @@ for (const page of EXPECTED_PAGES) {
 }
 
 console.log(
-  `OK: Verified ${EXPECTED_PAGES.length} built Tutorial Appendix routes, ${woff2Files.length} self-hosted .woff2 assets, and 0 external CSS URLs.`,
+  `OK: Verified ${EXPECTED_PAGES.length} built routes (Optional Mode + Tutorial Appendix), ${woff2Files.length} self-hosted .woff2 assets, and 0 external CSS URLs.`,
 );

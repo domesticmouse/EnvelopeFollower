@@ -2,6 +2,8 @@
 import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/workbench.css';
+import KatexStyles from '../components/KatexStyles.astro';
+import MermaidHydrator from '../components/MermaidHydrator.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { extractFaceplateMotifs } from '../lib/panel-svg.ts';
@@ -40,6 +42,8 @@ interface Props {
   heroMeta?: readonly HeroMetaItem[];
   currentPath: string;
   headings?: readonly HeadingItem[];
+  hasMath?: boolean;
+  hasMermaid?: boolean;
 }
 
 const {
@@ -53,6 +57,8 @@ const {
   heroMeta,
   currentPath,
   headings = [],
+  hasMath = false,
+  hasMermaid = false,
 } = Astro.props;
 
 const normalizedCurrent = normalizeRoutePath(currentPath);
@@ -106,6 +112,7 @@ const pageTitle = isOverview ? title : `${title} | ENV / SKEW Build Tutorial`;
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalHref} />
+    {hasMath && <KatexStyles />}
     <slot name="head" />
   </head>
   <body>
@@ -262,6 +269,7 @@ const pageTitle = isOverview ? title : `${title} | ENV / SKEW Build Tutorial`;
 
       initTocScrollSpy();
     </script>
+    {hasMermaid && <MermaidHydrator />}
     <slot name="scripts" />
   </body>
 </html>
