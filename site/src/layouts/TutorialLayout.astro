@@ -2,12 +2,17 @@
 import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/workbench.css';
+import FigureLightbox from '../components/FigureLightbox.astro';
 import KatexStyles from '../components/KatexStyles.astro';
 import MermaidHydrator from '../components/MermaidHydrator.astro';
 import SearchModal from '../components/SearchModal.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
-import { extractFaceplateMotifs } from '../lib/panel-svg.ts';
+import {
+  extractFaceplateLayers,
+  extractFaceplateMotifs,
+  renderAssembledFaceplateSvg,
+} from '../lib/panel-svg.ts';
 import {
   SECTION_LABELS,
   SITE_URL,
@@ -80,6 +85,9 @@ const outlineHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 const showToc = outlineHeadings.length >= 2;
 const isOverview = section === 'overview';
 const sectionLabel = SECTION_LABELS[section];
+const assembledFaceplateSvg = isOverview
+  ? renderAssembledFaceplateSvg(extractFaceplateLayers())
+  : undefined;
 
 const resolvedHeroMeta: readonly HeroMetaItem[] =
   heroMeta && heroMeta.length > 0
@@ -201,24 +209,49 @@ const hasSearchSlot = Astro.slots.has('search-trigger');
           )
         }
 
-        <header class="c-output-bay">
-          <div class="c-bay-main">
-            <span class="c-bay-kicker">{bayKicker}</span>
-            <h1 data-pagefind-body>{title}</h1>
-            <p class="c-bay-desc">{description}</p>
-          </div>
-          <div class="c-bay-spine" aria-hidden="true"></div>
-          <div class="c-bay-specs" data-pagefind-ignore>
-            {
-              resolvedHeroMeta.map((item) => (
-                <div class="c-bay-spec-row">
-                  <span class="c-bay-spec-label">{item.label}</span>
-                  <span class="c-bay-spec-value">{item.value}</span>
+        {
+          assembledFaceplateSvg ? (
+            <header class="c-output-bay c-output-bay-overview">
+              <div class="c-bay-lead">
+                <div class="c-bay-main">
+                  <span class="c-bay-kicker">{bayKicker}</span>
+                  <h1 data-pagefind-body>{title}</h1>
+                  <p class="c-bay-desc">{description}</p>
                 </div>
-              ))
-            }
-          </div>
-        </header>
+                <div class="c-bay-specs" data-pagefind-ignore>
+                  {resolvedHeroMeta.map((item) => (
+                    <div class="c-bay-spec-row">
+                      <span class="c-bay-spec-label">{item.label}</span>
+                      <span class="c-bay-spec-value">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div class="c-bay-spine" aria-hidden="true"></div>
+              <div class="c-bay-faceplate" data-pagefind-ignore>
+                <Fragment set:html={assembledFaceplateSvg} />
+                <span class="c-bay-faceplate-label">6 HP · 30 × 128.5 mm</span>
+              </div>
+            </header>
+          ) : (
+            <header class="c-output-bay">
+              <div class="c-bay-main">
+                <span class="c-bay-kicker">{bayKicker}</span>
+                <h1 data-pagefind-body>{title}</h1>
+                <p class="c-bay-desc">{description}</p>
+              </div>
+              <div class="c-bay-spine" aria-hidden="true"></div>
+              <div class="c-bay-specs" data-pagefind-ignore>
+                {resolvedHeroMeta.map((item) => (
+                  <div class="c-bay-spec-row">
+                    <span class="c-bay-spec-label">{item.label}</span>
+                    <span class="c-bay-spec-value">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </header>
+          )
+        }
 
         <article class="tutorial-prose" data-pagefind-body>
           <slot />
@@ -271,15 +304,18 @@ const hasSearchSlot = Astro.slots.has('search-trigger');
     <SiteFooter />
 
     <SearchModal />
+    <FigureLightbox />
     <slot name="dialogs" />
 
     <script>
       import { initCopyController } from '../lib/copy-controller.ts';
+      import { initFigureLightbox } from '../lib/figure-lightbox.ts';
       import { initSearchModal } from '../lib/search-modal.ts';
       import { initTocScrollSpy } from '../lib/toc-scrollspy.ts';
 
       initTocScrollSpy();
       initSearchModal();
+      initFigureLightbox();
       initCopyController();
     </script>
     {hasMermaid && <MermaidHydrator />}

@@ -967,6 +967,49 @@ dialog.search-dialog[open] {
   overflow-wrap: anywhere;
 }
 
+.c-output-bay-overview {
+  grid-template-columns: minmax(0, 1fr) 1px auto;
+}
+
+.c-bay-lead {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.c-bay-lead .c-bay-main {
+  flex: 1 1 auto;
+}
+
+.c-bay-lead .c-bay-specs {
+  border-block-start: 1px solid var(--border-subtle);
+}
+
+.c-bay-faceplate {
+  padding: 0.85rem 1.05rem;
+  background: var(--bg-void);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.c-bay-faceplate .faceplate-svg {
+  display: block;
+  inline-size: auto;
+  block-size: min(360px, 60vh);
+  max-inline-size: 112px;
+}
+
+.c-bay-faceplate-label {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
 /* ============================================================================
  * PROSE, FRAMING WINGS HR, TABLES, CALLOUTS & READ-ONLY CHECKLIST LEDGERS
  * ============================================================================ */
@@ -1623,6 +1666,194 @@ dialog.search-dialog[open] {
 }
 
 /* ============================================================================
+ * FIGURES, FIGURE GRIDS & NATIVE DIALOG LIGHTBOX
+ * ============================================================================ */
+.figure-grid {
+  display: grid;
+  gap: 1rem;
+  margin-block: 1.25rem;
+  align-items: start;
+}
+
+.figure-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.figure-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tutorial-figure {
+  margin-block: 1.25rem;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  inline-size: 100%;
+}
+
+.figure-grid .tutorial-figure {
+  margin-block: 0;
+}
+
+.figure-zoom-btn,
+.figure-media {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.figure-zoom-btn {
+  cursor: zoom-in;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+}
+
+.tutorial-figure.is-framed .figure-zoom-btn,
+.tutorial-figure.is-framed .figure-media {
+  padding: 0.45rem;
+  background: var(--bg-surface);
+  border-color: var(--border-ui);
+}
+
+.figure-zoom-btn:hover,
+.figure-zoom-btn:focus-visible {
+  border-color: var(--accent-gold);
+}
+
+.figure-img {
+  display: block;
+  margin-inline: auto;
+  max-inline-size: 100%;
+  inline-size: auto;
+  block-size: auto;
+}
+
+.figure-zoom-badge {
+  position: absolute;
+  inset-block-end: 0.4rem;
+  inset-inline-end: 0.4rem;
+  padding: 0.12rem 0.38rem;
+  background: var(--bg-void);
+  border: 1px solid var(--border-ui);
+  color: var(--accent-gold-link);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transition: opacity 0.14s ease;
+  pointer-events: none;
+}
+
+.figure-zoom-btn:hover .figure-zoom-badge,
+.figure-zoom-btn:focus-visible .figure-zoom-badge {
+  opacity: 1;
+}
+
+.figure-caption {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  line-height: 1.42;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+dialog.figure-lightbox {
+  inline-size: min(92vw, 68rem);
+  max-inline-size: none;
+  max-block-size: calc(100svh - 2.5rem);
+  margin: auto;
+  padding: 0;
+  border: 2px solid var(--accent-gold);
+  background: var(--bg-surface);
+  color: var(--ink-primary);
+  overscroll-behavior: contain;
+}
+
+dialog.figure-lightbox[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.figure-lightbox-shell {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  padding: 0.85rem 1rem 1rem;
+  gap: 0.75rem;
+}
+
+.figure-lightbox-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block-end: 0.5rem;
+  border-block-end: 1px solid var(--border-subtle);
+}
+
+.figure-lightbox-title {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+}
+
+.figure-lightbox-close {
+  min-block-size: 36px;
+  padding: 0.25rem 0.7rem;
+  border: 1px solid var(--border-ui);
+  background: var(--bg-surface-elevated);
+  color: var(--ink-silk);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.figure-lightbox-close:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold-bright);
+}
+
+.figure-lightbox-stage {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  min-block-size: 0;
+  overflow: auto;
+}
+
+.figure-lightbox-img {
+  display: block;
+  max-inline-size: 100%;
+  max-block-size: calc(100svh - 11rem);
+  inline-size: auto;
+  block-size: auto;
+  object-fit: contain;
+  background: var(--bg-void);
+}
+
+.figure-lightbox-caption {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--ink-silk);
+  text-align: center;
+}
+
+/* ============================================================================
  * PREV / NEXT NAVIGATION & FOOTER
  * ============================================================================ */
 .prev-next-nav {
@@ -1739,12 +1970,17 @@ dialog.search-dialog[open] {
 }
 
 @media (max-width: 720px) {
-  .c-output-bay {
+  .c-output-bay,
+  .c-output-bay-overview {
     grid-template-columns: 1fr;
   }
 
   .c-bay-spine {
     block-size: 1px;
+  }
+
+  .c-bay-faceplate .faceplate-svg {
+    block-size: 320px;
   }
 
   .prev-next-nav {
@@ -1756,7 +1992,8 @@ dialog.search-dialog[open] {
     text-align: start;
   }
 
-  dialog.search-dialog {
+  dialog.search-dialog,
+  dialog.figure-lightbox {
     inline-size: calc(100vw - 1rem);
     max-block-size: calc(100svh - 2rem);
     margin: 1rem auto auto;
@@ -1764,6 +2001,11 @@ dialog.search-dialog[open] {
 }
 
 @media (max-width: 640px) {
+  .figure-grid-2,
+  .figure-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
   .c-patch-strip {
     grid-template-columns: 1fr;
   }
@@ -1793,6 +2035,8 @@ dialog.search-dialog[open] {
   }
 
   dialog.search-dialog,
+  dialog.figure-lightbox,
+  .figure-zoom-badge,
   .search-result-link {
     transition: none !important;
     animation: none !important;
@@ -1833,6 +2077,13 @@ dialog.search-dialog[open] {
   .prompt-copy-btn,
   .prompt-copy-tip,
   .tutorial-prose .katex-display,
+  .tutorial-figure.is-framed .figure-zoom-btn,
+  .tutorial-figure.is-framed .figure-media,
+  .figure-zoom-btn:hover,
+  .figure-zoom-btn:focus-visible,
+  .figure-zoom-badge,
+  dialog.figure-lightbox,
+  .figure-lightbox-close,
   .mermaid-card {
     border-color: CanvasText !important;
   }
@@ -1899,6 +2150,8 @@ dialog.search-dialog[open] {
   .prev-next-nav,
   .nav-drawer,
   dialog.search-dialog,
+  dialog.figure-lightbox,
+  .figure-zoom-badge,
   [data-search-trigger],
   .footer-nav,
   .skip-link,

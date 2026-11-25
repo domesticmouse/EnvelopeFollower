@@ -2,6 +2,8 @@
 import { getCollection, render } from 'astro:content';
 import Callout from '../components/Callout.astro';
 import Disclosure from '../components/Disclosure.astro';
+import Figure from '../components/Figure.astro';
+import FigureGrid from '../components/FigureGrid.astro';
 import PromptBlock from '../components/PromptBlock.astro';
 import PromptGroup from '../components/PromptGroup.astro';
 import TableWrapper from '../components/TableWrapper.astro';
@@ -42,6 +44,8 @@ const { hasMath, hasMermaid } = detectContentFeatures(entry.body);
     components={{
       Callout,
       Disclosure,
+      Figure,
+      FigureGrid,
       PromptBlock,
       PromptGroup,
       table: TableWrapper,

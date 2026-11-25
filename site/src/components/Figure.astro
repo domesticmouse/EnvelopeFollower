@@ -1,0 +1,73 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image, getImage } from 'astro:assets';
+
+export interface Props {
+  src: ImageMetadata;
+  alt: string;
+  caption?: string;
+  framed?: boolean;
+  maxWidth?: number | string;
+  priority?: boolean;
+  zoomable?: boolean;
+}
+
+const {
+  src,
+  alt,
+  caption,
+  framed = false,
+  maxWidth,
+  priority = false,
+  zoomable = true,
+} = Astro.props;
+
+const resolvedMaxWidth =
+  maxWidth === undefined ? undefined : typeof maxWidth === 'number' ? `${maxWidth}px` : maxWidth;
+const figureStyle = resolvedMaxWidth ? `max-inline-size: ${resolvedMaxWidth};` : undefined;
+
+const fullResImage = zoomable ? await getImage({ src }) : undefined;
+const zoomAriaLabel = caption
+  ? `Inspect full-resolution figure: ${caption} (${alt})`
+  : `Inspect full-resolution figure: ${alt}`;
+---
+
+<figure class:list={['tutorial-figure', { 'is-framed': framed }]} style={figureStyle}>
+  {
+    zoomable && fullResImage ? (
+      <button
+        type="button"
+        class="figure-zoom-btn"
+        data-lightbox-trigger
+        data-lightbox-src={fullResImage.src}
+        data-lightbox-alt={alt}
+        data-lightbox-caption={caption ?? ''}
+        aria-label={zoomAriaLabel}
+      >
+        <Image
+          src={src}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : undefined}
+          decoding={priority ? 'sync' : 'async'}
+          class="figure-img"
+        />
+        <span class="figure-zoom-badge" aria-hidden="true">
+          ⤢ ZOOM
+        </span>
+      </button>
+    ) : (
+      <div class="figure-media">
+        <Image
+          src={src}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchpriority={priority ? 'high' : undefined}
+          decoding={priority ? 'sync' : 'async'}
+          class="figure-img"
+        />
+      </div>
+    )
+  }
+  {caption && <figcaption class="figure-caption">{caption}</figcaption>}
+</figure>
