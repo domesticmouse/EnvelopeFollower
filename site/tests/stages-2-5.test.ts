@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { detectContentFeatures } from '../src/lib/content-features.ts';
+import { AVOIDED_GLOSSARY_PATTERNS } from '../src/lib/site-contract.ts';
 import { tutorialSchema } from '../src/lib/tutorial-schema.ts';
 
 const STAGES_DIR = path.resolve(
@@ -11,8 +12,11 @@ const STAGES_DIR = path.resolve(
   '../src/content/tutorial/stages',
 );
 
-const AVOIDED_TERMS_RE =
-  /\b(?:codelab|docs site|documentation portal|module website|base sketch|original diagram|reference schematic|reference section|reference docs|technical references|master build checklist|fabrication checklist|prompt card|blockquote prompt|raw prompt|motivating prompt|conversation log|chat log|prompt log|build session|tracker log|github history|issue trail|decision log|context anchor|agent readme|workspace index|github front door|compact readme|landing readme)\b/i;
+function findAvoidedGlossaryTerms(body: string): string[] {
+  return AVOIDED_GLOSSARY_PATTERNS.filter(([, pattern]) => pattern.test(body)).map(
+    ([term]) => term,
+  );
+}
 
 function splitMdx(fileName: string): { frontmatter: Record<string, unknown>; body: string } {
   const raw = fs.readFileSync(path.join(STAGES_DIR, fileName), 'utf8');
@@ -90,7 +94,7 @@ describe('Stages 2-5 MDX migration contracts', () => {
     expect(body).toContain("EnvelopeFollower.webp'");
     expect(body).toContain('<Figure');
     expect(body).not.toMatch(/\]\((?!https?:\/\/)[^)]*\.md(?:#[^)]*)?\)/);
-    expect(body).not.toMatch(AVOIDED_TERMS_RE);
+    expect(findAvoidedGlossaryTerms(body)).toEqual([]);
   });
 
   it('Stage 3 matches Zod frontmatter, PromptBlock, PromptGroup, KaTeX, Mermaid, and link contracts', () => {
@@ -109,7 +113,7 @@ describe('Stages 2-5 MDX migration contracts', () => {
     expect(body).toContain('turn={1}');
     expect(body).toContain('turn={2}');
     expect(body).not.toMatch(/\]\((?!https?:\/\/)[^)]*\.md(?:#[^)]*)?\)/);
-    expect(body).not.toMatch(AVOIDED_TERMS_RE);
+    expect(findAvoidedGlossaryTerms(body)).toEqual([]);
   });
 
   it('Stage 4 matches Zod frontmatter, PromptBlock, PromptGroup, Disclosure, Figure, no KaTeX/Mermaid, and link contracts', () => {
@@ -131,7 +135,7 @@ describe('Stages 2-5 MDX migration contracts', () => {
     expect(body).toContain("schematic.png'");
     expect(body).toContain('<Figure');
     expect(body).not.toMatch(/\]\((?!https?:\/\/)[^)]*\.md(?:#[^)]*)?\)/);
-    expect(body).not.toMatch(AVOIDED_TERMS_RE);
+    expect(findAvoidedGlossaryTerms(body)).toEqual([]);
   });
 
   it('Stage 5 matches Zod frontmatter, PromptBlock, PromptGroup, FigureGrid, no KaTeX/Mermaid, and link contracts', () => {
@@ -154,6 +158,6 @@ describe('Stages 2-5 MDX migration contracts', () => {
     expect(body).toContain("pcb_back.png'");
     expect(body).toContain('maxWidth={240}');
     expect(body).not.toMatch(/\]\((?!https?:\/\/)[^)]*\.md(?:#[^)]*)?\)/);
-    expect(body).not.toMatch(AVOIDED_TERMS_RE);
+    expect(findAvoidedGlossaryTerms(body)).toEqual([]);
   });
 });

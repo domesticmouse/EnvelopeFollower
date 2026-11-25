@@ -967,22 +967,30 @@ dialog.search-dialog[open] {
   overflow-wrap: anywhere;
 }
 
-.c-output-bay-overview {
+.c-output-bay.is-overview-bay {
   grid-template-columns: minmax(0, 1fr) 1px auto;
+  grid-template-rows: 1fr auto;
 }
 
-.c-bay-lead {
-  display: flex;
-  flex-direction: column;
-  min-inline-size: 0;
+.c-output-bay.is-overview-bay .c-bay-main {
+  grid-column: 1;
+  grid-row: 1;
 }
 
-.c-bay-lead .c-bay-main {
-  flex: 1 1 auto;
-}
-
-.c-bay-lead .c-bay-specs {
+.c-output-bay.is-overview-bay .c-bay-specs {
+  grid-column: 1;
+  grid-row: 2;
   border-block-start: 1px solid var(--border-subtle);
+}
+
+.c-output-bay.is-overview-bay .c-bay-spine {
+  grid-column: 2;
+  grid-row: 1 / -1;
+}
+
+.c-output-bay.is-overview-bay .c-bay-faceplate {
+  grid-column: 3;
+  grid-row: 1 / -1;
 }
 
 .c-bay-faceplate {
@@ -1071,9 +1079,10 @@ dialog.search-dialog[open] {
 .tutorial-prose hr,
 .c-wing-hr {
   border: 0;
+  overflow: visible;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: space-between;
   margin-block: 1.85rem;
   block-size: 2px;
   background: linear-gradient(
@@ -1082,6 +1091,18 @@ dialog.search-dialog[open] {
     rgba(216, 177, 84, 0.35) 50%,
     var(--accent-gold) 100%
   );
+}
+
+.tutorial-prose hr::before,
+.tutorial-prose hr::after,
+.c-wing-hr::before,
+.c-wing-hr::after {
+  content: '';
+  display: block;
+  flex-shrink: 0;
+  inline-size: 3px;
+  block-size: 12px;
+  background: var(--accent-gold);
 }
 
 .tutorial-prose pre:not(.mermaid) {
@@ -1576,6 +1597,10 @@ dialog.search-dialog[open] {
   background: linear-gradient(90deg, var(--led-amber-bg) 0%, var(--bg-surface) 28%);
 }
 
+.callout-info {
+  border-inline-start-color: var(--accent-gold);
+}
+
 .callout-note {
   border-inline-start-color: var(--border-ui);
 }
@@ -1597,17 +1622,7 @@ dialog.search-dialog[open] {
   padding: 0.08rem 0.36rem;
   border: 1px solid var(--border-ui);
   background: var(--bg-code);
-  color: var(--accent-gold-link);
-}
-
-.callout-tip .callout-kicker {
-  border-color: var(--led-green);
-  color: var(--led-green);
-}
-
-.callout-warning .callout-kicker {
-  border-color: var(--led-amber);
-  color: var(--led-amber);
+  color: var(--ink-silk);
 }
 
 .callout-title {
@@ -1989,8 +2004,29 @@ dialog.figure-lightbox[open] {
 
 @media (max-width: 720px) {
   .c-output-bay,
-  .c-output-bay-overview {
+  .c-output-bay.is-overview-bay {
     grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+
+  .c-output-bay.is-overview-bay > :is(.c-bay-main, .c-bay-specs, .c-bay-spine, .c-bay-faceplate) {
+    grid-column: 1;
+  }
+
+  .c-output-bay.is-overview-bay .c-bay-main {
+    grid-row: 1;
+  }
+
+  .c-output-bay.is-overview-bay .c-bay-specs {
+    grid-row: 2;
+  }
+
+  .c-output-bay.is-overview-bay .c-bay-spine {
+    grid-row: 3;
+  }
+
+  .c-output-bay.is-overview-bay .c-bay-faceplate {
+    grid-row: 4;
   }
 
   .c-bay-spine {
@@ -2086,7 +2122,6 @@ dialog.figure-lightbox[open] {
   .tutorial-prose li.task-list-item,
   .tutorial-prose blockquote,
   .tutorial-prose pre,
-  .tutorial-prose blockquote,
   .code-console,
   .code-console-head,
   .c-patch-strip,
@@ -2129,6 +2164,35 @@ dialog.figure-lightbox[open] {
 
   .tutorial-prose li.task-list-item > input[type='checkbox']:checked::after {
     border-color: HighlightText !important;
+  }
+
+  .c-search-btn,
+  .menu-btn,
+  .nav-drawer-close,
+  .search-close-btn,
+  .prompt-copy-btn,
+  .figure-zoom-btn,
+  .figure-lightbox-close {
+    color: ButtonText !important;
+  }
+
+  dialog::backdrop {
+    backdrop-filter: none !important;
+    filter: none !important;
+  }
+
+  *:not(.sr-only) {
+    clip-path: none !important;
+    filter: none !important;
+  }
+
+  .tutorial-prose hr,
+  .c-wing-hr,
+  .tutorial-prose hr::before,
+  .tutorial-prose hr::after,
+  .c-wing-hr::before,
+  .c-wing-hr::after {
+    background: CanvasText !important;
   }
 
   svg {
@@ -2227,6 +2291,15 @@ dialog.figure-lightbox[open] {
 
   .c-bay-specs {
     background: #f5f5f5 !important;
+  }
+
+  .tutorial-prose hr,
+  .c-wing-hr,
+  .tutorial-prose hr::before,
+  .tutorial-prose hr::after,
+  .c-wing-hr::before,
+  .c-wing-hr::after {
+    background: #111111 !important;
   }
 
   .tutorial-prose li.task-list-item > input[type='checkbox'] {

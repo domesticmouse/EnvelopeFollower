@@ -1,16 +1,7 @@
 import type { Element, ElementContent, Root } from 'hast';
 import { visit } from 'unist-util-visit';
 import { COPY_ICON_DEFS } from '../lib/copy-icons.ts';
-
-function readClassNames(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value.filter((item): item is string => typeof item === 'string');
-  }
-  if (typeof value === 'string') {
-    return value.split(/\s+/).filter(Boolean);
-  }
-  return [];
-}
+import { readClassNames } from './hast-utils.ts';
 
 function extractLanguage(preNode: Element): string | null {
   const dataLang = preNode.properties?.dataLanguage ?? preNode.properties?.['data-language'];

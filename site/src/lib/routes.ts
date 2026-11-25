@@ -21,8 +21,17 @@ export const COMPANION_SITE_URL =
 /** Upstream HAGIWO No. 43 inspiration article URL. */
 export const HAGIWO_NOTE_URL = 'https://note.com/solder_state/n/n110e9ba066b3?hl=en';
 
+/** Canonical ordered section identifiers shared by routes and the tutorial Zod schema. */
+export const TUTORIAL_SECTIONS = [
+  'overview',
+  'hardware',
+  'companion-site',
+  'optional',
+  'appendix',
+] as const;
+
 /** Canonical section identifiers matching the tutorial Zod schema. */
-export type TutorialSection = 'overview' | 'hardware' | 'companion-site' | 'optional' | 'appendix';
+export type TutorialSection = (typeof TUTORIAL_SECTIONS)[number];
 
 /** Glossary-aligned display labels for all five tutorial sections. */
 export const SECTION_LABELS: Readonly<Record<TutorialSection, string>> = {
@@ -43,13 +52,7 @@ export const SEARCH_SECTION_LABELS: Readonly<Record<TutorialSection, string>> = 
 };
 
 /** Ordered list of all five tutorial curriculum groups. */
-export const SECTION_ORDER: readonly TutorialSection[] = [
-  'overview',
-  'hardware',
-  'companion-site',
-  'optional',
-  'appendix',
-];
+export const SECTION_ORDER: readonly TutorialSection[] = TUTORIAL_SECTIONS;
 
 /** Canonical metadata for each of the 13 Build Tutorial routes. */
 export interface TutorialRoute {
@@ -332,26 +335,20 @@ export function getProgressMeterLabel(route: TutorialRoute): string {
   return `PROGRESS · ${route.badge}`;
 }
 
+const SECTION_PREFIXES: readonly [string, TutorialSection][] = [
+  ['/optional/', 'optional'],
+  ['/appendix/', 'appendix'],
+  ['/stages/08', 'companion-site'],
+  ['/stages/09', 'companion-site'],
+  ['/stages/', 'hardware'],
+];
+
 /** Resolve a built or relative URL to its canonical TutorialSection via TUTORIAL_ROUTES. */
 export function getSectionByUrl(rawUrl: string): TutorialSection {
-  const withoutOrigin = rawUrl.replace(/^https?:\/\/[^/]+/i, '');
-  const matched = getRouteByPath(withoutOrigin);
-  if (matched) {
-    return matched.section;
-  }
-
-  const normalized = normalizeRoutePath(withoutOrigin);
-  if (normalized.startsWith('/optional/')) {
-    return 'optional';
-  }
-  if (normalized.startsWith('/appendix/')) {
-    return 'appendix';
-  }
-  if (normalized.startsWith('/stages/08') || normalized.startsWith('/stages/09')) {
-    return 'companion-site';
-  }
-  if (normalized.startsWith('/stages/')) {
-    return 'hardware';
-  }
-  return 'overview';
+  const normalized = normalizeRoutePath(rawUrl.replace(/^https?:\/\/[^/]+/i, ''));
+  return (
+    TUTORIAL_ROUTES.find((route) => route.path === normalized)?.section ??
+    SECTION_PREFIXES.find(([prefix]) => normalized.startsWith(prefix))?.[1] ??
+    'overview'
+  );
 }

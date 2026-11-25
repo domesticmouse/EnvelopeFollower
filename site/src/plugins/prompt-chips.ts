@@ -1,4 +1,5 @@
 import type { Element, Root, RootContent } from 'hast';
+import { extractText, readClassNames } from './hast-utils.ts';
 
 export type PromptChipClass = 'chip-skill' | 'chip-file';
 
@@ -18,26 +19,6 @@ export function classifyPromptChip(text: string): PromptChipClass | null {
     return 'chip-file';
   }
   return null;
-}
-
-function normalizeClassList(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value.filter((item): item is string => typeof item === 'string' && item.length > 0);
-  }
-  if (typeof value === 'string') {
-    return value.split(/\s+/).filter(Boolean);
-  }
-  return [];
-}
-
-function extractText(node: Root | RootContent): string {
-  if (node.type === 'text') {
-    return node.value;
-  }
-  if ('children' in node && Array.isArray(node.children)) {
-    return (node.children as RootContent[]).map((child) => extractText(child)).join('');
-  }
-  return '';
 }
 
 interface MdxJsxLike {
@@ -67,7 +48,7 @@ function walkHast(
   ) {
     const chipClass = classifyPromptChip(extractText(node));
     if (chipClass) {
-      const existing = normalizeClassList(node.properties?.className ?? node.properties?.class);
+      const existing = readClassNames(node.properties?.className ?? node.properties?.class);
       if (!existing.includes(chipClass)) {
         node.properties = {
           ...(node.properties ?? {}),
