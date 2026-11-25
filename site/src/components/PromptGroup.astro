@@ -1,0 +1,11 @@
+---
+export interface Props {
+  label?: string;
+}
+
+const { label = 'Multi-turn prompt sequence' } = Astro.props;
+---
+
+<div class="c-patch-chain" role="group" aria-label={label}>
+  <slot />
+</div>

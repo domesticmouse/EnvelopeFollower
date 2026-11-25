@@ -267,11 +267,13 @@ const hasSearchSlot = Astro.slots.has('search-trigger');
     <slot name="dialogs" />
 
     <script>
+      import { initCopyController } from '../lib/copy-controller.ts';
       import { initSearchModal } from '../lib/search-modal.ts';
       import { initTocScrollSpy } from '../lib/toc-scrollspy.ts';
 
       initTocScrollSpy();
       initSearchModal();
+      initCopyController();
     </script>
     <slot name="scripts" />
   </body>

@@ -1,0 +1,26 @@
+---
+import { parseInlineBackticks } from '../lib/inline-code.ts';
+
+export interface Props {
+  title: string;
+  open?: boolean;
+}
+
+const { title, open = false } = Astro.props;
+const titleSegments = parseInlineBackticks(title);
+---
+
+<details class="c-disclosure" open={open}>
+  <summary class="c-disclosure-summary">
+    <span class="c-disclosure-title">
+      {
+        titleSegments.map((seg) =>
+          seg.kind === 'code' ? <code>{seg.value}</code> : seg.value,
+        )
+      }
+    </span>
+  </summary>
+  <div class="c-disclosure-body">
+    <slot />
+  </div>
+</details>

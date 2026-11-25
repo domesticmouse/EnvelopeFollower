@@ -1,6 +1,9 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Callout from '../components/Callout.astro';
+import Disclosure from '../components/Disclosure.astro';
+import PromptBlock from '../components/PromptBlock.astro';
+import PromptGroup from '../components/PromptGroup.astro';
 import TableWrapper from '../components/TableWrapper.astro';
 import TutorialLayout from '../layouts/TutorialLayout.astro';
 
@@ -31,5 +34,13 @@ const currentPath = entry.id === 'index' ? '/' : `/${entry.id}/`;
   currentPath={currentPath}
   headings={headings}
 >
-  <Content components={{ Callout, table: TableWrapper }} />
+  <Content
+    components={{
+      Callout,
+      Disclosure,
+      PromptBlock,
+      PromptGroup,
+      table: TableWrapper,
+    }}
+  />
 </TutorialLayout>
