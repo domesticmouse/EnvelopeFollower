@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content';
+import Callout from '../components/Callout.astro';
+import Disclosure from '../components/Disclosure.astro';
+import Figure from '../components/Figure.astro';
+import FigureGrid from '../components/FigureGrid.astro';
+import PromptBlock from '../components/PromptBlock.astro';
+import PromptGroup from '../components/PromptGroup.astro';
+import TableWrapper from '../components/TableWrapper.astro';
+import TutorialLayout from '../layouts/TutorialLayout.astro';
+import { detectContentFeatures } from '../lib/content-features.ts';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('tutorial');
+  return entries.map((entry) => ({
+    params: {
+      slug: entry.id === 'index' ? undefined : entry.id,
+    },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const currentPath = entry.id === 'index' ? '/' : `/${entry.id}/`;
+const { hasMath, hasMermaid } = detectContentFeatures(entry.body);
+---
+
+<TutorialLayout
+  title={entry.data.title}
+  navTitle={entry.data.navTitle}
+  description={entry.data.description}
+  section={entry.data.section}
+  order={entry.data.order}
+  badge={entry.data.badge}
+  stage={entry.data.stage}
+  heroMeta={entry.data.heroMeta}
+  currentPath={currentPath}
+  headings={headings}
+  hasMath={hasMath}
+  hasMermaid={hasMermaid}
+>
+  <Content
+    components={{
+      Callout,
+      Disclosure,
+      Figure,
+      FigureGrid,
+      PromptBlock,
+      PromptGroup,
+      table: TableWrapper,
+    }}
+  />
+</TutorialLayout>

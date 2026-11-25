@@ -1,0 +1,156 @@
+---
+import { extractFaceplateMotifs } from '../lib/panel-svg.ts';
+import {
+  COMPANION_SITE_URL,
+  PRIMARY_JUMP_NAV,
+  TUTORIAL_REPO_URL,
+  getRouteGroups,
+  isJumpNavActive,
+  normalizeRoutePath,
+  withBase,
+} from '../lib/routes.ts';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+const normalizedCurrent = normalizeRoutePath(currentPath);
+const motifs = extractFaceplateMotifs();
+const routeGroups = getRouteGroups();
+---
+
+<div class="c-telemetry" data-pagefind-ignore>
+  <div class="c-telemetry-inner">
+    <span>DM // R1.0 · BUILD TUTORIAL WORKBENCH</span>
+    <div class="c-telemetry-links">
+      <a href={COMPANION_SITE_URL} target="_blank" rel="noopener noreferrer">Companion Site ↗</a>
+      <a href={TUTORIAL_REPO_URL} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+    </div>
+  </div>
+</div>
+
+<header class="c-header" data-pagefind-ignore>
+  <div class="c-header-inner">
+    <div class="c-brand-wrap">
+      <a href={withBase('/')} class="c-brand">
+        <Fragment set:html={motifs.heroEnvelopeSvg} />
+        <span class="c-brand-name">ENV / SKEW</span>
+      </a>
+      <span class="c-brand-qualifier">BUILD TUTORIAL</span>
+    </div>
+
+    <nav class="c-nav desktop-jump-nav" aria-label="Primary">
+      {
+        PRIMARY_JUMP_NAV.map((item) => {
+          const active = isJumpNavActive(normalizedCurrent, item);
+          return (
+            <a
+              href={withBase(item.href)}
+              class="c-nav-link"
+              aria-current={active ? 'page' : undefined}
+            >
+              {active && <Fragment set:html={motifs.ledOctagonSvg} />}
+              <span>{item.shortLabel}</span>
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <div class="c-header-actions">
+      <button
+        type="button"
+        class="menu-btn"
+        command="show-modal"
+        commandfor="mobile-nav-drawer"
+        aria-controls="mobile-nav-drawer"
+        aria-expanded="false"
+        aria-label="Open navigation menu"
+      >
+        <span aria-hidden="true">☰</span>
+        <span>Rack</span>
+      </button>
+
+      <slot name="search-trigger">
+        <button
+          type="button"
+          class="c-search-btn"
+          data-search-trigger
+          aria-haspopup="dialog"
+          aria-controls="site-search-dialog"
+          aria-label="Search build tutorial"
+        >
+          <span aria-hidden="true">⌕</span>
+          <span>SEARCH</span>
+          <kbd>⌘K</kbd>
+        </button>
+      </slot>
+    </div>
+  </div>
+</header>
+
+<dialog
+  id="mobile-nav-drawer"
+  class="nav-drawer"
+  closedby="any"
+  aria-labelledby="mobile-nav-title"
+  data-pagefind-ignore
+>
+  <div class="nav-drawer-head">
+    <h2 id="mobile-nav-title" class="nav-drawer-title">ENV / SKEW · BUILD TUTORIAL</h2>
+    <form method="dialog">
+      <button type="submit" class="nav-drawer-close" autofocus aria-label="Close navigation menu">
+        Close
+      </button>
+    </form>
+  </div>
+  <nav class="nav-drawer-body" aria-label="Mobile curriculum navigation">
+    {
+      routeGroups.map((group) => (
+        <section>
+          <h3 class="nav-drawer-group-title">{group.label}</h3>
+          <ul class="nav-drawer-links">
+            {group.routes.map((route) => {
+              const isCurrent = route.path === normalizedCurrent;
+              return (
+                <li>
+                  <a
+                    href={withBase(route.path)}
+                    class="nav-drawer-link"
+                    aria-current={isCurrent ? 'page' : undefined}
+                  >
+                    <span>{route.navTitle}</span>
+                    <span class="nav-drawer-badge">{route.badge}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))
+    }
+
+    <div class="nav-drawer-ext">
+      <a
+        href={COMPANION_SITE_URL}
+        class="nav-drawer-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span>Companion Site</span>
+        <span aria-hidden="true">↗</span>
+      </a>
+      <a href={TUTORIAL_REPO_URL} class="nav-drawer-link" target="_blank" rel="noopener noreferrer">
+        <span>GitHub Repository</span>
+        <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </nav>
+</dialog>
+
+<script>
+  import { initDialogChrome } from '../lib/dialog-chrome.ts';
+
+  initDialogChrome();
+</script>

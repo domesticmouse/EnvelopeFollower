@@ -1,0 +1,29 @@
+<dialog
+  id="figure-lightbox"
+  class="figure-lightbox"
+  data-figure-lightbox
+  data-managed-dialog
+  data-pagefind-ignore
+  closedby="any"
+  aria-labelledby="figure-lightbox-title"
+>
+  <div class="figure-lightbox-shell">
+    <div class="figure-lightbox-head">
+      <span id="figure-lightbox-title" class="figure-lightbox-title" data-figure-lightbox-title>
+        Figure Preview
+      </span>
+      <button
+        type="button"
+        class="figure-lightbox-close"
+        data-figure-lightbox-close
+        aria-label="Close figure preview"
+      >
+        Close
+      </button>
+    </div>
+    <figure class="figure-lightbox-stage">
+      <img class="figure-lightbox-img" data-figure-lightbox-img alt="" />
+      <figcaption class="figure-lightbox-caption" data-figure-lightbox-caption hidden></figcaption>
+    </figure>
+  </div>
+</dialog>

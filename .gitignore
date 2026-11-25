@@ -1,5 +1,7 @@
 __pycache__/
-/site/
+/site/dist/
+/site/.astro/
+/site/node_modules/
 .venv/
 _tmp_*
 capability_mode.json

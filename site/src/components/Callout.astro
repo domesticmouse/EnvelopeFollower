@@ -1,0 +1,43 @@
+---
+import { parseInlineBackticks } from '../lib/inline-code.ts';
+
+export interface Props {
+  type: 'note' | 'tip' | 'info' | 'warning';
+  title?: string;
+}
+
+const { type, title } = Astro.props;
+const hasTitleSlot = Astro.slots.has('title');
+const titleSegments = title ? parseInlineBackticks(title) : [];
+
+const TYPE_LABELS: Record<Props['type'], string> = {
+  note: 'NOTE',
+  tip: 'TIP',
+  info: 'INFO',
+  warning: 'WARNING',
+};
+---
+
+<aside class={`callout callout-${type}`} aria-label={TYPE_LABELS[type]}>
+  <div class="callout-header">
+    <span class="callout-kicker">{TYPE_LABELS[type]}</span>
+    {
+      hasTitleSlot ? (
+        <span class="callout-title">
+          <slot name="title" />
+        </span>
+      ) : (
+        title && (
+          <span class="callout-title">
+            {titleSegments.map((seg) =>
+              seg.kind === 'code' ? <code>{seg.value}</code> : seg.value,
+            )}
+          </span>
+        )
+      )
+    }
+  </div>
+  <div class="callout-body">
+    <slot />
+  </div>
+</aside>
