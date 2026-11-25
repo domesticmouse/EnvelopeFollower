@@ -1,11 +1,12 @@
 // @vitest-environment node
-import { satteri } from '@astrojs/markdown-satteri';
+import { unified } from '@astrojs/markdown-remark';
 import { describe, expect, it } from 'vitest';
-import { codeConsolePlugin } from '../src/plugins/code-console.ts';
+import { rehypeCodeConsole } from '../src/plugins/code-console.ts';
 
 async function compileMdxWithConsole(mdxSource: string): Promise<string> {
-  const processor = satteri({
-    hastPlugins: [codeConsolePlugin()],
+  const processor = unified({
+    gfm: true,
+    rehypePlugins: [rehypeCodeConsole],
   });
   const renderer = await processor.createMdxRenderer!(
     {
@@ -20,7 +21,7 @@ async function compileMdxWithConsole(mdxSource: string): Promise<string> {
   return result.code;
 }
 
-describe('codeConsolePlugin', () => {
+describe('rehypeCodeConsole', () => {
   it.each(['csv', 'bash', 'python', 'json', 'yaml', 'gitignore', 'text'])(
     'wraps %s Shiki code blocks with console header, copy button, and tabindex="0" well',
     async (lang) => {

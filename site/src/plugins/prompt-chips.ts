@@ -1,7 +1,6 @@
-import type { SatteriProcessorOptions } from '@astrojs/markdown-satteri';
+import type { Element, Root, RootContent } from 'hast';
 
 export type PromptChipClass = 'chip-skill' | 'chip-file';
-export type SatteriHastPlugin = NonNullable<SatteriProcessorOptions['hastPlugins']>[number];
 
 const SKILL_CHIP_PATTERN = /^\/[a-z0-9-]+$/i;
 const FILE_CHIP_PATTERN = /^@\[[^\]]+\]$/;
@@ -31,49 +30,66 @@ function normalizeClassList(value: unknown): string[] {
   return [];
 }
 
+function extractText(node: Root | RootContent): string {
+  if (node.type === 'text') {
+    return node.value;
+  }
+  if ('children' in node && Array.isArray(node.children)) {
+    return (node.children as RootContent[]).map((child) => extractText(child)).join('');
+  }
+  return '';
+}
+
+interface MdxJsxLike {
+  type?: string;
+  name?: string;
+  children?: RootContent[];
+}
+
+function walkHast(
+  node: Root | RootContent,
+  insidePromptBlock: boolean,
+  insidePre: boolean,
+): void {
+  const mdxNode = node as unknown as MdxJsxLike;
+  const isPromptBlock =
+    (mdxNode.type === 'mdxJsxFlowElement' || mdxNode.type === 'mdxJsxTextElement') &&
+    mdxNode.name === 'PromptBlock';
+  const nextPromptBlock = insidePromptBlock || isPromptBlock;
+  const nextPre =
+    insidePre || (node.type === 'element' && (node as Element).tagName === 'pre');
+
+  if (
+    node.type === 'element' &&
+    node.tagName === 'code' &&
+    nextPromptBlock &&
+    !nextPre
+  ) {
+    const chipClass = classifyPromptChip(extractText(node));
+    if (chipClass) {
+      const existing = normalizeClassList(node.properties?.className ?? node.properties?.class);
+      if (!existing.includes(chipClass)) {
+        node.properties = {
+          ...(node.properties ?? {}),
+          className: [...existing, chipClass],
+        };
+      }
+    }
+  }
+
+  if ('children' in node && Array.isArray(node.children)) {
+    for (const child of node.children as RootContent[]) {
+      walkHast(child, nextPromptBlock, nextPre);
+    }
+  }
+}
+
 /**
- * Sätteri HAST plugin that styles `/skill` and `@[file]` inline `<code>` elements
+ * Rehype plugin that styles `/skill` and `@[file]` inline `<code>` elements
  * inside `<PromptBlock>` MDX JSX nodes without modifying their copied text content.
  */
-export function promptChipsPlugin(): SatteriHastPlugin {
-  return {
-    name: 'prompt-chips',
-    element: {
-      filter: ['code'],
-      visit(node, ctx) {
-        let ancestor: ReturnType<typeof ctx.parent> | undefined = ctx.parent(node);
-        let insidePre = false;
-        let insidePromptBlock = false;
-
-        while (ancestor) {
-          if (ancestor.type === 'element' && ancestor.tagName === 'pre') {
-            insidePre = true;
-            break;
-          }
-          if (
-            (ancestor.type === 'mdxJsxFlowElement' || ancestor.type === 'mdxJsxTextElement') &&
-            ancestor.name === 'PromptBlock'
-          ) {
-            insidePromptBlock = true;
-            break;
-          }
-          ancestor = ctx.parent(ancestor);
-        }
-
-        if (!insidePromptBlock || insidePre) {
-          return;
-        }
-
-        const chipClass = classifyPromptChip(ctx.textContent(node));
-        if (!chipClass) {
-          return;
-        }
-
-        const existing = normalizeClassList(node.properties?.className ?? node.properties?.class);
-        if (!existing.includes(chipClass)) {
-          ctx.setProperty(node, 'className', [...existing, chipClass]);
-        }
-      },
-    },
+export function rehypePromptChips(): (tree: Root) => void {
+  return (tree) => {
+    walkHast(tree, false, false);
   };
 }

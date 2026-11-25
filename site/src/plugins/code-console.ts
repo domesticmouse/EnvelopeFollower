@@ -1,5 +1,6 @@
+import type { Element, ElementContent, Root } from 'hast';
+import { visit } from 'unist-util-visit';
 import { COPY_ICON_DEFS } from '../lib/copy-icons.ts';
-import type { SatteriHastPlugin } from './prompt-chips.ts';
 
 function readClassNames(value: unknown): string[] {
   if (Array.isArray(value)) {
@@ -11,17 +12,14 @@ function readClassNames(value: unknown): string[] {
   return [];
 }
 
-function extractLanguage(preNode: {
-  properties?: Record<string, unknown>;
-  children?: readonly { type?: string; tagName?: string; properties?: Record<string, unknown> }[];
-}): string | null {
+function extractLanguage(preNode: Element): string | null {
   const dataLang = preNode.properties?.dataLanguage ?? preNode.properties?.['data-language'];
   if (typeof dataLang === 'string' && dataLang.trim().length > 0) {
     return dataLang.trim();
   }
 
-  const codeChild = preNode.children?.find(
-    (child) => child.type === 'element' && child.tagName === 'code',
+  const codeChild = preNode.children.find(
+    (child): child is Element => child.type === 'element' && child.tagName === 'code',
   );
   const codeClasses = readClassNames(codeChild?.properties?.className ?? codeChild?.properties?.class);
   const langClass = codeClasses.find((cls) => cls.startsWith('language-'));
@@ -38,128 +36,127 @@ function extractLanguage(preNode: {
 }
 
 /**
- * Sätteri HAST plugin that wraps Shiki fenced code blocks (excluding `mermaid`)
+ * Rehype plugin that wraps Shiki fenced code blocks (excluding `mermaid`)
  * inside a `.code-console` frame with an in-flow `.code-console-head` bar and
  * an Invoker Commands Copy button (`command="--copy"`).
  */
-export function codeConsolePlugin(): SatteriHastPlugin {
-  return () => {
+export function rehypeCodeConsole(): (tree: Root) => void {
+  return (tree) => {
     let blockIndex = 0;
 
-    return {
-      name: 'code-console',
-      element: {
-        filter: ['pre'],
-        visit(node, ctx) {
-          const parent = ctx.parent(node);
-          if (
-            parent?.type === 'element' &&
-            parent.tagName === 'div' &&
-            readClassNames(parent.properties?.className ?? parent.properties?.class).includes(
-              'code-console',
-            )
-          ) {
-            return;
-          }
+    visit(tree, 'element', (node, index, parent) => {
+      if (!parent || index === undefined || node.tagName !== 'pre') {
+        return;
+      }
 
-          const lang = extractLanguage(node);
-          if (!lang || lang.toLowerCase() === 'mermaid') {
-            return;
-          }
+      if (
+        parent.type === 'element' &&
+        parent.tagName === 'div' &&
+        readClassNames(parent.properties?.className ?? parent.properties?.class).includes(
+          'code-console',
+        )
+      ) {
+        return;
+      }
 
-          const existingId = node.properties?.id;
-          const codeId =
-            typeof existingId === 'string' && existingId.length > 0
-              ? existingId
-              : `code-well-${++blockIndex}`;
+      const lang = extractLanguage(node);
+      if (!lang || lang.toLowerCase() === 'mermaid') {
+        return;
+      }
 
-          const preClone = {
-            ...node,
-            properties: {
-              ...(node.properties ?? {}),
-              id: codeId,
-              tabindex: '0',
-            },
-          };
+      const existingId = node.properties?.id;
+      const codeId =
+        typeof existingId === 'string' && existingId.length > 0
+          ? existingId
+          : `code-well-${++blockIndex}`;
 
-          const header = {
-            type: 'element' as const,
-            tagName: 'div',
-            properties: {
-              className: ['code-console-head'],
-              dataPagefindIgnore: '',
-            },
+      const preClone: Element = {
+        ...node,
+        properties: {
+          ...(node.properties ?? {}),
+          id: codeId,
+          tabIndex: 0,
+        },
+      };
+
+      const header: Element = {
+        type: 'element',
+        tagName: 'div',
+        properties: {
+          className: ['code-console-head'],
+          dataPagefindIgnore: '',
+        },
+        children: [
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: { className: ['code-console-lang'] },
+            children: [{ type: 'text', value: lang.toUpperCase() }],
+          },
+          {
+            type: 'element',
+            tagName: 'span',
+            properties: { className: ['prompt-copy-wrap'] },
             children: [
               {
-                type: 'element' as const,
-                tagName: 'span',
-                properties: { className: ['code-console-lang'] },
-                children: [{ type: 'text' as const, value: lang.toUpperCase() }],
-              },
-              {
-                type: 'element' as const,
-                tagName: 'span',
-                properties: { className: ['prompt-copy-wrap'] },
+                type: 'element',
+                tagName: 'button',
+                properties: {
+                  type: 'button',
+                  className: ['prompt-copy-btn', 'code-copy-btn'],
+                  command: '--copy',
+                  commandfor: codeId,
+                  ariaLabel: `Copy ${lang} code`,
+                },
                 children: [
-                  {
-                    type: 'element' as const,
-                    tagName: 'button',
-                    properties: {
-                      type: 'button',
-                      className: ['prompt-copy-btn', 'code-copy-btn'],
-                      command: '--copy',
-                      commandfor: codeId,
-                      ariaLabel: `Copy ${lang} code`,
-                    },
-                    children: [
-                      ...COPY_ICON_DEFS.map((icon) => ({
-                        type: 'element' as const,
-                        tagName: 'svg',
-                        properties: {
-                          className: icon.className.split(' '),
-                          viewBox: '0 0 24 24',
-                          ariaHidden: 'true',
-                          focusable: 'false',
-                        },
-                        children: [
-                          {
-                            type: 'element' as const,
-                            tagName: 'path',
-                            properties: { d: icon.pathD },
-                            children: [],
-                          },
-                        ],
-                      })),
-                      {
-                        type: 'element' as const,
-                        tagName: 'span',
-                        properties: {},
-                        children: [{ type: 'text' as const, value: 'Copy' }],
+                  ...COPY_ICON_DEFS.map(
+                    (icon): ElementContent => ({
+                      type: 'element',
+                      tagName: 'svg',
+                      properties: {
+                        className: icon.className.split(' '),
+                        viewBox: '0 0 24 24',
+                        ariaHidden: 'true',
+                        focusable: 'false',
                       },
-                    ],
-                  },
+                      children: [
+                        {
+                          type: 'element',
+                          tagName: 'path',
+                          properties: { d: icon.pathD },
+                          children: [],
+                        },
+                      ],
+                    }),
+                  ),
                   {
-                    type: 'element' as const,
+                    type: 'element',
                     tagName: 'span',
-                    properties: {
-                      className: ['prompt-copy-tip'],
-                      role: 'status',
-                    },
-                    children: [],
+                    properties: {},
+                    children: [{ type: 'text', value: 'Copy' }],
                   },
                 ],
               },
+              {
+                type: 'element',
+                tagName: 'span',
+                properties: {
+                  className: ['prompt-copy-tip'],
+                  role: 'status',
+                },
+                children: [],
+              },
             ],
-          };
+          },
+        ],
+      };
 
-          ctx.replaceNode(node, {
-            type: 'element',
-            tagName: 'div',
-            properties: { className: ['code-console'] },
-            children: [header, preClone],
-          });
-        },
-      },
-    };
+      parent.children[index] = {
+        type: 'element',
+        tagName: 'div',
+        properties: { className: ['code-console'] },
+        children: [header, preClone],
+      };
+    });
   };
 }

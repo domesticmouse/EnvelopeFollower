@@ -1,12 +1,13 @@
 // @vitest-environment node
-import { satteri } from '@astrojs/markdown-satteri';
+import { unified } from '@astrojs/markdown-remark';
 import { Window } from 'happy-dom';
 import { describe, expect, it } from 'vitest';
-import { classifyPromptChip, promptChipsPlugin } from '../src/plugins/prompt-chips.ts';
+import { classifyPromptChip, rehypePromptChips } from '../src/plugins/prompt-chips.ts';
 
 async function compileMdxSnippet(mdxSource: string): Promise<string> {
-  const processor = satteri({
-    hastPlugins: [promptChipsPlugin()],
+  const processor = unified({
+    gfm: true,
+    rehypePlugins: [rehypePromptChips],
   });
   const renderer = await processor.createMdxRenderer!(
     {
@@ -37,7 +38,7 @@ describe('classifyPromptChip', () => {
   });
 });
 
-describe('promptChipsPlugin', () => {
+describe('rehypePromptChips', () => {
   it('adds .chip-skill and .chip-file inside <PromptBlock> while leaving ordinary inline code neutral', async () => {
     const compiled = await compileMdxSnippet(`
 <PromptBlock title="Test Prompt">

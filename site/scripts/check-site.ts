@@ -6,17 +6,45 @@ import { Window } from 'happy-dom';
 const SITE_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST_DIR = path.join(SITE_DIR, 'dist');
 
-const EXPECTED_PAGES = [
+interface ExpectedPage {
+  file: string;
+  checklistItems: number;
+  expectedChecked: number;
+  expectedCalloutTitleCode?: string;
+  expectedProgress: string;
+  expectedPrevHref?: string;
+  expectedNextHref?: string;
+  expectedPromptStrips: number;
+  expectedCodeConsoles: number;
+  expectMath: boolean;
+  expectMermaid: boolean;
+}
+
+const EXPECTED_PAGES: ExpectedPage[] = [
   {
     file: path.join(DIST_DIR, 'stages/01-hardware-agent-skills/index.html'),
     checklistItems: 0,
     expectedChecked: 0,
-    expectedCalloutTitleCode: undefined,
     expectedProgress: 'PROGRESS · STAGE 01 / 09',
     expectedPrevHref: '/EnvelopeFollower/',
     expectedNextHref: '/EnvelopeFollower/stages/02-sketch-extraction-and-critique/',
     expectedPromptStrips: 1,
     expectedCodeConsoles: 5,
+    expectMath: false,
+    expectMermaid: false,
+  },
+  {
+    file: path.join(DIST_DIR, 'optional/ac-dc-input-coupling/index.html'),
+    checklistItems: 0,
+    expectedChecked: 0,
+    expectedCalloutTitleCode: 'ENV / SKEW',
+    expectedProgress: 'PROGRESS · OPT',
+    expectedPrevHref: '/EnvelopeFollower/stages/09-companion-site-delivery/',
+    expectedNextHref: '/EnvelopeFollower/appendix/netlist-and-bom/',
+    expectedPromptStrips: 0,
+    expectedCodeConsoles: 0,
+    expectMath: true,
+    expectMermaid: true,
   },
   {
     file: path.join(DIST_DIR, 'appendix/netlist-and-bom/index.html'),
@@ -28,6 +56,8 @@ const EXPECTED_PAGES = [
     expectedNextHref: '/EnvelopeFollower/appendix/engineering-sign-off-checklist/',
     expectedPromptStrips: 0,
     expectedCodeConsoles: 1,
+    expectMath: false,
+    expectMermaid: false,
   },
   {
     file: path.join(DIST_DIR, 'appendix/engineering-sign-off-checklist/index.html'),
@@ -38,6 +68,8 @@ const EXPECTED_PAGES = [
     expectedNextHref: undefined,
     expectedPromptStrips: 0,
     expectedCodeConsoles: 0,
+    expectMath: false,
+    expectMermaid: false,
   },
 ];
 
@@ -61,6 +93,15 @@ if (!fs.existsSync(DIST_DIR)) {
   fail(`Missing dist directory at ${DIST_DIR}. Run "npm run build" first.`);
 }
 
+for (const pagefindArtifact of [
+  path.join(DIST_DIR, 'pagefind/pagefind.js'),
+  path.join(DIST_DIR, 'pagefind/pagefind-entry.json'),
+]) {
+  if (!fs.existsSync(pagefindArtifact) || fs.statSync(pagefindArtifact).size === 0) {
+    fail(`Missing or empty Pagefind index artifact: ${pagefindArtifact}`);
+  }
+}
+
 const woff2Files: string[] = [];
 const cssFiles: string[] = [];
 const jsFiles: string[] = [];
@@ -68,6 +109,9 @@ function walk(dir: string): void {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
+      if (entry.name === 'pagefind') {
+        continue;
+      }
       walk(full);
     } else if (entry.name.endsWith('.woff2')) {
       woff2Files.push(entry.name);
@@ -213,6 +257,54 @@ for (const page of EXPECTED_PAGES) {
     );
   }
 
+  if (win.document.querySelectorAll('.katex-error').length > 0) {
+    fail(`Rendered KaTeX parse error (.katex-error) detected in ${page.file}`);
+  }
+
+  const stylesheetLinks = Array.from(
+    win.document.querySelectorAll('link[rel="stylesheet"]'),
+  ).map((el) => el.getAttribute('href') ?? '');
+  const hasKatexCssLink = stylesheetLinks.some((href) => /katex/i.test(href));
+  const scriptSrcs = Array.from(win.document.querySelectorAll('script[src]')).map(
+    (el) => el.getAttribute('src') ?? '',
+  );
+  const hasMermaidScript = scriptSrcs.some((src) => /mermaid/i.test(src));
+
+  if (page.expectMath) {
+    if (!hasKatexCssLink) {
+      fail(`Expected self-hosted KaTeX CSS link on math route ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.katex').length === 0) {
+      fail(`Expected rendered .katex math nodes in ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.katex-display').length === 0) {
+      fail(`Expected rendered .katex-display block in ${page.file}`);
+    }
+  } else {
+    if (hasKatexCssLink) {
+      fail(`Unexpected KaTeX CSS link on non-math route ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.katex').length > 0) {
+      fail(`Unexpected .katex nodes on non-math route ${page.file}`);
+    }
+  }
+
+  if (page.expectMermaid) {
+    if (!hasMermaidScript) {
+      fail(`Expected Mermaid hydrator script on diagram route ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.mermaid-card[data-pagefind-ignore] pre.mermaid').length === 0) {
+      fail(`Expected .mermaid-card[data-pagefind-ignore] pre.mermaid block in ${page.file}`);
+    }
+  } else {
+    if (hasMermaidScript) {
+      fail(`Unexpected Mermaid script on non-diagram route ${page.file}`);
+    }
+    if (win.document.querySelectorAll('.mermaid').length > 0) {
+      fail(`Unexpected .mermaid block on non-diagram route ${page.file}`);
+    }
+  }
+
   const checkboxes = Array.from(win.document.querySelectorAll('article input[type="checkbox"]'));
   if (checkboxes.length !== page.checklistItems) {
     fail(`Expected ${page.checklistItems} checkboxes in ${page.file}, found ${checkboxes.length}`);
@@ -231,5 +323,5 @@ for (const page of EXPECTED_PAGES) {
 }
 
 console.log(
-  `OK: Verified ${EXPECTED_PAGES.length} built tutorial routes, ${woff2Files.length} self-hosted .woff2 assets, and 0 external CSS URLs.`,
+  `OK: Verified ${EXPECTED_PAGES.length} built routes, ${woff2Files.length} self-hosted .woff2 assets, Pagefind index, and 0 external CSS URLs.`,
 );

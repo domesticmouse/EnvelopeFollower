@@ -1,9 +1,13 @@
-import { satteri } from '@astrojs/markdown-satteri';
 import mdx from '@astrojs/mdx';
+import { unified } from '@astrojs/markdown-remark';
 import { defineConfig } from 'astro/config';
-import { codeConsolePlugin } from './src/plugins/code-console.ts';
-import { promptChipsPlugin } from './src/plugins/prompt-chips.ts';
+import rehypeKatex from 'rehype-katex';
+import remarkMath from 'remark-math';
 import { SITE_BASE, SITE_ORIGIN } from './src/lib/routes.ts';
+import { rehypeCodeConsole } from './src/plugins/code-console.ts';
+import { rehypeMermaidBlocks } from './src/plugins/rehype-mermaid.ts';
+import { rehypePromptChips } from './src/plugins/prompt-chips.ts';
+import { remarkPromoteDoubleDollarMath } from './src/plugins/remark-double-dollar-math.ts';
 
 export default defineConfig({
   site: SITE_ORIGIN,
@@ -14,9 +18,6 @@ export default defineConfig({
   },
   integrations: [mdx()],
   markdown: {
-    processor: satteri({
-      hastPlugins: [promptChipsPlugin(), codeConsolePlugin()],
-    }),
     syntaxHighlight: {
       type: 'shiki',
       excludeLangs: ['mermaid'],
@@ -27,5 +28,15 @@ export default defineConfig({
         gitignore: 'plaintext',
       },
     },
+    processor: unified({
+      gfm: true,
+      remarkPlugins: [remarkMath, remarkPromoteDoubleDollarMath],
+      rehypePlugins: [
+        [rehypeKatex, { strict: false }],
+        rehypeMermaidBlocks,
+        rehypePromptChips,
+        rehypeCodeConsole,
+      ],
+    }),
   },
 });
