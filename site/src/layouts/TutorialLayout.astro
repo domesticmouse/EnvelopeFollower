@@ -2,6 +2,7 @@
 import '../styles/fonts.css';
 import '../styles/tokens.css';
 import '../styles/workbench.css';
+import SearchModal from '../components/SearchModal.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import { extractFaceplateMotifs } from '../lib/panel-svg.ts';
@@ -95,6 +96,7 @@ const canonicalHref = new URL(
   SITE_URL,
 ).toString();
 const pageTitle = isOverview ? title : `${title} | ENV / SKEW Build Tutorial`;
+const hasSearchSlot = Astro.slots.has('search-trigger');
 ---
 
 <!doctype html>
@@ -111,9 +113,15 @@ const pageTitle = isOverview ? title : `${title} | ENV / SKEW Build Tutorial`;
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
-    <SiteHeader currentPath={normalizedCurrent}>
-      <slot name="search-trigger" slot="search-trigger" />
-    </SiteHeader>
+    {
+      hasSearchSlot ? (
+        <SiteHeader currentPath={normalizedCurrent}>
+          <slot name="search-trigger" slot="search-trigger" />
+        </SiteHeader>
+      ) : (
+        <SiteHeader currentPath={normalizedCurrent} />
+      )
+    }
 
     <div class="c-shell">
       <aside class="c-rail left-rail" aria-label="Modular curriculum rack" data-pagefind-ignore>
@@ -255,12 +263,15 @@ const pageTitle = isOverview ? title : `${title} | ENV / SKEW Build Tutorial`;
 
     <SiteFooter />
 
+    <SearchModal />
     <slot name="dialogs" />
 
     <script>
+      import { initSearchModal } from '../lib/search-modal.ts';
       import { initTocScrollSpy } from '../lib/toc-scrollspy.ts';
 
       initTocScrollSpy();
+      initSearchModal();
     </script>
     <slot name="scripts" />
   </body>

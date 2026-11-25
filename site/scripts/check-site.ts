@@ -105,6 +105,34 @@ for (const page of EXPECTED_PAGES) {
     fail(`Expected exactly 1 <h1> in ${page.file}, found ${h1s.length}`);
   }
 
+  if (!win.document.querySelector('h1[data-pagefind-body]')) {
+    fail(`Missing h1[data-pagefind-body] indexing boundary in ${page.file}`);
+  }
+  if (!win.document.querySelector('article[data-pagefind-body]')) {
+    fail(`Missing article[data-pagefind-body] indexing boundary in ${page.file}`);
+  }
+  for (const selector of [
+    'header.c-header[data-pagefind-ignore]',
+    'dialog#mobile-nav-drawer[data-pagefind-ignore]',
+    'aside.left-rail[data-pagefind-ignore]',
+    'nav.breadcrumbs[data-pagefind-ignore]',
+    'aside.right-toc[data-pagefind-ignore]',
+    'nav.prev-next-nav[data-pagefind-ignore]',
+    'footer.site-footer[data-pagefind-ignore]',
+    'dialog#site-search-dialog[data-pagefind-ignore]',
+  ]) {
+    if (!win.document.querySelector(selector)) {
+      fail(`Missing expected indexing exclusion "${selector}" in ${page.file}`);
+    }
+  }
+
+  if (!win.document.querySelector('[data-search-trigger]')) {
+    fail(`Missing [data-search-trigger] header button in ${page.file}`);
+  }
+  if (!win.document.querySelector('dialog[data-search-dialog][closedby="any"]')) {
+    fail(`Missing native <dialog data-search-dialog closedby="any"> in ${page.file}`);
+  }
+
   for (const script of Array.from(win.document.querySelectorAll('script'))) {
     if ((script.textContent ?? '').includes('localStorage')) {
       fail(`Forbidden localStorage usage found in inline <script> in ${page.file}`);
