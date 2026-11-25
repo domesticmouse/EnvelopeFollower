@@ -16,11 +16,33 @@ interface ExpectedPage {
   expectedNextHref?: string;
   expectedPromptStrips: number;
   expectedCodeConsoles: number;
+  expectBreadcrumbs?: boolean;
   expectMath: boolean;
+  expectDisplayMath?: boolean;
   expectMermaid: boolean;
+  expectFaceplateSvg?: boolean;
+  expectedFigures?: number;
+  expectedPriorityFigures?: number;
 }
 
 const EXPECTED_PAGES: ExpectedPage[] = [
+  {
+    file: path.join(DIST_DIR, 'index.html'),
+    checklistItems: 0,
+    expectedChecked: 0,
+    expectedProgress: 'PROGRESS · STAGE 00 / 09',
+    expectedPrevHref: undefined,
+    expectedNextHref: '/EnvelopeFollower/stages/01-hardware-agent-skills/',
+    expectedPromptStrips: 0,
+    expectedCodeConsoles: 0,
+    expectBreadcrumbs: false,
+    expectMath: true,
+    expectDisplayMath: false,
+    expectMermaid: true,
+    expectFaceplateSvg: true,
+    expectedFigures: 3,
+    expectedPriorityFigures: 3,
+  },
   {
     file: path.join(DIST_DIR, 'stages/01-hardware-agent-skills/index.html'),
     checklistItems: 0,
@@ -44,6 +66,7 @@ const EXPECTED_PAGES: ExpectedPage[] = [
     expectedPromptStrips: 0,
     expectedCodeConsoles: 0,
     expectMath: true,
+    expectDisplayMath: true,
     expectMermaid: true,
   },
   {
@@ -174,11 +197,12 @@ for (const page of EXPECTED_PAGES) {
     'header.c-header[data-pagefind-ignore]',
     'dialog#mobile-nav-drawer[data-pagefind-ignore]',
     'aside.left-rail[data-pagefind-ignore]',
-    'nav.breadcrumbs[data-pagefind-ignore]',
+    ...(page.expectBreadcrumbs !== false ? ['nav.breadcrumbs[data-pagefind-ignore]'] : []),
     'aside.right-toc[data-pagefind-ignore]',
     'nav.prev-next-nav[data-pagefind-ignore]',
     'footer.site-footer[data-pagefind-ignore]',
     'dialog#site-search-dialog[data-pagefind-ignore]',
+    'dialog#figure-lightbox[data-pagefind-ignore]',
   ]) {
     if (!win.document.querySelector(selector)) {
       fail(`Missing expected indexing exclusion "${selector}" in ${page.file}`);
@@ -191,6 +215,9 @@ for (const page of EXPECTED_PAGES) {
   if (!win.document.querySelector('dialog[data-search-dialog][closedby="any"]')) {
     fail(`Missing native <dialog data-search-dialog closedby="any"> in ${page.file}`);
   }
+  if (!win.document.querySelector('dialog[data-figure-lightbox][closedby="any"]')) {
+    fail(`Missing native <dialog data-figure-lightbox closedby="any"> in ${page.file}`);
+  }
 
   for (const script of Array.from(win.document.querySelectorAll('script'))) {
     if ((script.textContent ?? '').includes('localStorage')) {
@@ -202,6 +229,53 @@ for (const page of EXPECTED_PAGES) {
     const markup = svg.outerHTML;
     if (markup.includes('_03_Registration_Frame') || markup.includes('registration_frame')) {
       fail(`Registration frame leaked into rendered <svg> in ${page.file}`);
+    }
+  }
+
+  if (page.expectFaceplateSvg && !win.document.querySelector('svg.faceplate-svg')) {
+    fail(`Expected assembled 6 HP faceplate SVG (svg.faceplate-svg) in ${page.file}`);
+  }
+
+  if (page.expectedFigures !== undefined) {
+    const figures = win.document.querySelectorAll('article figure.tutorial-figure');
+    if (figures.length !== page.expectedFigures) {
+      fail(
+        `Expected ${page.expectedFigures} <Figure> elements in ${page.file}, found ${figures.length}`,
+      );
+    }
+    const imgs = Array.from(win.document.querySelectorAll('article figure.tutorial-figure img'));
+    if (imgs.length !== page.expectedFigures) {
+      fail(`Expected ${page.expectedFigures} figure <img> tags in ${page.file}, found ${imgs.length}`);
+    }
+    let priorityCount = 0;
+    for (const img of imgs) {
+      const width = Number(img.getAttribute('width'));
+      const height = Number(img.getAttribute('height'));
+      if (!Number.isInteger(width) || width <= 0 || !Number.isInteger(height) || height <= 0) {
+        fail(`Figure <img> missing positive integer width/height in ${page.file}`);
+      }
+      const src = img.getAttribute('src') ?? '';
+      if (!src.startsWith('/EnvelopeFollower/_astro/')) {
+        fail(`Expected Astro-bundled figure src in ${page.file}, got "${src}"`);
+      }
+      const relAsset = src.slice('/EnvelopeFollower/'.length);
+      if (!fs.existsSync(path.join(DIST_DIR, relAsset))) {
+        fail(`Missing built figure image asset ${relAsset} in dist/`);
+      }
+      if (img.getAttribute('fetchpriority') === 'high') {
+        if (img.getAttribute('loading') === 'lazy') {
+          fail(`Priority figure must never pair fetchpriority="high" with loading="lazy" in ${page.file}`);
+        }
+        priorityCount += 1;
+      }
+    }
+    if (
+      page.expectedPriorityFigures !== undefined &&
+      priorityCount !== page.expectedPriorityFigures
+    ) {
+      fail(
+        `Expected ${page.expectedPriorityFigures} priority figures in ${page.file}, found ${priorityCount}`,
+      );
     }
   }
 
@@ -277,7 +351,7 @@ for (const page of EXPECTED_PAGES) {
     if (win.document.querySelectorAll('.katex').length === 0) {
       fail(`Expected rendered .katex math nodes in ${page.file}`);
     }
-    if (win.document.querySelectorAll('.katex-display').length === 0) {
+    if (page.expectDisplayMath && win.document.querySelectorAll('.katex-display').length === 0) {
       fail(`Expected rendered .katex-display block in ${page.file}`);
     }
   } else {
