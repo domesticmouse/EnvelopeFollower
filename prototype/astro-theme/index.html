@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ENV / SKEW Build Tutorial — Astro Theme Prototype</title>
+    <meta name="color-scheme" content="dark" />
+    <script>
+      try {
+        var stored = localStorage.getItem("env-proto-color-scheme");
+        document.querySelector('meta[name="color-scheme"]').content = stored || "dark";
+      } catch (e) {}
+    </script>
+    <link rel="stylesheet" href="./tokens.css" />
+    <link rel="stylesheet" href="./variants.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <div id="app" data-variant="A"></div>
+
+    <dialog id="site-search-dialog" class="search-dialog" closedby="any" aria-labelledby="site-search-title">
+      <div class="search-dialog-shell">
+        <div class="search-dialog-head">
+          <label for="site-search-input" id="site-search-title" class="search-dialog-title">Search Build Tutorial</label>
+          <button type="button" id="search-close-btn" class="search-close-btn" aria-label="Close search">Esc</button>
+        </div>
+        <div class="search-input-wrap">
+          <span aria-hidden="true">⌕</span>
+          <input
+            id="site-search-input"
+            type="text"
+            inputmode="search"
+            class="search-input"
+            placeholder="Search stages, prompts, tools (e.g. SKiDL, silk_layout.json, /wayfinder, TP7)…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+        </div>
+        <p id="search-status" class="search-status" aria-live="polite"></p>
+        <ul id="search-results" class="search-results" role="listbox" aria-label="Search results"></ul>
+      </div>
+    </dialog>
+
+    <dialog id="mobile-nav-drawer" class="nav-drawer" closedby="any" aria-labelledby="mobile-nav-title">
+      <div class="nav-drawer-head">
+        <h2 id="mobile-nav-title" style="margin:0;font-family:var(--font-slab);color:var(--accent-gold);letter-spacing:0.06em;">ENV / SKEW</h2>
+        <button type="button" id="drawer-close-btn" class="search-close-btn" aria-label="Close navigation menu">Close</button>
+      </div>
+      <nav aria-label="Mobile navigation">
+        <ul id="mobile-nav-list" class="nav-drawer-links"></ul>
+      </nav>
+    </dialog>
+
+    <nav id="prototype-switcher" class="proto-switcher" aria-label="Prototype variant switcher"></nav>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
