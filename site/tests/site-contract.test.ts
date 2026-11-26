@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -178,6 +179,29 @@ function buildChecklistHtml(topCount: number, totalCount: number, checkedCount: 
 function writeFile(filePath: string, content: string | Buffer): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content);
+}
+
+function runGit(cwd: string, args: string[]): string {
+  return execFileSync('git', ['-C', cwd, ...args], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    env: {
+      ...process.env,
+      GIT_AUTHOR_NAME: 'Test Author',
+      GIT_AUTHOR_EMAIL: 'test@example.com',
+      GIT_COMMITTER_NAME: 'Test Committer',
+      GIT_COMMITTER_EMAIL: 'test@example.com',
+    },
+  }).trim();
+}
+
+function replacePinShaInFixture(fixture: FixturePaths, oldSha: string, newSha: string): void {
+  const readmePath = path.join(fixture.repoRoot, 'README.md');
+  fs.writeFileSync(readmePath, fs.readFileSync(readmePath, 'utf8').replaceAll(oldSha, newSha));
+  for (const mdxRel of Object.values(ROUTE_TO_MDX)) {
+    const mdxPath = path.join(fixture.mdxDir, mdxRel);
+    fs.writeFileSync(mdxPath, fs.readFileSync(mdxPath, 'utf8').replaceAll(oldSha, newSha));
+  }
 }
 
 interface FixturePaths {
@@ -445,6 +469,30 @@ describe('Build Tutorial site-contract verifier', () => {
     expect(result.errors.some((e) => e.includes('barlow-condensed'))).toBe(true);
   });
 
+  it('Contract Group 1/2: fails on missing <meta name="color-scheme" content="dark"> or <script> inside <main>', () => {
+    const fixture = createValidBuiltFixture();
+    const indexPath = path.join(fixture.distDir, 'index.html');
+    fs.writeFileSync(
+      indexPath,
+      fs.readFileSync(indexPath, 'utf8').replace('<meta name="color-scheme" content="dark" />', ''),
+    );
+
+    const stage1Path = path.join(fixture.distDir, 'stages/01-hardware-agent-skills/index.html');
+    fs.writeFileSync(
+      stage1Path,
+      fs.readFileSync(stage1Path, 'utf8').replace('</article>', '<script>console.log("bad");</script></article>'),
+    );
+
+    const result = verifyBuiltSite({
+      ...fixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+
+    expect(result.errors.some((e) => e.includes('color-scheme') && /\[Group [12]\]/.test(e))).toBe(true);
+    expect(result.errors.some((e) => e.includes('<main>') && e.includes('<script>'))).toBe(true);
+  });
+
   it('Contract Group 3: fails on missing/oversized source images, wrong figure framing, missing lightbox trigger, priority+lazy, and figure count mismatch', () => {
     const fixture = createValidBuiltFixture();
     // Oversize checklist PNG (> 500 KiB) and site WebP (> 250 KiB), delete one base render
@@ -694,5 +742,205 @@ Refers to Optional Branch.
       requirePagefind: true,
     });
     expect(ciFail.errors.some((e) => e.includes('uninitialized'))).toBe(true);
+  });
+
+  it('Contract Group 6: rejects /HEAD/ and /main without subpath while ignoring branch prefixes like /mainline/', () => {
+    for (const badUrl of [
+      'https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/HEAD/README.md',
+      'https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/HEAD',
+      'https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/main',
+    ]) {
+      const fixture = createValidBuiltFixture();
+      fs.appendFileSync(
+        path.join(fixture.mdxDir, 'stages/08-wayfinder-site-planning.mdx'),
+        `\n[Unpinned](${badUrl})\n`,
+      );
+      const result = verifyBuiltSite({
+        ...fixture,
+        requireReference: true,
+        requirePagefind: true,
+      });
+      expect(result.errors.some((e) => e.includes('unpinned'))).toBe(true);
+    }
+
+    const okFixture = createValidBuiltFixture();
+    fs.appendFileSync(
+      path.join(okFixture.mdxDir, 'stages/08-wayfinder-site-planning.mdx'),
+      '\n[Branch](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/mainline/foo)\n',
+    );
+    const okResult = verifyBuiltSite({
+      ...okFixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+    expect(okResult.errors).toEqual([]);
+  });
+
+  it('Contract Group 6: verifies historical and HEAD pinned commit SHAs via git cat-file -t, rejects broken/mismatched/bogus/traversal/empty-blob pins, and enforces README HEAD SHA', () => {
+    const fixture = createValidBuiltFixture();
+    fs.rmSync(fixture.referenceDir, { recursive: true, force: true });
+    fs.mkdirSync(fixture.referenceDir, { recursive: true });
+
+    runGit(fixture.referenceDir, ['init', '-b', 'main']);
+    writeFile(path.join(fixture.referenceDir, 'DesignSpec.md'), '# DesignSpec');
+    writeFile(path.join(fixture.referenceDir, 'patches/README.md'), '# Patches');
+    writeFile(path.join(fixture.referenceDir, 'old-only.md'), '# Historical');
+    runGit(fixture.referenceDir, ['add', '.']);
+    runGit(fixture.referenceDir, ['commit', '-m', 'commit A']);
+    const shaA7 = runGit(fixture.referenceDir, ['rev-parse', '--short=7', 'HEAD']);
+    const shaA40 = runGit(fixture.referenceDir, ['rev-parse', 'HEAD']);
+
+    fs.rmSync(path.join(fixture.referenceDir, 'old-only.md'));
+    writeFile(path.join(fixture.referenceDir, 'new-only.md'), '# Current');
+    runGit(fixture.referenceDir, ['add', '-A']);
+    runGit(fixture.referenceDir, ['commit', '-m', 'commit B']);
+    const shaB7 = runGit(fixture.referenceDir, ['rev-parse', '--short=7', 'HEAD']);
+
+    replacePinShaInFixture(fixture, '8ad81d0', shaB7);
+    const stage8Mdx = path.join(fixture.mdxDir, 'stages/08-wayfinder-site-planning.mdx');
+    fs.appendFileSync(
+      stage8Mdx,
+      `
+[HistoricalFile](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaA7}/old-only.md)
+[FullShaTree](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/${shaA40})
+[HeadTree](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/${shaB7})
+[PatchesDir](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/${shaB7}/patches/)
+[QueryHash](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaB7}/new-only.md?plain=1#L1)
+`,
+    );
+
+    const validResult = verifyBuiltSite({
+      ...fixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+    expect(validResult.errors).toEqual([]);
+
+    // Now inject failures: empty blob, deleted file in commitB, type mismatch, traversal, bogus SHA, stale README
+    fs.appendFileSync(
+      stage8Mdx,
+      `
+[EmptyBlob](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaB7})
+[DeletedInB](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaB7}/old-only.md)
+[WrongKind](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/${shaB7}/new-only.md)
+[Traversal](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaB7}/../outside.txt)
+[BogusSha](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/deadbee/DesignSpec.md)
+`,
+    );
+    const readmePath = path.join(fixture.repoRoot, 'README.md');
+    fs.writeFileSync(
+      readmePath,
+      fs.readFileSync(readmePath, 'utf8').replaceAll(shaB7, shaA7),
+    );
+
+    const failResult = verifyBuiltSite({
+      ...fixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+    expect(failResult.errors.some((e) => e.includes(`blob/${shaB7}`))).toBe(true);
+    expect(failResult.errors.some((e) => e.includes('old-only.md'))).toBe(true);
+    expect(failResult.errors.some((e) => e.includes('new-only.md'))).toBe(true);
+    expect(failResult.errors.some((e) => e.includes('outside.txt'))).toBe(true);
+    expect(failResult.errors.some((e) => e.includes('deadbee'))).toBe(true);
+    expect(failResult.errors.some((e) => e.includes('README.md') && e.includes(shaB7))).toBe(true);
+  });
+
+  it('Contract Group 6: falls back to working tree on shallow clones and synthetic non-git reference/, and detects submodule .git file', () => {
+    // 1. Upstream repo with commitA (old-only.md) -> commitB (DesignSpec.md only)
+    const fixture = createValidBuiltFixture();
+    const upstreamDir = path.join(path.dirname(fixture.repoRoot), 'upstream');
+    fs.mkdirSync(upstreamDir, { recursive: true });
+    runGit(upstreamDir, ['init', '-b', 'main']);
+    writeFile(path.join(upstreamDir, 'DesignSpec.md'), '# DesignSpec');
+    writeFile(path.join(upstreamDir, 'patches/README.md'), '# Patches');
+    writeFile(path.join(upstreamDir, 'old-only.md'), '# Historical');
+    runGit(upstreamDir, ['add', '.']);
+    runGit(upstreamDir, ['commit', '-m', 'commit A']);
+    const shaA7 = runGit(upstreamDir, ['rev-parse', '--short=7', 'HEAD']);
+
+    fs.rmSync(path.join(upstreamDir, 'old-only.md'));
+    runGit(upstreamDir, ['add', '-A']);
+    runGit(upstreamDir, ['commit', '-m', 'commit B']);
+    const shaB7 = runGit(upstreamDir, ['rev-parse', '--short=7', 'HEAD']);
+
+    // Shallow clone (--depth=1 via file://) into referenceDir
+    fs.rmSync(fixture.referenceDir, { recursive: true, force: true });
+    execFileSync('git', ['clone', '--depth=1', `file://${upstreamDir}`, fixture.referenceDir], {
+      stdio: 'ignore',
+    });
+    expect(runGit(fixture.referenceDir, ['rev-parse', '--is-shallow-repository'])).toBe('true');
+
+    replacePinShaInFixture(fixture, '8ad81d0', shaB7);
+    const stage8Mdx = path.join(fixture.mdxDir, 'stages/08-wayfinder-site-planning.mdx');
+    // shaA7 is unknown in shallow history, but DesignSpec.md exists in working tree & tree/<shaA7> is valid
+    fs.appendFileSync(
+      stage8Mdx,
+      `
+[ShallowFallbackFile](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaA7}/DesignSpec.md)
+[ShallowFallbackTree](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/${shaA7})
+`,
+    );
+    const shallowOk = verifyBuiltSite({
+      ...fixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+    expect(shallowOk.errors).toEqual([]);
+
+    // Missing file in working tree under unknown historical SHA still fails in shallow fallback
+    fs.appendFileSync(
+      stage8Mdx,
+      `\n[ShallowMissing](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaA7}/old-only.md)\n`,
+    );
+    const shallowMissing = verifyBuiltSite({
+      ...fixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+    expect(shallowMissing.errors.some((e) => e.includes('old-only.md'))).toBe(true);
+
+    // 2. Submodule-style .git file (gitdir: ...) is recognized as a git checkout
+    const subFixture = createValidBuiltFixture();
+    const realGitDir = path.join(path.dirname(subFixture.repoRoot), 'modules-ref-git');
+    fs.rmSync(subFixture.referenceDir, { recursive: true, force: true });
+    fs.mkdirSync(subFixture.referenceDir, { recursive: true });
+    fs.renameSync(path.join(fixture.referenceDir, '.git'), realGitDir);
+    fs.writeFileSync(path.join(subFixture.referenceDir, '.git'), `gitdir: ${realGitDir}\n`);
+    writeFile(path.join(subFixture.referenceDir, 'DesignSpec.md'), '# DesignSpec');
+    writeFile(path.join(subFixture.referenceDir, 'patches/README.md'), '# Patches');
+    // Intentionally leave 8ad81d0 in README.md (not shaB7) to prove .git file triggers HEAD SHA check
+    const subResult = verifyBuiltSite({
+      ...subFixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+    expect(subResult.errors.some((e) => e.includes('README.md') && e.includes(shaB7))).toBe(true);
+
+    // 3. Synthetic non-git reference/ allows tree/<sha> with empty subpath and rejects blob/<sha> with empty subpath
+    const synthFixture = createValidBuiltFixture();
+    const synthMdx = path.join(synthFixture.mdxDir, 'stages/08-wayfinder-site-planning.mdx');
+    fs.appendFileSync(
+      synthMdx,
+      '\n[SynthTree](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0)\n',
+    );
+    expect(
+      verifyBuiltSite({
+        ...synthFixture,
+        requireReference: true,
+        requirePagefind: true,
+      }).errors,
+    ).toEqual([]);
+
+    fs.appendFileSync(
+      synthMdx,
+      '\n[SynthBlobEmpty](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0)\n',
+    );
+    const synthFail = verifyBuiltSite({
+      ...synthFixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+    expect(synthFail.errors.some((e) => e.includes('blob/8ad81d0'))).toBe(true);
   });
 });
