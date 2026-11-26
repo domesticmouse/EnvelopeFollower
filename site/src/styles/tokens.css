@@ -38,6 +38,8 @@
   --font-body: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
+  --page-max-inline: 1380px;
+
   --focus-ring: 2px solid var(--accent-gold-bright);
   accent-color: var(--accent-gold);
   /* Never transition or animate scrollbar-color */
