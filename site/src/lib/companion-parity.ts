@@ -384,16 +384,22 @@ function checkWorkflowParity(
     return;
   }
 
-  if (siteWorkflow.nodeVersion !== EXPECTED_CI_NODE_VERSION) {
-    errors.push(
-      `[Group 7] .github/workflows/docs.yml node-version must be ${JSON.stringify(EXPECTED_CI_NODE_VERSION)}, got ${JSON.stringify(siteWorkflow.nodeVersion)}`,
-    );
+  for (const [_siteLabel, workflowPath, workflow] of [
+    ['Build Tutorial', '.github/workflows/docs.yml', siteWorkflow],
+    ['Companion Site', 'reference/.github/workflows/deploy-pages.yml', refWorkflow],
+  ] as const) {
+    if (workflow.nodeVersion !== EXPECTED_CI_NODE_VERSION) {
+      errors.push(
+        `[Group 7] ${workflowPath} node-version must be ${JSON.stringify(EXPECTED_CI_NODE_VERSION)}, got ${JSON.stringify(workflow.nodeVersion)}`,
+      );
+    }
+    if (workflow.astroTelemetryDisabled !== EXPECTED_ASTRO_TELEMETRY) {
+      errors.push(
+        `[Group 7] ${workflowPath} ASTRO_TELEMETRY_DISABLED must be ${JSON.stringify(EXPECTED_ASTRO_TELEMETRY)}, got ${JSON.stringify(workflow.astroTelemetryDisabled)}`,
+      );
+    }
   }
-  if (refWorkflow.nodeVersion !== EXPECTED_CI_NODE_VERSION) {
-    errors.push(
-      `[Group 7] reference/.github/workflows/deploy-pages.yml node-version must be ${JSON.stringify(EXPECTED_CI_NODE_VERSION)}, got ${JSON.stringify(refWorkflow.nodeVersion)}`,
-    );
-  }
+
   if (
     siteWorkflow.nodeVersion &&
     refWorkflow.nodeVersion &&
@@ -403,20 +409,10 @@ function checkWorkflowParity(
       `[Group 7] CI workflow node-version mismatch: docs.yml has ${JSON.stringify(siteWorkflow.nodeVersion)}, deploy-pages.yml has ${JSON.stringify(refWorkflow.nodeVersion)}`,
     );
   }
-
-  if (siteWorkflow.astroTelemetryDisabled !== EXPECTED_ASTRO_TELEMETRY) {
-    errors.push(
-      `[Group 7] .github/workflows/docs.yml ASTRO_TELEMETRY_DISABLED must be ${JSON.stringify(EXPECTED_ASTRO_TELEMETRY)}, got ${JSON.stringify(siteWorkflow.astroTelemetryDisabled)}`,
-    );
-  }
-  if (refWorkflow.astroTelemetryDisabled !== EXPECTED_ASTRO_TELEMETRY) {
-    errors.push(
-      `[Group 7] reference/.github/workflows/deploy-pages.yml ASTRO_TELEMETRY_DISABLED must be ${JSON.stringify(EXPECTED_ASTRO_TELEMETRY)}, got ${JSON.stringify(refWorkflow.astroTelemetryDisabled)}`,
-    );
-  }
 }
 
-function isPopulatedDir(dirPath: string): boolean {
+/** Return true if `dirPath` exists on disk as a non-empty directory. */
+export function isPopulatedDir(dirPath: string): boolean {
   return (
     fs.existsSync(dirPath) &&
     fs.statSync(dirPath).isDirectory() &&

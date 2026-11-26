@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Window } from 'happy-dom';
-import { verifyCompanionParity } from './companion-parity.ts';
+import { isPopulatedDir, verifyCompanionParity } from './companion-parity.ts';
 import {
   CANONICAL_ROUTES,
   SITE_BASE,
@@ -1158,7 +1158,9 @@ function createGitReferenceVerifier(referenceDir: string) {
         }
         return;
       }
-      verifyGithubTarget(referenceDir, kind, safeSubpath, relSource, sha, errors);
+      if (!targetExistsOnDisk(referenceDir, kind, safeSubpath)) {
+        errors.push(`[Group 6] ${relSource}: missing target for ${kind}/${sha}/${rawSubpath}`);
+      }
     },
   };
 }
@@ -1279,11 +1281,7 @@ function checkOutboundPinningRepoLinksAndGlossary(
   }
 
   const refVerifier = createGitReferenceVerifier(referenceDir);
-  const refPopulated =
-    fs.existsSync(referenceDir) &&
-    fs.statSync(referenceDir).isDirectory() &&
-    fs.readdirSync(referenceDir).length > 0;
-  if (!refPopulated) {
+  if (!isPopulatedDir(referenceDir)) {
     const msg = `Reference submodule directory is uninitialized/empty (${referenceDir}); skipping pinned target resolution.`;
     if (requireReference) {
       errors.push(`[Group 6] ${msg} (--require-reference / GITHUB_ACTIONS=true)`);
