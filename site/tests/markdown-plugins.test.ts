@@ -121,10 +121,12 @@ describe('rehypeMermaidBlocks', () => {
     expect(scroll.properties?.className).toEqual(['mermaid-scroll']);
     expect(scroll.properties?.tabIndex).toBe(0);
     expect(scroll.properties?.role).toBe('region');
+    expect(scroll.properties?.ariaLabel).toBe('Diagram');
 
     const pre = scroll.children[0] as Element;
     expect(pre.tagName).toBe('pre');
     expect(pre.properties?.className).toEqual(['mermaid']);
+    expect(pre.properties?.dataMermaidLabel).toBeUndefined();
     expect(pre.children[0]).toEqual({ type: 'text', value: 'flowchart LR\n  J1 --> RV1' });
 
     // Running a second pass must not double-wrap
