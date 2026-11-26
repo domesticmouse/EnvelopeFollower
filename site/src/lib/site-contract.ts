@@ -1037,6 +1037,17 @@ function resolveSafeSubpath(
   return relFromBase.replaceAll('\\', '/');
 }
 
+function targetExistsOnDisk(baseRoot: string, kind: string, safeSubpath: string): boolean {
+  if (!safeSubpath) {
+    return kind === 'tree' && fs.existsSync(baseRoot) && fs.statSync(baseRoot).isDirectory();
+  }
+  const target = path.resolve(baseRoot, safeSubpath);
+  return (
+    fs.existsSync(target) &&
+    (kind === 'blob' ? fs.statSync(target).isFile() : fs.statSync(target).isDirectory())
+  );
+}
+
 function verifyGithubTarget(
   baseRoot: string,
   kind: string,
@@ -1049,18 +1060,7 @@ function verifyGithubTarget(
   if (safeSubpath === null) {
     return;
   }
-  if (!safeSubpath) {
-    if (kind === 'tree' && fs.existsSync(baseRoot) && fs.statSync(baseRoot).isDirectory()) {
-      return;
-    }
-    errors.push(`[Group 6] ${relSource}: missing target for ${kind}/${refLabel}/${rawSubpath}`);
-    return;
-  }
-  const target = path.resolve(baseRoot, safeSubpath);
-  const exists =
-    fs.existsSync(target) &&
-    (kind === 'blob' ? fs.statSync(target).isFile() : fs.statSync(target).isDirectory());
-  if (!exists) {
+  if (!targetExistsOnDisk(baseRoot, kind, safeSubpath)) {
     errors.push(`[Group 6] ${relSource}: missing target for ${kind}/${refLabel}/${rawSubpath}`);
   }
 }
@@ -1110,6 +1110,7 @@ function createGitReferenceVerifier(referenceDir: string) {
       rawSubpath: string,
       relSource: string,
       errors: string[],
+      warnings: string[],
     ): void => {
       const safeSubpath = resolveSafeSubpath(
         referenceDir,
@@ -1149,6 +1150,12 @@ function createGitReferenceVerifier(referenceDir: string) {
           );
           return;
         }
+        if (!targetExistsOnDisk(referenceDir, kind, safeSubpath)) {
+          warnings.push(
+            `[Group 6] ${relSource}: shallow reference/ checkout cannot verify unfetched commit ${sha} target ${kind}/${sha}/${rawSubpath}`,
+          );
+        }
+        return;
       }
       verifyGithubTarget(referenceDir, kind, safeSubpath, relSource, sha, errors);
     },
@@ -1286,7 +1293,14 @@ function checkOutboundPinningRepoLinksAndGlossary(
     for (const doc of scanDocs) {
       for (const match of doc.content.matchAll(PINNED_REF_SHA_RE)) {
         if (match[1] && match[2]) {
-          refVerifier.verifyPinnedTarget(match[1], match[2], match[3] ?? '', doc.relPath, errors);
+          refVerifier.verifyPinnedTarget(
+            match[1],
+            match[2],
+            match[3] ?? '',
+            doc.relPath,
+            errors,
+            warnings,
+          );
         }
       }
     }

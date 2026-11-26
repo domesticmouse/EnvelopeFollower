@@ -887,18 +887,49 @@ Refers to Optional Branch.
       requirePagefind: true,
     });
     expect(shallowOk.errors).toEqual([]);
+    expect(shallowOk.warnings).toEqual([]);
 
-    // Missing file in working tree under unknown historical SHA still fails in shallow fallback
+    // Unfetched historical SHA links whose targets are absent from shallow HEAD working tree produce [Group 6] shallow warnings, not errors
     fs.appendFileSync(
       stage8Mdx,
-      `\n[ShallowMissing](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaA7}/old-only.md)\n`,
+      `
+[ShallowMissingFile](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaA7}/old-only.md)
+[ShallowMissingDir](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/${shaA7}/prototype/visual-design-system)
+`,
     );
-    const shallowMissing = verifyBuiltSite({
+    const shallowUnfetchedMissing = verifyBuiltSite({
       ...fixture,
       requireReference: true,
       requirePagefind: true,
     });
-    expect(shallowMissing.errors.some((e) => e.includes('old-only.md'))).toBe(true);
+    expect(shallowUnfetchedMissing.errors).toEqual([]);
+    expect(
+      shallowUnfetchedMissing.warnings.some(
+        (w) => w.includes('[Group 6]') && w.includes('shallow') && w.includes('old-only.md'),
+      ),
+    ).toBe(true);
+    expect(
+      shallowUnfetchedMissing.warnings.some(
+        (w) =>
+          w.includes('[Group 6]') &&
+          w.includes('shallow') &&
+          w.includes('prototype/visual-design-system'),
+      ),
+    ).toBe(true);
+
+    // Broken link on shallow HEAD commit (commitB) still errors via git cat-file -t
+    fs.appendFileSync(
+      stage8Mdx,
+      `\n[ShallowHeadBroken](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/${shaB7}/old-only.md)\n`,
+    );
+    const shallowHeadBroken = verifyBuiltSite({
+      ...fixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+    expect(
+      shallowHeadBroken.errors.some((e) => e.includes('[Group 6]') && e.includes('old-only.md')),
+    ).toBe(true);
 
     // 2. Submodule-style .git file (gitdir: ...) is recognized as a git checkout
     const subFixture = createValidBuiltFixture();
@@ -934,7 +965,11 @@ Refers to Optional Branch.
 
     fs.appendFileSync(
       synthMdx,
-      '\n[SynthBlobEmpty](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0)\n',
+      `
+[SynthBlobEmpty](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0)
+[SynthMissingFile](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/missing-target.md)
+[SynthMissingDir](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0/missing-dir)
+`,
     );
     const synthFail = verifyBuiltSite({
       ...synthFixture,
@@ -942,5 +977,8 @@ Refers to Optional Branch.
       requirePagefind: true,
     });
     expect(synthFail.errors.some((e) => e.includes('blob/8ad81d0'))).toBe(true);
+    expect(synthFail.errors.some((e) => e.includes('missing-target.md'))).toBe(true);
+    expect(synthFail.errors.some((e) => e.includes('missing-dir'))).toBe(true);
+    expect(synthFail.warnings).toEqual([]);
   });
 });
