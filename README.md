@@ -83,6 +83,7 @@ EnvelopeFollower/
 ├── .agents/skills/                        # Agent skills (agy-brain-explorer + mattpocock/skills suite)
 ├── .github/workflows/docs.yml             # Node.js 24 build, verifier & GitHub Pages deploy
 ├── EnvelopeFollower.webp                  # Original Hagiwo Sketch reference image
+├── EVENT_ANNOUNCEMENT.md                  # Reusable announcement copy for live coding events
 ├── PotentialImprovements.md               # Standalone note on DC-coupled FWR bypass
 ├── skills-lock.json                       # Pinned upstream skill versions
 └── LICENSE                                # Apache License 2.0
@@ -121,6 +122,12 @@ npm run typecheck && npm test && npm run build && npm run check -- --require-ref
   - Tutorial adaptation map: [Adapt EnvelopeFollower Tutorial Docs to Updated ENV / SKEW Reference Repo (`#4`)](https://github.com/domesticmouse/EnvelopeFollower/issues/4)
   - Immutable historical snapshot: All `13` tutorial MDX pages, [`PotentialImprovements.md`](PotentialImprovements.md), and [`docs/research/reference-github-trail.md`](docs/research/reference-github-trail.md) remain anchored to [`8ad81d0`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0) ([`PR #32`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/pull/32)).
 - **Standalone Notes:** See [`PotentialImprovements.md`](PotentialImprovements.md) for the original Hagiwo-RefDes `SW1`-across-`C1` analysis and [`site/src/content/tutorial/optional/ac-dc-input-coupling.mdx`](site/src/content/tutorial/optional/ac-dc-input-coupling.mdx) ([live page](https://domesticmouse.github.io/EnvelopeFollower/optional/ac-dc-input-coupling/)) for its `ENV / SKEW` translation (`SW3` across `C7`).
+
+---
+
+## Running a Live Event
+
+Hosting a workshop or live coding event based on this **Build Tutorial**? See [`EVENT_ANNOUNCEMENT.md`](EVENT_ANNOUNCEMENT.md) for reusable announcement copy linking to both the live **Build Tutorial** and the **Companion Site**.
 
 ---
 
