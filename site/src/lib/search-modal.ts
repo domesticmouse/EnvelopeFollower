@@ -381,15 +381,20 @@ export function initSearchModal(options: SearchModalOptions = {}): () => void {
       } else if (event.key === 'ArrowUp') {
         event.preventDefault();
         updateSelection(activeIndex - 1);
-      } else if (event.key === 'Enter' && activeIndex >= 0) {
-        const selectedLink = resultsEl.querySelectorAll<HTMLAnchorElement>('[data-search-result] a')[
-          activeIndex
-        ];
-        if (selectedLink) {
-          event.preventDefault();
-          const href = selectedLink.getAttribute('href') ?? selectedLink.href;
-          dialog.close();
-          navigate(href);
+      } else if (event.key === 'Enter') {
+        if (event.isComposing || event.keyCode === 229) {
+          return;
+        }
+        if (activeIndex >= 0) {
+          const selectedLink = resultsEl.querySelectorAll<HTMLAnchorElement>('[data-search-result] a')[
+            activeIndex
+          ];
+          if (selectedLink) {
+            event.preventDefault();
+            const href = selectedLink.getAttribute('href') ?? selectedLink.href;
+            dialog.close();
+            navigate(href);
+          }
         }
       }
     },

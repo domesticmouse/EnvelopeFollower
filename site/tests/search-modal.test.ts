@@ -327,4 +327,71 @@ describe('initSearchModal — debounce, safe <mark> excerpts & keyboard navigati
       win.close();
     }
   });
+
+  it('ignores Enter while IME composition is active (isComposing or keyCode 229) and navigates on subsequent Enter', async () => {
+    const { win, doc, dialog } = setupSearchDom();
+    const navigate = vi.fn<(url: string) => void>();
+
+    const loadPagefind = vi.fn<() => Promise<PagefindApi>>(async () => ({
+      search: async () => ({
+        results: [
+          {
+            data: async () => ({
+              url: '/EnvelopeFollower/stages/04-skidl-and-schematic/',
+              meta: { title: 'Stage 04: SKiDL & Schematic' },
+              excerpt: 'Run <mark>SKiDL</mark> check.',
+            }),
+          },
+        ],
+      }),
+    }));
+
+    const cleanup = initSearchModal({ root: doc, loadPagefind, debounceMs: 0, navigate });
+    try {
+      doc.querySelector<HTMLButtonElement>('[data-search-trigger]')!.click();
+      await Promise.resolve();
+      await Promise.resolve();
+
+      const input = doc.querySelector<HTMLInputElement>('[data-search-input]')!;
+      input.value = 'SKiDL';
+      input.dispatchEvent(new win.Event('input', { bubbles: true }) as unknown as Event);
+      await new Promise((r) => setTimeout(r, 15));
+
+      expect(dialog.hasAttribute('open')).toBe(true);
+      expect(doc.querySelectorAll('[data-search-result]')).toHaveLength(1);
+
+      const composingEvent = new win.KeyboardEvent('keydown', {
+        key: 'Enter',
+        isComposing: true,
+        bubbles: true,
+      });
+      input.dispatchEvent(composingEvent as unknown as Event);
+      expect(dialog.hasAttribute('open')).toBe(true);
+      expect(navigate).not.toHaveBeenCalled();
+
+      const keyCode229Event = new win.KeyboardEvent('keydown', {
+        key: 'Enter',
+        keyCode: 229,
+        bubbles: true,
+      });
+      if (keyCode229Event.keyCode !== 229) {
+        Object.defineProperty(keyCode229Event, 'keyCode', { value: 229 });
+      }
+      input.dispatchEvent(keyCode229Event as unknown as Event);
+      expect(dialog.hasAttribute('open')).toBe(true);
+      expect(navigate).not.toHaveBeenCalled();
+
+      input.dispatchEvent(
+        new win.KeyboardEvent('keydown', { key: 'Enter', bubbles: true }) as unknown as Event,
+      );
+      expect(dialog.hasAttribute('open')).toBe(false);
+      expect(navigate).toHaveBeenCalledTimes(1);
+      expect(navigate).toHaveBeenCalledWith(
+        '/EnvelopeFollower/stages/04-skidl-and-schematic/',
+      );
+    } finally {
+      cleanup();
+      win.close();
+    }
+  });
 });
