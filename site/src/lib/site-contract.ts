@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Window } from 'happy-dom';
@@ -291,9 +292,10 @@ function hasMixedLrSubgraphCrossEdges(diagram: string): boolean {
   return false;
 }
 
-const UNPINNED_MAIN_RE = /EnvelopeFollowerWithSkewLimiter\/(?:blob|tree)\/main\//;
-const PINNED_8AD81D0_RE =
-  /https:\/\/github\.com\/domesticmouse\/EnvelopeFollowerWithSkewLimiter\/(blob|tree)\/8ad81d0\/([^\s)"'>]+)/g;
+const UNPINNED_MAIN_RE =
+  /EnvelopeFollowerWithSkewLimiter\/(?:blob|tree)\/(?:main|HEAD)(?:\/|(?=["')\s>#?]|$))/;
+const PINNED_REF_SHA_RE =
+  /https:\/\/github\.com\/domesticmouse\/EnvelopeFollowerWithSkewLimiter\/(blob|tree)\/([0-9a-f]{7,40})(?:\/([^\s)"'>]*))?(?=["')\s>#?]|$)/g;
 const LOCAL_MAIN_RE =
   /https:\/\/github\.com\/domesticmouse\/EnvelopeFollower\/(blob|tree)\/main\/([^\s)"'>]+)/g;
 const MD_LINK_RE = /!?\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
@@ -447,6 +449,9 @@ function checkPagefindBoundariesAndDialogs(
   doc: Document,
   errors: string[],
 ): void {
+  if (!doc.querySelector('head meta[name="color-scheme"][content="dark"]')) {
+    errors.push(`[Group 1] ${route}: missing <meta name="color-scheme" content="dark"> in <head>`);
+  }
   const h1Count = doc.querySelectorAll('h1').length;
   if (h1Count !== 1) {
     errors.push(`[Group 1] ${route}: expected exactly 1 <h1>, found ${h1Count}`);
@@ -559,6 +564,13 @@ function checkRouteLinksAssetsAndScripts(
     if (/^\s*import\s+(?:[\w*{]|['"])/m.test(inlineCode)) {
       errors.push(`[Group 2] ${route}: unbundled inline ESM import in <script> without src`);
     }
+  }
+
+  const mainScripts = doc.querySelectorAll('main script');
+  if (mainScripts.length > 0) {
+    errors.push(
+      `[Group 2] ${route}: found ${mainScripts.length} <script> element(s) inside <main>`,
+    );
   }
 
   for (const img of doc.querySelectorAll('img')) {
@@ -993,6 +1005,38 @@ function checkKatexMermaidAndAppendix(
   }
 }
 
+function normalizeGithubSubpath(rawSubpath: string): string {
+  const withoutHash = rawSubpath.split('#')[0] ?? '';
+  const withoutQuery = withoutHash.split('?')[0] ?? '';
+  return safeDecodeURIComponent(withoutQuery).replace(/\/+$/, '');
+}
+
+function resolveSafeSubpath(
+  baseRoot: string,
+  kind: string,
+  refLabel: string,
+  rawSubpath: string,
+  relSource: string,
+  errors: string[],
+): string | null {
+  const subpath = normalizeGithubSubpath(rawSubpath);
+  if (!subpath) {
+    return '';
+  }
+  const target = path.resolve(baseRoot, subpath);
+  const relFromBase = path.relative(baseRoot, target);
+  if (
+    subpath.startsWith('/') ||
+    subpath.split('/').includes('..') ||
+    relFromBase.startsWith('..') ||
+    path.isAbsolute(relFromBase)
+  ) {
+    errors.push(`[Group 6] ${relSource}: ${kind}/${refLabel}/${rawSubpath} escapes target root`);
+    return null;
+  }
+  return relFromBase.replaceAll('\\', '/');
+}
+
 function verifyGithubTarget(
   baseRoot: string,
   kind: string,
@@ -1001,19 +1045,114 @@ function verifyGithubTarget(
   refLabel: string,
   errors: string[],
 ): void {
-  const subpath = safeDecodeURIComponent(rawSubpath.split('#')[0] ?? '').replace(/\/+$/, '');
-  const target = path.resolve(baseRoot, subpath);
-  const relFromBase = path.relative(baseRoot, target);
-  if (relFromBase.startsWith('..') || path.isAbsolute(relFromBase)) {
-    errors.push(`[Group 6] ${relSource}: ${kind}/${refLabel}/${rawSubpath} escapes target root`);
+  const safeSubpath = resolveSafeSubpath(baseRoot, kind, refLabel, rawSubpath, relSource, errors);
+  if (safeSubpath === null) {
     return;
   }
+  if (!safeSubpath) {
+    if (kind === 'tree' && fs.existsSync(baseRoot) && fs.statSync(baseRoot).isDirectory()) {
+      return;
+    }
+    errors.push(`[Group 6] ${relSource}: missing target for ${kind}/${refLabel}/${rawSubpath}`);
+    return;
+  }
+  const target = path.resolve(baseRoot, safeSubpath);
   const exists =
     fs.existsSync(target) &&
     (kind === 'blob' ? fs.statSync(target).isFile() : fs.statSync(target).isDirectory());
   if (!exists) {
     errors.push(`[Group 6] ${relSource}: missing target for ${kind}/${refLabel}/${rawSubpath}`);
   }
+}
+
+function isGitCheckout(referenceDir: string): boolean {
+  return fs.existsSync(path.join(referenceDir, '.git'));
+}
+
+function createGitReferenceVerifier(referenceDir: string) {
+  const gitCheckout = isGitCheckout(referenceDir);
+  const objectTypeCache = new Map<string, string | null>();
+  let shallowCache: boolean | null = null;
+
+  const runGit = (args: string[]): string | null => {
+    try {
+      return execFileSync('git', ['-C', referenceDir, ...args], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+      }).trim();
+    } catch {
+      return null;
+    }
+  };
+
+  const catFileType = (objectSpec: string): string | null => {
+    if (objectTypeCache.has(objectSpec)) {
+      return objectTypeCache.get(objectSpec) ?? null;
+    }
+    const result = runGit(['cat-file', '-t', objectSpec]);
+    objectTypeCache.set(objectSpec, result);
+    return result;
+  };
+
+  const isShallow = (): boolean => {
+    if (shallowCache === null) {
+      shallowCache = runGit(['rev-parse', '--is-shallow-repository']) === 'true';
+    }
+    return shallowCache;
+  };
+
+  return {
+    isGitCheckout: gitCheckout,
+    headShortSha: (): string | null => (gitCheckout ? runGit(['rev-parse', '--short=7', 'HEAD']) : null),
+    verifyPinnedTarget: (
+      kind: string,
+      sha: string,
+      rawSubpath: string,
+      relSource: string,
+      errors: string[],
+    ): void => {
+      const safeSubpath = resolveSafeSubpath(
+        referenceDir,
+        kind,
+        sha,
+        rawSubpath,
+        relSource,
+        errors,
+      );
+      if (safeSubpath === null) {
+        return;
+      }
+      if (!safeSubpath && kind === 'blob') {
+        errors.push(`[Group 6] ${relSource}: blob/${sha} requires a file subpath`);
+        return;
+      }
+      if (gitCheckout) {
+        const shaType = catFileType(sha);
+        if (shaType === 'commit') {
+          if (!safeSubpath) {
+            if (kind !== 'tree') {
+              errors.push(`[Group 6] ${relSource}: ${kind}/${sha} requires a subpath`);
+            }
+            return;
+          }
+          const entryType = catFileType(`${sha}:${safeSubpath}`);
+          if (entryType !== kind) {
+            errors.push(
+              `[Group 6] ${relSource}: missing or mismatched ${kind} target for ${kind}/${sha}/${rawSubpath} (git object type: ${entryType ?? 'missing'})`,
+            );
+          }
+          return;
+        }
+        if (!isShallow()) {
+          errors.push(
+            `[Group 6] ${relSource}: unresolvable commit SHA ${sha} for ${kind}/${sha}${rawSubpath ? `/${rawSubpath}` : ''}`,
+          );
+          return;
+        }
+      }
+      verifyGithubTarget(referenceDir, kind, safeSubpath, relSource, sha, errors);
+    },
+  };
 }
 
 function checkRootDocLinks(
@@ -1118,7 +1257,7 @@ function checkOutboundPinningRepoLinksAndGlossary(
   for (const doc of scanDocs) {
     if (UNPINNED_MAIN_RE.test(doc.content)) {
       errors.push(
-        `[Group 6] ${doc.relPath}: contains unpinned EnvelopeFollowerWithSkewLimiter/{blob,tree}/main/ link`,
+        `[Group 6] ${doc.relPath}: contains unpinned EnvelopeFollowerWithSkewLimiter/{blob,tree}/{main,HEAD} link`,
       );
     }
     if (doc.content.includes('TutorialUpdateTodo.md')) {
@@ -1131,12 +1270,13 @@ function checkOutboundPinningRepoLinksAndGlossary(
     }
   }
 
+  const refVerifier = createGitReferenceVerifier(referenceDir);
   const refPopulated =
     fs.existsSync(referenceDir) &&
     fs.statSync(referenceDir).isDirectory() &&
     fs.readdirSync(referenceDir).length > 0;
   if (!refPopulated) {
-    const msg = `Reference submodule directory is uninitialized/empty (${referenceDir}); skipping 8ad81d0 target resolution.`;
+    const msg = `Reference submodule directory is uninitialized/empty (${referenceDir}); skipping pinned target resolution.`;
     if (requireReference) {
       errors.push(`[Group 6] ${msg} (--require-reference / GITHUB_ACTIONS=true)`);
     } else {
@@ -1144,9 +1284,9 @@ function checkOutboundPinningRepoLinksAndGlossary(
     }
   } else {
     for (const doc of scanDocs) {
-      for (const match of doc.content.matchAll(PINNED_8AD81D0_RE)) {
+      for (const match of doc.content.matchAll(PINNED_REF_SHA_RE)) {
         if (match[1] && match[2]) {
-          verifyGithubTarget(referenceDir, match[1], match[2], doc.relPath, '8ad81d0', errors);
+          refVerifier.verifyPinnedTarget(match[1], match[2], match[3] ?? '', doc.relPath, errors);
         }
       }
     }
@@ -1159,9 +1299,20 @@ function checkOutboundPinningRepoLinksAndGlossary(
   if (!fs.existsSync(readmePath) || !fs.statSync(readmePath).isFile()) {
     errors.push('[Group 6] Missing root README.md');
   } else {
+    const readmeContent = fs.readFileSync(readmePath, 'utf8');
     checkRootDocLinks(repoRoot, readmePath, distDir, parsedDocs, errors);
-    if (fs.readFileSync(readmePath, 'utf8').includes('analysis/capability_mode.json')) {
+    if (readmeContent.includes('analysis/capability_mode.json')) {
       errors.push('[Group 6] README.md still references analysis/capability_mode.json');
+    }
+    if (refVerifier.isGitCheckout) {
+      const headShortSha = refVerifier.headShortSha();
+      if (!headShortSha) {
+        errors.push(`[Group 6] Unable to resolve HEAD short SHA in ${referenceDir}`);
+      } else if (!readmeContent.includes(headShortSha)) {
+        errors.push(
+          `[Group 6] README.md does not reference current reference/ HEAD SHA (${headShortSha})`,
+        );
+      }
     }
   }
 
