@@ -116,7 +116,7 @@ describe('lazy client-side Mermaid hydration module', () => {
 
     const initialize = vi.fn();
     const render = vi.fn(async () => {
-      throw new Error('Syntax error in diagram');
+      throw new Error('Syntax error in text');
     });
     const loadMermaid = vi.fn(async () => ({ initialize, render }));
 
