@@ -4,6 +4,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
+import {
+  LOCKED_CORE_TOKENS,
+  SHARED_BYTE_IDENTICAL_FILES,
+} from '../src/lib/companion-parity.ts';
 import { CANONICAL_ROUTES, SITE_BASE } from '../src/lib/routes.ts';
 import { verifyBuiltSite } from '../src/lib/site-contract.ts';
 
@@ -212,6 +216,107 @@ interface FixturePaths {
   referenceDir: string;
 }
 
+const MINIMAL_PARITY_TOKENS_BODY = LOCKED_CORE_TOKENS.map((key) => {
+  if (key === 'color-scheme') return '  color-scheme: dark;';
+  if (key === 'accent-color') return '  accent-color: var(--accent-gold);';
+  if (key === 'scrollbar-color') return '  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);';
+  if (key === '--focus-ring') return '  --focus-ring: 2px solid var(--accent-gold-bright);';
+  return `  ${key}: #141518;`;
+}).join('\n');
+
+const MINIMAL_SHARED_DEPS = {
+  '@astrojs/markdown-remark': '^7.3.10',
+  '@fontsource/barlow-condensed': '^5.3.0',
+  '@fontsource/ibm-plex-mono': '^5.3.0',
+  '@fontsource/ibm-plex-sans': '^5.3.0',
+  '@fontsource/space-grotesk': '^5.3.0',
+  astro: '^7.4.13',
+  'github-slugger': '^2.0.0',
+  'invokers-polyfill': '^1.0.5',
+  katex: '^0.19.1',
+  mermaid: '^12.3.0',
+  'rehype-katex': '^7.0.1',
+  'remark-math': '^6.0.0',
+  'unist-util-visit': '^5.2.0',
+};
+
+const MINIMAL_SHARED_DEV_DEPS = {
+  '@astrojs/check': '^0.9.12',
+  '@types/hast': '^3.0.5',
+  '@types/mdast': '^4.0.4',
+  '@types/node': '^24.0.0',
+  'happy-dom': '^21.0.4',
+  pagefind: '^1.6.0',
+  typescript: '^5.9.3',
+  vitest: '^5.1.1',
+};
+
+function populateSiteParityFiles(repoRoot: string): void {
+  const siteDir = path.join(repoRoot, 'site');
+  writeFile(
+    path.join(siteDir, 'package.json'),
+    JSON.stringify(
+      {
+        name: 'env-skew-build-tutorial',
+        private: true,
+        engines: { node: '>=24.0.0' },
+        dependencies: { ...MINIMAL_SHARED_DEPS, '@astrojs/mdx': '^8.1.6' },
+        devDependencies: { ...MINIMAL_SHARED_DEV_DEPS },
+      },
+      null,
+      2,
+    ),
+  );
+  for (const relPath of SHARED_BYTE_IDENTICAL_FILES) {
+    writeFile(path.join(siteDir, relPath), `// shared ${relPath}\n`);
+  }
+  writeFile(
+    path.join(siteDir, 'src/styles/tokens.css'),
+    `:root {\n${MINIMAL_PARITY_TOKENS_BODY}\n  --accent-gold-link: #d8b154;\n  --page-max-inline: 1380px;\n}\n`,
+  );
+  writeFile(
+    path.join(repoRoot, '.github/workflows/docs.yml'),
+    "jobs:\n  build:\n    env:\n      ASTRO_TELEMETRY_DISABLED: '1'\n    steps:\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '24'\n",
+  );
+}
+
+function populateReferenceParityFiles(referenceDir: string): void {
+  const refSiteDir = path.join(referenceDir, 'site');
+  writeFile(
+    path.join(refSiteDir, 'package.json'),
+    JSON.stringify(
+      {
+        name: 'env-skew-site',
+        private: true,
+        engines: { node: '>=24.0.0' },
+        dependencies: { ...MINIMAL_SHARED_DEPS },
+        devDependencies: {
+          ...MINIMAL_SHARED_DEV_DEPS,
+          'rehype-raw': '^7.0.0',
+          'rehype-stringify': '^10.0.1',
+          'remark-gfm': '^4.0.1',
+          'remark-parse': '^11.0.0',
+          'remark-rehype': '^11.1.2',
+          unified: '^11.0.5',
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  for (const relPath of SHARED_BYTE_IDENTICAL_FILES) {
+    writeFile(path.join(refSiteDir, relPath), `// shared ${relPath}\n`);
+  }
+  writeFile(
+    path.join(refSiteDir, 'src/styles/tokens.css'),
+    `:root {\n${MINIMAL_PARITY_TOKENS_BODY}\n  --led-dark: #c5cad4;\n  --led-dark-bg: #1e2128;\n  --page-max-inline: 1200px;\n}\n`,
+  );
+  writeFile(
+    path.join(referenceDir, '.github/workflows/deploy-pages.yml'),
+    "jobs:\n  build:\n    env:\n      ASTRO_TELEMETRY_DISABLED: '1'\n    steps:\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '24'\n",
+  );
+}
+
 function createValidBuiltFixture(): FixturePaths {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'env-skew-tutorial-contract-'));
   tempDirs.push(root);
@@ -244,9 +349,11 @@ function createValidBuiltFixture(): FixturePaths {
     writeFile(path.join(distDir, `_astro/${stem}.full.png`), Buffer.from('png'));
   }
 
-  // Reference submodule pinned targets + repo root files
+  // Reference submodule pinned targets + repo root files + companion parity files
   writeFile(path.join(referenceDir, 'DesignSpec.md'), '# DesignSpec');
   writeFile(path.join(referenceDir, 'patches/README.md'), '# Patches');
+  populateSiteParityFiles(repoRoot);
+  populateReferenceParityFiles(referenceDir);
   writeFile(path.join(repoRoot, 'GLOSSARY.md'), '# Glossary');
   writeFile(path.join(repoRoot, 'prompts/README.md'), '# Session Traces');
   writeFile(
@@ -734,14 +841,16 @@ Refers to Optional Branch.
       requirePagefind: true,
     });
     expect(localWarn.errors).toEqual([]);
-    expect(localWarn.warnings.some((w) => w.includes('uninitialized'))).toBe(true);
+    expect(localWarn.warnings.some((w) => w.includes('[Group 6]') && w.includes('uninitialized'))).toBe(true);
+    expect(localWarn.warnings.some((w) => w.includes('[Group 7]') && w.includes('uninitialized'))).toBe(true);
 
     const ciFail = verifyBuiltSite({
       ...fixture,
       requireReference: true,
       requirePagefind: true,
     });
-    expect(ciFail.errors.some((e) => e.includes('uninitialized'))).toBe(true);
+    expect(ciFail.errors.some((e) => e.includes('[Group 6]') && e.includes('uninitialized'))).toBe(true);
+    expect(ciFail.errors.some((e) => e.includes('[Group 7]') && e.includes('uninitialized'))).toBe(true);
   });
 
   it('Contract Group 6: rejects /HEAD/ and /main without subpath while ignoring branch prefixes like /mainline/', () => {
@@ -785,6 +894,7 @@ Refers to Optional Branch.
     writeFile(path.join(fixture.referenceDir, 'DesignSpec.md'), '# DesignSpec');
     writeFile(path.join(fixture.referenceDir, 'patches/README.md'), '# Patches');
     writeFile(path.join(fixture.referenceDir, 'old-only.md'), '# Historical');
+    populateReferenceParityFiles(fixture.referenceDir);
     runGit(fixture.referenceDir, ['add', '.']);
     runGit(fixture.referenceDir, ['commit', '-m', 'commit A']);
     const shaA7 = runGit(fixture.referenceDir, ['rev-parse', '--short=7', 'HEAD']);
@@ -855,6 +965,7 @@ Refers to Optional Branch.
     writeFile(path.join(upstreamDir, 'DesignSpec.md'), '# DesignSpec');
     writeFile(path.join(upstreamDir, 'patches/README.md'), '# Patches');
     writeFile(path.join(upstreamDir, 'old-only.md'), '# Historical');
+    populateReferenceParityFiles(upstreamDir);
     runGit(upstreamDir, ['add', '.']);
     runGit(upstreamDir, ['commit', '-m', 'commit A']);
     const shaA7 = runGit(upstreamDir, ['rev-parse', '--short=7', 'HEAD']);
@@ -940,6 +1051,7 @@ Refers to Optional Branch.
     fs.writeFileSync(path.join(subFixture.referenceDir, '.git'), `gitdir: ${realGitDir}\n`);
     writeFile(path.join(subFixture.referenceDir, 'DesignSpec.md'), '# DesignSpec');
     writeFile(path.join(subFixture.referenceDir, 'patches/README.md'), '# Patches');
+    populateReferenceParityFiles(subFixture.referenceDir);
     // Intentionally leave 8ad81d0 in README.md (not shaB7) to prove .git file triggers HEAD SHA check
     const subResult = verifyBuiltSite({
       ...subFixture,
@@ -980,5 +1092,23 @@ Refers to Optional Branch.
     expect(synthFail.errors.some((e) => e.includes('missing-target.md'))).toBe(true);
     expect(synthFail.errors.some((e) => e.includes('missing-dir'))).toBe(true);
     expect(synthFail.warnings).toEqual([]);
+  });
+
+  it('Contract Group 7: fails when Companion Site shared files, tokens.css, package.json, or CI workflows drift', () => {
+    const fixture = createValidBuiltFixture();
+    fs.appendFileSync(path.join(fixture.repoRoot, 'site/src/lib/dialog-chrome.ts'), '\n// drift\n');
+    fs.writeFileSync(
+      path.join(fixture.repoRoot, '.github/workflows/docs.yml'),
+      "jobs:\n  build:\n    steps:\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n",
+    );
+
+    const result = verifyBuiltSite({
+      ...fixture,
+      requireReference: true,
+      requirePagefind: true,
+    });
+
+    expect(result.errors.some((e) => e.startsWith('[Group 7]') && e.includes('dialog-chrome.ts'))).toBe(true);
+    expect(result.errors.some((e) => e.startsWith('[Group 7]') && e.includes('node-version'))).toBe(true);
   });
 });

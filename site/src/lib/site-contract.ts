@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Window } from 'happy-dom';
+import { verifyCompanionParity } from './companion-parity.ts';
 import {
   CANONICAL_ROUTES,
   SITE_BASE,
@@ -1376,7 +1377,7 @@ function checkOutboundPinningRepoLinksAndGlossary(
   }
 }
 
-/** Verify built Astro output and repository contract invariants across all 6 contract groups. */
+/** Verify built Astro output and repository contract invariants across all 7 contract groups. */
 export function verifyBuiltSite(options: VerifyBuiltSiteOptions): SiteContractResult {
   const distDir = path.resolve(options.distDir);
   const repoRoot = path.resolve(options.repoRoot);
@@ -1471,6 +1472,13 @@ export function verifyBuiltSite(options: VerifyBuiltSiteOptions): SiteContractRe
       errors,
       warnings,
     );
+    const companionParity = verifyCompanionParity({
+      repoRoot,
+      referenceDir,
+      requireReference,
+    });
+    errors.push(...companionParity.errors);
+    warnings.push(...companionParity.warnings);
   } finally {
     for (const { win } of parsedDocs.values()) {
       win.close();
