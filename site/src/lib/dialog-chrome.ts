@@ -25,7 +25,7 @@ function setTriggersExpanded(doc: Document, dialogId: string, expanded: boolean)
   }
 }
 
-/** Safely open a native `<dialog>` modal with `open` attribute fallback in limited test DOMs. */
+/** Safely opens a native `<dialog>` modal with `open` attribute fallback in limited test DOMs. */
 export function showModalSafe(dialog: HTMLDialogElement): void {
   if (typeof dialog.showModal === 'function') {
     try {
@@ -42,14 +42,16 @@ export function showModalSafe(dialog: HTMLDialogElement): void {
 }
 
 /**
- * Attach Safari `closedby="any"` press-and-release outside backdrop dismissal to a `<dialog>`.
+ * Attaches Safari `closedby="any"` press-and-release outside backdrop dismissal to a `<dialog>`.
  * Requires both pointerdown and pointerup outside bounds so drag-selections ending outside don't dismiss.
  */
 export function wireBackdropLightDismiss(
   dialog: HTMLDialogElement,
   signal?: AbortSignal,
 ): void {
-  if (dialog.getAttribute('closedby') !== 'any') {
+  const supportsClosedBy =
+    typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
+  if (supportsClosedBy || dialog.getAttribute('closedby') !== 'any') {
     return;
   }
 
@@ -81,7 +83,7 @@ export function wireBackdropLightDismiss(
 }
 
 /**
- * Wire accessible modal `<dialog>` returnValue cleanup, aria-expanded sync,
+ * Wire accessible modal <dialog> returnValue cleanup, aria-expanded sync,
  * conditional invokers-polyfill loading, and Safari closedby="any" light-dismiss fallback.
  */
 export function initDialogChrome(
@@ -107,7 +109,6 @@ export function initDialogChrome(
       }
       setTriggersExpanded(doc, dialog.id, false);
     });
-
     dialog.addEventListener('command', () => {
       queueMicrotask(() => {
         setTriggersExpanded(doc, dialog.id, dialog.open);

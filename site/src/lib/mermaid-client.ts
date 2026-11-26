@@ -90,8 +90,9 @@ export async function hydrateMermaidDiagrams(
       const container = ownerDoc.createElement('div');
       container.className = 'mermaid mermaid-svg';
       container.setAttribute('data-mermaid-rendered', 'true');
+      const label = block.getAttribute('data-mermaid-label')?.trim() || 'Diagram';
       container.setAttribute('role', 'img');
-      container.setAttribute('aria-label', 'Circuit signal flow diagram');
+      container.setAttribute('aria-label', label);
       container.innerHTML = svg;
       block.replaceWith(container);
       renderedCount += 1;

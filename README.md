@@ -5,7 +5,7 @@ An end-to-end, interactive human-in-the-loop engineering tutorial documenting th
 > **Cross-Site Orientation:**
 > - **Live Build Tutorial (this repository):** **[domesticmouse.github.io/EnvelopeFollower](https://domesticmouse.github.io/EnvelopeFollower/)** *(or read from [`site/src/content/tutorial/index.mdx`](site/src/content/tutorial/index.mdx) / serve locally with Astro Core on Node.js `24`)*
 > - **Live `ENV / SKEW` Companion Site:** **[domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/)** *(interactive **Patch Guides**, `211`-step **Build Checklists**, hardware showcase, and **Reference Specs**)*
-> - **Hardware Source Repository:** [`domesticmouse/EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter) (pinned in `reference/` at [`8ad81d0`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0))
+> - **Hardware Source Repository:** [`domesticmouse/EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter) (pinned in `reference/` at [`164f50f`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/164f50f))
 
 <table align="center">
   <tr>
@@ -22,14 +22,16 @@ An end-to-end, interactive human-in-the-loop engineering tutorial documenting th
 
 ---
 
-## Companion Reference Hardware & Companion Site (`8ad81d0`)
+## Companion Reference Hardware & Companion Site (`164f50f`)
 
-Every netlist rule, KiCad script, verification gate, manufacturing pack, **Build Checklist**, **Patch Guide**, and **Companion Site** workflow in this tutorial traces directly to [`domesticmouse/EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter) (`reference/` @ [`8ad81d0`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0)):
+Every netlist rule, KiCad script, verification gate, manufacturing pack, **Build Checklist**, **Patch Guide**, and **Companion Site** workflow in this tutorial traces directly to [`domesticmouse/EnvelopeFollowerWithSkewLimiter`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter) (`reference/` @ [`164f50f`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/164f50f)):
 
-- **6 HP Dual-Mode Hardware (`ENV / SKEW`):** Combines AC-coupled **Envelope Follower Mode** (`IN`, `J1`) and normal-broken DC-coupled **Asymmetric Skew Limiter Mode** (`SLEW IN`, `J2`) around `2× TL074HIDR` (`80` netlist components, `83` PCB footprints across `48` active nets): `50` Bottom-Side Economic SMDs across `17` rows in [`jlcpcb_bom.csv`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/jlcpcb_bom.csv) (`3` Extended SKUs), `18` manual through-hole parts in [`bom/ibom.html`](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/bom/ibom.html), and `12` DNP Keystone test points (`TP1`–`TP12`).
-- **Mated 3U Front Panel & Fabrication Packs:** Generated via `--blank-front` (`generate_eurorack_panel.py`), styled in Dark Techno / Brutalist Matte Black + White `F.SilkS` + ENIG Gold `F.Mask` with `vectorcraft-cli` (`40 px/mm` clearance audit), fractured via `SHAPE_POLY_SET` into KiCad 10, and bundled with dual-board Gerbers and CPL in [`manufacturing/`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0/manufacturing).
-- **Post-`4a02c46` Hardware Deliverables (`8ad81d0`):** Adds `81` deterministic visual **Build Checklist** PNGs (`pcba_alignment`, `hand_assembly`, `board_bringup`) backing [`checklists/`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0/checklists), a real-world parts substitution record ([`tayda-1000489380.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/manufacturing/orders/tayda-1000489380.md)), and `8` musical **Patch Guides** ([`patches/`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0/patches)) completing the `20`-file single-source hardware corpus.
+- **6 HP Dual-Mode Hardware (`ENV / SKEW`):** Combines AC-coupled **Envelope Follower Mode** (`IN`, `J1`) and normal-broken DC-coupled **Asymmetric Skew Limiter Mode** (`SLEW IN`, `J2`) around `2× TL074HIDR` (`80` netlist components, `83` PCB footprints across `48` active nets): `50` Bottom-Side Economic SMDs across `17` rows in [`jlcpcb_bom.csv`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/164f50f/jlcpcb_bom.csv) (`3` Extended SKUs), `18` manual through-hole parts in [`bom/ibom.html`](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/bom/ibom.html), and `12` DNP Keystone test points (`TP1`–`TP12`).
+- **Mated 3U Front Panel & Fabrication Packs:** Generated via `--blank-front` (`generate_eurorack_panel.py`), styled in Dark Techno / Brutalist Matte Black + White `F.SilkS` + ENIG Gold `F.Mask` with `vectorcraft-cli` (`40 px/mm` clearance audit), fractured via `SHAPE_POLY_SET` into KiCad 10, and bundled with dual-board Gerbers and CPL in [`manufacturing/`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/164f50f/manufacturing).
+- **Post-`4a02c46` Hardware Deliverables (`164f50f`):** Adds `81` deterministic visual **Build Checklist** PNGs (`pcba_alignment`, `hand_assembly`, `board_bringup`) backing [`checklists/`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/164f50f/checklists), a real-world parts substitution record ([`tayda-1000489380.md`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/164f50f/manufacturing/orders/tayda-1000489380.md)), and `8` musical **Patch Guides** ([`patches/`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/164f50f/patches)) completing the `20`-file single-source hardware corpus.
 - **25-Route Astro Core Companion Site:** Planned with `mattpocock/skills` and `/wayfinder` (`GLOSSARY.md`, `ADR 0001`, throwaway UI prototypes) and published as the live [**`ENV / SKEW` Companion Site**](https://domesticmouse.github.io/EnvelopeFollowerWithSkewLimiter/), compiling the `20` unmodified root Markdown files into `25` routes with `97` allowlisted **Static Passthroughs**, Pagefind search, Native Web Components, and `211`-step `localStorage` checklists.
+
+> **Dual-Tier Submodule Pin ([`ADR 0002`](docs/adr/0002-copy-aligned-site-parity-and-dual-tier-submodule-pin.md)):** `reference/` and this **Living Context Map** track the live aligned **Companion Site** HEAD ([`164f50f`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/164f50f)). All `13` tutorial MDX pages under `site/src/content/tutorial/`, [`PotentialImprovements.md`](PotentialImprovements.md), and [`docs/research/reference-github-trail.md`](docs/research/reference-github-trail.md) remain anchored to [`8ad81d0`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0) as the immutable **Decision Trail** snapshot ([`PR #32`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/pull/32)).
 
 ---
 
@@ -73,11 +75,11 @@ EnvelopeFollower/
 │   │   └── styles/                        # Self-hosted @fontsource/* imports, tokens & workbench CSS
 │   └── tests/                             # Vitest + happy-dom unit & contract suites
 ├── docs/                                  # Internal repo governance & engineering records (excluded from site)
-│   ├── adr/                               # Architecture Decision Records (`0001-astro-core-mdx-tutorial-site.md`)
+│   ├── adr/                               # Architecture Decision Records (0001 MDX site, 0002 parity & dual-tier pin)
 │   ├── agents/                            # Agent workflow contracts (issue tracker, triage labels, domain)
 │   └── research/                          # Primary-source research notes
 ├── prompts/                               # 16 pre-Wayfinder hardware Session Traces (01–16) + README.md
-├── reference/                             # Git submodule -> domesticmouse/EnvelopeFollowerWithSkewLimiter (8ad81d0)
+├── reference/                             # Git submodule -> domesticmouse/EnvelopeFollowerWithSkewLimiter (164f50f)
 ├── .agents/skills/                        # Agent skills (agy-brain-explorer + mattpocock/skills suite)
 ├── .github/workflows/docs.yml             # Node.js 24 build, verifier & GitHub Pages deploy
 ├── EnvelopeFollower.webp                  # Original Hagiwo Sketch reference image
@@ -113,9 +115,11 @@ npm run typecheck && npm test && npm run build && npm run check -- --require-ref
 - **Decision Trail (Public GitHub Record):** Stages 8–9 and this tutorial adaptation follow the public GitHub record:
   - Hardware planning map: [ENV / SKEW GitHub Pages Site & README Overhaul (`#4`)](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/issues/4)
   - Hardware implementation spec: [ENV / SKEW GitHub Pages Site & README Overhaul — Implementation Specification (`#17`)](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/issues/17)
-  - Single-source site architecture: [`ADR 0001` — Astro Core Single-Source Site](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/8ad81d0/docs/adr/0001-astro-core-single-source-site.md)
+  - Single-source site architecture: [`ADR 0001` — Astro Core Single-Source Site](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/blob/164f50f/docs/adr/0001-astro-core-single-source-site.md)
   - Tutorial site architecture: [`ADR 0001` — Astro Core in `site/` with Relocated MDX Content Collections](docs/adr/0001-astro-core-mdx-tutorial-site.md)
+  - Copy-aligned site parity & submodule pin policy: [`ADR 0002` — Copy-Aligned Site Parity and Dual-Tier Submodule Pin](docs/adr/0002-copy-aligned-site-parity-and-dual-tier-submodule-pin.md)
   - Tutorial adaptation map: [Adapt EnvelopeFollower Tutorial Docs to Updated ENV / SKEW Reference Repo (`#4`)](https://github.com/domesticmouse/EnvelopeFollower/issues/4)
+  - Immutable historical snapshot: All `13` tutorial MDX pages, [`PotentialImprovements.md`](PotentialImprovements.md), and [`docs/research/reference-github-trail.md`](docs/research/reference-github-trail.md) remain anchored to [`8ad81d0`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/tree/8ad81d0) ([`PR #32`](https://github.com/domesticmouse/EnvelopeFollowerWithSkewLimiter/pull/32)).
 - **Standalone Notes:** See [`PotentialImprovements.md`](PotentialImprovements.md) for the original Hagiwo-RefDes `SW1`-across-`C1` analysis and [`site/src/content/tutorial/optional/ac-dc-input-coupling.mdx`](site/src/content/tutorial/optional/ac-dc-input-coupling.mdx) ([live page](https://domesticmouse.github.io/EnvelopeFollower/optional/ac-dc-input-coupling/)) for its `ENV / SKEW` translation (`SW3` across `C7`).
 
 ---

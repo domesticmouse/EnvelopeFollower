@@ -62,7 +62,7 @@ export function rehypeMermaidBlocks(): (tree: Root) => void {
               className: ['mermaid-scroll'],
               tabIndex: 0,
               role: 'region',
-              ariaLabel: 'Signal flow diagram',
+              ariaLabel: 'Diagram',
             },
             [h('pre', { className: ['mermaid'] }, [{ type: 'text', value: diagramSource }])],
           ),
