@@ -139,7 +139,7 @@ a:hover {
 }
 
 .c-telemetry-inner {
-  max-inline-size: 1380px;
+  max-inline-size: var(--page-max-inline);
   margin-inline: auto;
   padding: 0.32rem 1.25rem;
   display: flex;
@@ -169,7 +169,7 @@ a:hover {
 }
 
 .c-header-inner {
-  max-inline-size: 1380px;
+  max-inline-size: var(--page-max-inline);
   margin-inline: auto;
   padding: 0.55rem 1.25rem;
   display: flex;
@@ -620,7 +620,7 @@ dialog.search-dialog[open] {
  * ============================================================================ */
 .c-shell {
   inline-size: 100%;
-  max-inline-size: 1380px;
+  max-inline-size: var(--page-max-inline);
   margin-inline: auto;
   padding: 1.35rem 1.25rem 3rem;
   display: grid;
@@ -1942,7 +1942,7 @@ dialog.figure-lightbox[open] {
 }
 
 .site-footer-inner {
-  max-inline-size: 1380px;
+  max-inline-size: var(--page-max-inline);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -2223,6 +2223,13 @@ dialog.figure-lightbox[open] {
     --accent-gold-tint: #f0f0f0;
     --border-ui: #111111;
     --border-subtle: #888888;
+    --border-grid: #888888;
+    --led-green: #000000;
+    --led-green-bg: #ffffff;
+    --led-red: #000000;
+    --led-red-bg: #ffffff;
+    --led-amber: #000000;
+    --led-amber-bg: #ffffff;
   }
 
   .c-telemetry,
